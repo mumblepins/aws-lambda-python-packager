@@ -1,0 +1,116 @@
+exclude: ^(buildspec.yml|.pre-commit-config.yaml)$
+fail_fast: true
+repos:
+  - repo: https://github.com/mumblepins/pre-commit-poetry
+    rev: v0.0.3
+    hooks:
+      - id: pre_commit_poetry
+  - repo: https://github.com/pre-commit/mirrors-isort
+    rev: v5.10.1
+    hooks:
+      - id: isort
+  - repo: https://github.com/ambv/black
+    rev: 22.3.0
+    hooks:
+      - id: black
+        language_version: python3.9
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.1.0
+    hooks:
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-executables-have-shebangs
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-shebang-scripts-are-executable
+      - id: check-toml
+      - id: check-yaml
+      - id: detect-aws-credentials
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: fix-encoding-pragma
+      - id: mixed-line-ending
+        args:
+          - --fix=auto
+      - id: pretty-format-json
+        args:
+          - --autofix
+          - --indent=4
+          - --no-sort-keys
+        exclude: "[inputs.json|syntax_error.json]"
+      - id: trailing-whitespace
+  - repo: https://github.com/pycqa/flake8
+    rev: 4.0.1
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - flake8-bugbear>=19.3.0
+          - flake8-builtins>=1.4.1
+          - flake8-commas>=2.0.0
+          - flake8-comprehensions>=2.1.0
+          - flake8-debugger>=3.1.0
+          - flake8-pep3101>=1.2.1
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.9.0
+    hooks:
+      - id: python-check-blanket-noqa
+      - id: python-check-mock-methods
+      - id: python-no-log-warn
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.4
+    hooks:
+      - id: bandit
+        files: "^src/"
+  - repo: https://github.com/domdfcoding/flake2lint
+    rev: v0.4.1
+    hooks:
+      - id: flake2lint
+  - repo: https://github.com/mumblepins/dep_checker
+    rev: v0.6.3
+    hooks:
+      - id: dep_checker
+        args:
+          - -dsrc
+          - python_template_repo
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: mypy
+        language: system
+        pass_filenames: false
+        args: [ "--config-file", "pyproject.toml","--no-incremental" ]
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [ python ]
+        args:
+          [
+            "-rn", # Only display messages
+            "-sn", # Don't display the score
+          ]
+      - id: pytest-local
+        name: pytest-local
+        description: Run pytest in the local virtualenv
+        # although we mock SDK calls, credentials must be set, otherwise the credential-checking code
+        # in boto_helpers.py fails. this probably needs fixing properly in future.
+        # on the other hand, this means that accidentally exported creds aren't honoured when running
+        # tests, also a good thing
+        entry: >
+          env AWS_ACCESS_KEY_ID=""
+          AWS_SECRET_ACCESS_KEY=""
+          AWS_SESSION_TOKEN=""
+          AWS_DEFAULT_REGION="us-east-1"
+          pytest
+          "tests/"
+          --verbose
+          --cov=python_template_repo
+          --pyargs "python_template_repo"
+        #          --doctest-modules
+        #          --random-order-bucket="parent"
+        language: system
+        # ignore all files, run on hard-coded modules instead
+        pass_filenames: false
+        always_run: true

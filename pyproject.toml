@@ -1,0 +1,88 @@
+[tool.poetry]
+name = "python-template-repo"
+version = "0.0.1"
+description = "Description"
+authors = ["Daniel Sullivan <mumblepins@users.noreply.github.com>"]
+license = "LGPL-3.0-or-later"
+repository = "https://github.com/mumblepins/python-template-repo/"
+documentation = "https://mumblepins.github.io/python-template-repo/"
+readme = "README.md"
+packages = [{ include = "python_template_repo", from="src" }]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+
+[tool.poetry.group.dev.dependencies]
+pylint = "^2.13.0"
+pytest = "^7.1.1"
+coverage = "^6.3.2"
+pre-commit = "^2.15.0"
+Sphinx = "^4.4"
+sphinx-rtd-theme = "^1.0"
+mypy = "^0.942"
+pytest-cov = "^3.0.0"
+pylint-pytest = "^1.1.2"
+
+[tool.poetry.extras]
+
+[build-system]
+requires = ["poetry-core>=1.1.0a7"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+skip_gitignore = true
+line_length = 88
+indent = "    "
+multi_line_output = 3
+default_section = "FIRSTPARTY"
+skip = "env"
+include_trailing_comma = true
+combine_as_imports = true
+force_grid_wrap = 0
+
+[tool.black]
+line-length = 160
+include = '\.pyi?$'
+target-version = ['py39']
+exclude = '''
+/(
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | \.cache
+  | env
+  | venv
+  | \.aws-sam
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+
+
+[tool.mypy]
+files = 'src/**/*.py'
+exclude = '''(?x)(
+      \.eggs
+    | \.git          # root of the project
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | \.cache
+  | env
+  | venv
+  | \.aws-sam
+  | _build
+  | buck-out
+  | build
+  | dist
+  | package_
+)'''

@@ -1,0 +1,17 @@
+[run]
+branch = True
+
+[report]
+show_missing = True
+fail_under = 90
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if self.debug:
+    if settings.DEBUG
+    if .*? == .DEBUG.
+    if .*? == .INFO.
+    raise AssertionError
+    raise NotImplementedError
+    if 0:
+    if __name__ == .__main__.:
