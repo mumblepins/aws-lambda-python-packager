@@ -1,16 +1,18 @@
 [tool.poetry]
-name = "python-template-repo"
+name = "aws-lambda-python-packager"
 version = "0.0.1"
 description = "Description"
 authors = ["Daniel Sullivan <mumblepins@users.noreply.github.com>"]
 license = "LGPL-3.0-or-later"
-repository = "https://github.com/mumblepins/python-template-repo/"
-documentation = "https://mumblepins.github.io/python-template-repo/"
+repository = "https://github.com/mumblepins/aws-lambda-python-packager/"
+documentation = "https://mumblepins.github.io/aws-lambda-python-packager/"
 readme = "README.md"
-packages = [{ include = "python_template_repo", from="src" }]
+packages = [{ include = "aws_lambda_python_packager", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.7"
+poetry = { version = "^1.2.0a2", allow-prereleases = true }
+requests = "^2.27.1"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -23,6 +25,7 @@ sphinx-rtd-theme = "^1.0"
 mypy = "^0.942"
 pytest-cov = "^3.0.0"
 pylint-pytest = "^1.1.2"
+types-requests = "^2.27.19"
 
 [tool.poetry.extras]
 
@@ -45,7 +48,7 @@ force_grid_wrap = 0
 [tool.black]
 line-length = 160
 include = '\.pyi?$'
-target-version = ['py39']
+target-version = ['py38', 'py39', 'py310']
 exclude = '''
 /(
       \.eggs         # exclude a few common directories in the
@@ -86,3 +89,8 @@ exclude = '''(?x)(
   | dist
   | package_
 )'''
+
+
+[[tool.mypy.overrides]]
+module = "poetry.core.*"
+ignore_missing_imports = true

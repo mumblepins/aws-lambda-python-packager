@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "test-package"
+version = "0.1.0"
+description = "Test Package"
+authors = ["Daniel Sullivan <mumblepins@users.noreply.github.com>"]
+packages = [{ include = 'test_package' }]
+
+
+[tool.poetry.dependencies]
+python = "3.9.*"
+awswrangler = "*"
+boto3 = "1.20.32"
+
+
+[build-system]
+requires = ["poetry-core>=1.1.0a7", ]
+build-backend = "poetry.core.masonry.api"

@@ -16,7 +16,7 @@ repos:
         language_version: python3.9
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.1.0
+    rev: v4.2.0
     hooks:
       - id: check-case-conflict
       - id: check-docstring-first
@@ -72,7 +72,7 @@ repos:
       - id: dep_checker
         args:
           - -dsrc
-          - python_template_repo
+          - aws_lambda_python_packager
   - repo: local
     hooks:
       - id: mypy
@@ -106,8 +106,8 @@ repos:
           pytest
           "tests/"
           --verbose
-          --cov=python_template_repo
-          --pyargs "python_template_repo"
+          --cov=aws_lambda_python_packager
+          --pyargs "aws_lambda_python_packager"
         #          --doctest-modules
         #          --random-order-bucket="parent"
         language: system
