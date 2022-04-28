@@ -37,7 +37,8 @@ jobs:
 
       - uses: pre-commit/action@v2.0.3
       - name: run tests
-        run: poetry run pytest "tests/" \
+        run: |
+          poetry run pytest "tests/" \
           --verbose -n2 \
           --cov=aws_lambda_python_packager \
           --pyargs "aws_lambda_python_packager" \
