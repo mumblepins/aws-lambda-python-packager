@@ -76,11 +76,13 @@ repos:
         name: mypy
         entry: mypy
         language: system
+        stages: [manual]
         pass_filenames: false
         args: [ "--config-file", "pyproject.toml","--no-incremental" ]
       - id: pylint
         name: pylint
         entry: pylint
+        stages: [manual]
         language: system
         types: [ python ]
         args:
@@ -90,6 +92,7 @@ repos:
           ]
       - id: pytest-local
         name: pytest-local
+        stages: [manual]
         description: Run pytest in the local virtualenv
         # although we mock SDK calls, credentials must be set, otherwise the credential-checking code
         # in boto_helpers.py fails. this probably needs fixing properly in future.
