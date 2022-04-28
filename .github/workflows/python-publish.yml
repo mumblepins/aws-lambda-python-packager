@@ -42,17 +42,9 @@ jobs:
           --cov=aws_lambda_python_packager \
           --pyargs "aws_lambda_python_packager" \
           --cov-report=html --cov-report=term --cov-report=xml
-
-      - uses: actions/checkout@master
       - uses: codecov/codecov-action@v2
         with:
-          #          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
           files: ./coverage.xml
-  #            flags: unittests # optional
-  #            name: codecov-umbrella # optional
-  #            fail_ci_if_error: true # optional (default = false)
-  #            verbose: true # optional (default = false)
-
   deploy:
     needs:
       - pre_job
