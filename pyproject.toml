@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aws-lambda-python-packager"
-version = "0.1.0"
+version = "0.1.1"
 description = "Description"
 authors = ["Daniel Sullivan <mumblepins@users.noreply.github.com>"]
 license = "LGPL-3.0-or-later"
@@ -16,11 +16,13 @@ lambda-packager = "aws_lambda_python_packager.cli:main"
 python = "^3.7"
 poetry = { version = "^1.2.0a2", allow-prereleases = true }
 requests = "^2.27.1"
+python-certifi-win32 = { version = "^1.6", markers = "platform_system == 'Windows'" }
 
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.13.0"
 pytest = "^7.1.1"
+
 coverage = "^6.3.2"
 pre-commit = "^2.15.0"
 Sphinx = "^4.4"
@@ -97,3 +99,7 @@ exclude = '''(?x)(
 [[tool.mypy.overrides]]
 module = "poetry.core.*"
 ignore_missing_imports = true
+
+
+[tool.dep_checker]
+allowed_unused = ["python_certifi_win32"]

@@ -95,15 +95,7 @@ repos:
         name: pytest-local
         stages: [manual]
         description: Run pytest in the local virtualenv
-        # although we mock SDK calls, credentials must be set, otherwise the credential-checking code
-        # in boto_helpers.py fails. this probably needs fixing properly in future.
-        # on the other hand, this means that accidentally exported creds aren't honoured when running
-        # tests, also a good thing
         entry: >
-          env AWS_ACCESS_KEY_ID=""
-          AWS_SECRET_ACCESS_KEY=""
-          AWS_SESSION_TOKEN=""
-          AWS_DEFAULT_REGION="us-east-1"
           pytest
           -n 4
           "tests/"

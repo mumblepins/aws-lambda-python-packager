@@ -10,6 +10,7 @@ import io
 import logging
 import os
 import re
+import shutil
 import subprocess  # nosec B404
 import sys
 import tempfile
@@ -106,8 +107,12 @@ class LambdaPackager:
         self.update_pyproject = update_pyproject
         self.ignore_packages = ignore_packages
         self.packages_to_ignore, self.packages_to_ignore_dict = get_packages_to_ignore(region, architecture, python_version)
-        self._chngenv = partial(chgenv, POETRY_VIRTUALENVS_CREATE="false")
+        self._poetry_env_dir = tempfile.mkdtemp()
+        self._chngenv = partial(chgenv, POETRY_VIRTUALENVS_CREATE="true", POETRY_VIRTUALENVS_IN_PROJECT="false", POETRY_VIRTUALENVS_PATH=self._poetry_env_dir)
         self._chdir = partial(chdir, self.pyproject_path)
+
+    def __del__(self):
+        shutil.rmtree(self._poetry_env_dir, ignore_errors=True)
 
     def _run_cmd(self, *args, **kwargs):
         _kwargs = {

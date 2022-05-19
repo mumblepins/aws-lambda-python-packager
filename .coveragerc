@@ -1,5 +1,7 @@
 [run]
 branch = False
+concurrency = multiprocessing
+parallel = true
 
 [report]
 show_missing = True
