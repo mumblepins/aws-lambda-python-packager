@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aws_lambda_python_packager.lambda_packager &mdash; aws-lambda-python-packager v0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> aws-lambda-python-packager
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">aws_lambda_python_packager</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">aws-lambda-python-packager</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>aws_lambda_python_packager.lambda_packager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aws_lambda_python_packager.lambda_packager</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">AWS Lambda Packager</span>
+
+<span class="sd">This script is used to package the lambda function code into a zip file.</span>
+<span class="sd">It is an alternative to `sam build` and uses poetry to manage dependencies.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>  <span class="c1"># nosec B404</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">PathLike</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">NamedTemporaryFile</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">IO</span><span class="p">,</span>
+    <span class="n">List</span><span class="p">,</span>
+    <span class="n">Optional</span><span class="p">,</span>
+    <span class="n">Union</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">poetry.core.masonry.api</span> <span class="kn">import</span> <span class="n">build_sdist</span>
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">PLATFORMS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">&quot;x86_64&quot;</span><span class="p">,</span> <span class="s2">&quot;python3.7&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;x86_64&quot;</span><span class="p">,</span> <span class="s2">&quot;python3.9&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;x86_64&quot;</span><span class="p">,</span> <span class="s2">&quot;python3.8&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;arm64&quot;</span><span class="p">,</span> <span class="s2">&quot;python3.9&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;arm64&quot;</span><span class="p">,</span> <span class="s2">&quot;python3.8&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="c1"># From https://github.com/mumblepins/aws-get-lambda-python-pkg-versions</span>
+<span class="n">PACKAGE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/mumblepins/aws-get-lambda-python-pkg-versions/main/</span><span class="si">{region}</span><span class="s2">-</span><span class="si">{python_version}</span><span class="s2">-</span><span class="si">{architecture}</span><span class="s2">.json&quot;</span>
+
+
+<div class="viewcode-block" id="get_packages_to_ignore"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.get_packages_to_ignore">[docs]</a><span class="k">def</span> <span class="nf">get_packages_to_ignore</span><span class="p">(</span><span class="n">region</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">architecture</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">python_version</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">PACKAGE_URL</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="n">region</span><span class="p">,</span> <span class="n">architecture</span><span class="o">=</span><span class="n">architecture</span><span class="p">,</span> <span class="n">python_version</span><span class="o">=</span><span class="n">python_version</span><span class="p">))</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="n">pkgs_to_ignore</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">==</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+    <span class="n">pkgs_to_ignore_dict</span> <span class="o">=</span> <span class="n">data</span>
+    <span class="k">return</span> <span class="n">pkgs_to_ignore</span><span class="p">,</span> <span class="n">pkgs_to_ignore_dict</span></div>
+
+
+<div class="viewcode-block" id="chdir"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.chdir">[docs]</a><span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">chdir</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">):</span>
+    <span class="n">old_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">old_dir</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="chgenv"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.chgenv">[docs]</a><span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">chgenv</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">old_env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">old_env</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LambdaPackager"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager">[docs]</a><span class="k">class</span> <span class="nc">LambdaPackager</span><span class="p">:</span>
+
+    <span class="c1"># pylint: disable=too-many-instance-attributes</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pyproject_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PathLike</span><span class="p">],</span>
+        <span class="n">python_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;python3.9&quot;</span><span class="p">,</span>
+        <span class="n">architecture</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;x86_64&quot;</span><span class="p">,</span>
+        <span class="n">region</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;us-east-1&quot;</span><span class="p">,</span>
+        <span class="n">update_pyproject</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">ignore_packages</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the Lambda Packager</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pyproject_path: Path to the pyproject.toml file</span>
+<span class="sd">            python_version: Python version to target</span>
+<span class="sd">            architecture: Architecture to target (x86_64 or arm64)</span>
+<span class="sd">            region: AWS region to target</span>
+<span class="sd">            update_pyproject: whether to update pyproject.toml with the appropriate versions of packages</span>
+<span class="sd">                from the AWS lambda environment (ignored if ignore_packages is False)</span>
+<span class="sd">            ignore_packages: Ignore packages that already exist in the AWS lambda environment</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^\d+\.\d+$&quot;</span><span class="p">,</span> <span class="n">python_version</span><span class="p">):</span>
+            <span class="n">python_version</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;python</span><span class="si">{</span><span class="n">python_version</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">architecture</span><span class="p">,</span> <span class="n">python_version</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">PLATFORMS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">architecture</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">python_version</span><span class="si">}</span><span class="s2"> not supported&quot;</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pyproject_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">pyproject_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">python_version</span> <span class="o">=</span> <span class="n">python_version</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span> <span class="o">=</span> <span class="n">architecture</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="o">=</span> <span class="n">region</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_pyproject</span> <span class="o">=</span> <span class="n">update_pyproject</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ignore_packages</span> <span class="o">=</span> <span class="n">ignore_packages</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">packages_to_ignore</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">packages_to_ignore_dict</span> <span class="o">=</span> <span class="n">get_packages_to_ignore</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">architecture</span><span class="p">,</span> <span class="n">python_version</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chngenv</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">chgenv</span><span class="p">,</span> <span class="n">POETRY_VIRTUALENVS_CREATE</span><span class="o">=</span><span class="s2">&quot;false&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chdir</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">chdir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pyproject_path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_run_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;check&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;stdout&quot;</span><span class="p">:</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+            <span class="s2">&quot;stderr&quot;</span><span class="p">:</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chngenv</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chdir</span><span class="p">():</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">_kwargs</span><span class="p">)</span>  <span class="c1"># noqa: pylint: disable=subprocess-run-check # nosec: B603</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">stdout</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">),</span> <span class="n">r</span>
+
+        <span class="k">return</span> <span class="n">r</span>
+
+    <span class="k">def</span> <span class="nf">_export_requirements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># noinspection PyTypeChecker</span>
+        <span class="n">reqs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_cmd</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;poetry&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;export&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;--format=requirements.txt&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;--without-hashes&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">reqs</span>
+
+    <span class="k">def</span> <span class="nf">_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># noinspection PyTypeChecker</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_cmd</span><span class="p">([</span><span class="s2">&quot;poetry&quot;</span><span class="p">,</span> <span class="s2">&quot;lock&quot;</span><span class="p">,</span> <span class="s2">&quot;--no-update&quot;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_locked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># noinspection PyTypeChecker</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_cmd</span><span class="p">([</span><span class="s2">&quot;poetry&quot;</span><span class="p">,</span> <span class="s2">&quot;lock&quot;</span><span class="p">,</span> <span class="s2">&quot;--check&quot;</span><span class="p">,</span> <span class="s2">&quot;-q&quot;</span><span class="p">],</span> <span class="n">check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">returncode</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_change_pyproject</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cur_requires</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_requirements</span><span class="p">()</span>
+        <span class="n">pkgs_to_add_to_pyproject</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">cur_requires</span><span class="o">.</span><span class="n">splitlines</span><span class="p">(</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">pkg_name</span><span class="p">,</span> <span class="n">pkg_version</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^([^= ]*?)==(\S*).*$&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">pkg_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">packages_to_ignore_dict</span> <span class="ow">and</span> <span class="n">pkg_version</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">packages_to_ignore_dict</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pkg_name</span><span class="si">}</span><span class="s2"> is currently </span><span class="si">{</span><span class="n">pkg_version</span><span class="si">}</span><span class="s2"> but should be </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">packages_to_ignore_dict</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="n">pkgs_to_add_to_pyproject</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">packages_to_ignore_dict</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pkgs_to_add_to_pyproject</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pyproject_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;pyproject.</span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H-%M-%SZ&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">.toml&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+                <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pyproject_path</span><span class="p">,</span> <span class="s2">&quot;pyproject.toml&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf8&quot;</span><span class="p">),</span>
+                <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf8&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_run_cmd</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="s2">&quot;poetry&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;add&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;--lock&quot;</span><span class="p">,</span>
+                    <span class="o">*</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">==</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pkgs_to_add_to_pyproject</span><span class="o">.</span><span class="n">items</span><span class="p">()],</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+
+<div class="viewcode-block" id="LambdaPackager.export_reqs"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.export_reqs">[docs]</a>    <span class="k">def</span> <span class="nf">export_reqs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">output</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">,</span> <span class="n">IO</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param output:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_output</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">,</span> <span class="n">IO</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">output</span> <span class="ow">or</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_locked</span><span class="p">():</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;not locked, locking&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_packages</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_pyproject</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_change_pyproject</span><span class="p">()</span>
+        <span class="n">reqs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_requirements</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">reqs</span><span class="o">.</span><span class="n">splitlines</span><span class="p">(</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_packages</span> <span class="ow">and</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^([^= ]*?==\S*).*$&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">packages_to_ignore</span><span class="p">:</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;ignoring </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                <span class="k">continue</span>
+            <span class="n">_output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_output</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="LambdaPackager.build_sdist"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.build_sdist">[docs]</a>    <span class="nd">@contextmanager</span>
+    <span class="k">def</span> <span class="nf">build_sdist</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sdist_location</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chdir</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chngenv</span><span class="p">():</span>
+                <span class="n">sdist_name</span> <span class="o">=</span> <span class="n">build_sdist</span><span class="p">(</span><span class="n">sdist_location</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="n">Path</span><span class="p">(</span><span class="n">sdist_location</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">/</span> <span class="n">sdist_name</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">sdist_location</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_add_architecture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pip_command</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span> <span class="o">==</span> <span class="s2">&quot;arm64&quot;</span><span class="p">:</span>
+            <span class="n">pip_command</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="s2">&quot;--platform&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;manylinux2014_aarch64&quot;</span><span class="p">,</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span> <span class="o">==</span> <span class="s2">&quot;x86_64&quot;</span><span class="p">:</span>
+            <span class="n">pip_command</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="s2">&quot;--platform&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;manylinux2014_x86_64&quot;</span><span class="p">,</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">pip_command</span>
+
+<div class="viewcode-block" id="LambdaPackager.package_depends"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.package_depends">[docs]</a>    <span class="k">def</span> <span class="nf">package_depends</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PathLike</span><span class="p">]):</span>
+        <span class="n">reqs</span> <span class="o">=</span> <span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="s2">&quot;w+t&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf8&quot;</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># noqa: pylint: disable=consider-using-with</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_reqs</span><span class="p">(</span><span class="n">reqs</span><span class="o">.</span><span class="n">file</span><span class="p">)</span>
+        <span class="n">reqs</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">output_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+        <span class="n">pip_install_command</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;pip&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;install&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-r&quot;</span><span class="p">,</span>
+            <span class="n">reqs</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;--target&quot;</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">output_dir</span><span class="o">.</span><span class="n">absolute</span><span class="p">()),</span>
+            <span class="s2">&quot;--no-deps&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--disable-pip-version-check&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--ignore-installed&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--python-version&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">python_version</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;--implementation&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;cp&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">pip_install_command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_architecture</span><span class="p">(</span><span class="n">pip_install_command</span><span class="p">)</span>
+        <span class="c1"># noinspection PyTypeChecker</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run_cmd</span><span class="p">(</span>
+            <span class="n">pip_install_command</span><span class="p">,</span>
+            <span class="n">stdout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">stderr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">reqs</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LambdaPackager.package_main"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.package_main">[docs]</a>    <span class="k">def</span> <span class="nf">package_main</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_sdist</span><span class="p">()</span> <span class="k">as</span> <span class="n">sdist_path</span><span class="p">:</span>
+            <span class="n">pip_install_command</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;pip&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;install&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;--no-deps&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;--ignore-installed&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;--disable-pip-version-check&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;--target&quot;</span><span class="p">,</span>
+                <span class="n">output_dir</span><span class="p">,</span>
+                <span class="n">sdist_path</span><span class="p">,</span>
+            <span class="p">]</span>
+            <span class="n">pip_install_command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_architecture</span><span class="p">(</span><span class="n">pip_install_command</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_run_cmd</span><span class="p">(</span><span class="n">pip_install_command</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LambdaPackager.package"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.package">[docs]</a>    <span class="k">def</span> <span class="nf">package</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">package_depends</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">package_main</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Daniel Sullivan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
