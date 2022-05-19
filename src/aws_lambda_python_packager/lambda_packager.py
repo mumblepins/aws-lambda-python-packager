@@ -19,7 +19,12 @@ from functools import partial
 from os import PathLike
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import IO, List, Optional, Union
+from typing import (
+    IO,
+    List,
+    Optional,
+    Union,
+)
 
 import requests
 from poetry.core.masonry.api import build_sdist
@@ -68,6 +73,7 @@ def chgenv(**kwargs):
 
 
 class LambdaPackager:
+
     # pylint: disable=too-many-instance-attributes
     def __init__(
         self,
@@ -77,18 +83,20 @@ class LambdaPackager:
         region: str = "us-east-1",
         update_pyproject: bool = False,
         ignore_packages: bool = False,
-    ):
-        # pylint: disable=too-many-arguments
-        """
+    ):  # pylint: disable=too-many-arguments
+        """Initialize the Lambda Packager
 
-        :param pyproject_path:
-        :param python_version:
-        :param architecture:
-        :param region:
-        :param update_pyproject: whether to update pyproject.toml with the appropriate versions of packages
-         from the AWS lambda environment (ignored if ignore_packages is False)
-        :param ignore_packages: Ignore packages that already exist in the AWS lambda environment
+        Args:
+            pyproject_path: Path to the pyproject.toml file
+            python_version: Python version to target
+            architecture: Architecture to target (x86_64 or arm64)
+            region: AWS region to target
+            update_pyproject: whether to update pyproject.toml with the appropriate versions of packages
+                from the AWS lambda environment (ignored if ignore_packages is False)
+            ignore_packages: Ignore packages that already exist in the AWS lambda environment
         """
+        if re.match(r"^\d+\.\d+$", python_version):
+            python_version = f"python{python_version}"
         if (architecture, python_version) not in PLATFORMS:
             raise Exception(f"{architecture} {python_version} not supported")  # pragma: no cover
         self.pyproject_path = Path(pyproject_path)
@@ -215,6 +223,7 @@ class LambdaPackager:
                     "manylinux2014_x86_64",
                 ]
             )
+
         return pip_command
 
     def package_depends(self, output_dir: Union[str, PathLike]):
@@ -232,6 +241,10 @@ class LambdaPackager:
             "--no-deps",
             "--disable-pip-version-check",
             "--ignore-installed",
+            "--python-version",
+            self.python_version.replace("python", ""),
+            "--implementation",
+            "cp",
         ]
         pip_install_command = self._add_architecture(pip_install_command)
         # noinspection PyTypeChecker

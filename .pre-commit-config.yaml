@@ -1,18 +1,19 @@
 exclude: ^(buildspec.yml|.pre-commit-config.yaml)$
-fail_fast: true
+fail_fast: false
 repos:
   - repo: https://github.com/mumblepins/pre-commit-poetry
     rev: v0.0.3
     hooks:
       - id: pre_commit_poetry
-  - repo: https://github.com/pre-commit/mirrors-isort
-    rev: v5.10.1
+  - repo: https://github.com/pycqa/isort
+    rev: 5.10.1
     hooks:
       - id: isort
   - repo: https://github.com/ambv/black
     rev: 22.3.0
     hooks:
       - id: black
+        language_version: python3
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.2.0
     hooks:
@@ -104,6 +105,7 @@ repos:
           AWS_SESSION_TOKEN=""
           AWS_DEFAULT_REGION="us-east-1"
           pytest
+          -n 4
           "tests/"
           --verbose
           --cov=aws_lambda_python_packager

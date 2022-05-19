@@ -9,6 +9,9 @@ documentation = "https://mumblepins.github.io/aws-lambda-python-packager/"
 readme = "README.md"
 packages = [{ include = "aws_lambda_python_packager", from = "src" }]
 
+[tool.poetry.scripts]
+lambda-packager = "aws_lambda_python_packager.cli:main"
+
 [tool.poetry.dependencies]
 python = "^3.7"
 poetry = { version = "^1.2.0a2", allow-prereleases = true }
@@ -40,11 +43,10 @@ skip_gitignore = true
 line_length = 88
 indent = "    "
 multi_line_output = 3
-default_section = "FIRSTPARTY"
 skip = "env"
 include_trailing_comma = true
 combine_as_imports = true
-force_grid_wrap = 0
+force_grid_wrap = 3
 
 [tool.black]
 line-length = 160

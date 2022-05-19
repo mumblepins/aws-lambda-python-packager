@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 
 import toml
+
 from aws_lambda_python_packager.lambda_packager import LambdaPackager
 
 resources = Path(os.path.realpath(__file__)).parent / "resources"
