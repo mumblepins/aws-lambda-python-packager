@@ -20,22 +20,19 @@ jobs:
     if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - name: Install Poetry
+        run: pipx install poetry>=1.2.0b1
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: '3.9'
+          python-version: '3.10'
+          cache: 'poetry'
 
-      - name: Poetry
-        uses: abatilo/actions-poetry@v2.1.4
-        with:
-          poetry-version: 1.2.0b1
       - name: install dependencies
         run: |
           poetry install
-      - uses: actions/cache@v3
-        with:
-          path: ~/.cache
+
       - name: run pre-commit
         uses: pre-commit/action@v2.0.3
 #        run: poetry run pre-commit run --all-files
@@ -58,23 +55,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - name: Install Poetry
+        run: pipx install poetry>=1.2.0b1
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
           python-version: '3.10'
-      - name: Poetry
-        uses: abatilo/actions-poetry@v2.1.4
-        with:
-          poetry-version: 1.2.0b1
+          cache: 'poetry'
 
       - name: install dependencies
         run: |
           poetry install
-
-      - uses: actions/cache@v3
-        with:
-          path: ~/.cache
 
       - name: build
         run: |
