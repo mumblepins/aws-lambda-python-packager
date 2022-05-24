@@ -139,6 +139,7 @@ def main(
     strip_libraries=False,
     strip_python=False,
     strip_other=False,
+    **kwargs,
 ):  # pylint: disable=too-many-arguments,too-many-locals
     pp_path = Path(pyproject_path)
     if pp_path.is_file() and pp_path.name == "pyproject.toml":
