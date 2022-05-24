@@ -33,6 +33,9 @@ jobs:
       - name: install dependencies
         run: |
           poetry install
+      - uses: actions/cache@v3
+        with:
+          path: ~/.cache
       - name: run pre-commit
         uses: pre-commit/action@v2.0.3
 #        run: poetry run pre-commit run --all-files
@@ -68,6 +71,11 @@ jobs:
       - name: install dependencies
         run: |
           poetry install
+
+      - uses: actions/cache@v3
+        with:
+          path: ~/.cache
+
       - name: build
         run: |
           poetry build
