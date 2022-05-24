@@ -10,14 +10,18 @@ readme = "README.md"
 packages = [{ include = "aws_lambda_python_packager", from = "src" }]
 
 [tool.poetry.scripts]
-lambda-packager = "aws_lambda_python_packager.cli:main"
+lambda-packager = "aws_lambda_python_packager.cli:main_cli"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-poetry = { version = "^1.2.0a2", allow-prereleases = true }
-requests = "^2.27.1"
-python-certifi-win32 = { version = "^1.6", markers = "platform_system == 'Windows'" }
-
+poetry = { version = ">1.2.0a1", allow-prereleases = true }
+requests = "*"
+python-certifi-win32 = { version = "*", markers = "platform_system == 'Windows'" }
+fsspec = "*"
+appdirs = "*"
+aiohttp = "*"
+cleo = { version = "*", allow-prereleases = true }
+packaging = "*"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.13.0"
@@ -51,7 +55,7 @@ combine_as_imports = true
 force_grid_wrap = 3
 
 [tool.black]
-line-length = 160
+line-length = 120
 include = '\.pyi?$'
 target-version = ['py38', 'py39', 'py310']
 exclude = '''
@@ -97,9 +101,20 @@ exclude = '''(?x)(
 
 
 [[tool.mypy.overrides]]
-module = "poetry.core.*"
+module = "poetry.*"
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = "cleo.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "appdirs.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "fsspec.*"
+ignore_missing_imports = true
 
 [tool.dep_checker]
-allowed_unused = ["python_certifi_win32"]
+allowed_unused = ["python_certifi_win32", 'aiohttp']

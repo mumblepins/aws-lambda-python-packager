@@ -4,6 +4,7 @@ from pathlib import Path
 
 import toml
 
+from aws_lambda_python_packager.cli import main_args
 from aws_lambda_python_packager.lambda_packager import LambdaPackager
 
 resources = Path(os.path.realpath(__file__)).parent / "resources"
@@ -19,8 +20,8 @@ def load_pyproject(folder):
 def test_export_ignore_packages_update_pyproject(temp_path_filled):
     src, dst = temp_path_filled
 
-    lp = LambdaPackager(src, update_pyproject=True, ignore_packages=True)
-    lp.package(dst)
+    lp = LambdaPackager(src, dst, update_pyproject=True, ignore_packages=True)
+    lp.package()
     aw = dst / "awswrangler"
     pkg = dst / "test_package"
     assert aw.exists() and aw.is_dir()
@@ -36,8 +37,8 @@ def test_export_ignore_packages_update_pyproject(temp_path_filled):
 def test_export_ignore_packages_no_update_pyproject(temp_path_filled):
     src, dst = temp_path_filled
 
-    lp = LambdaPackager(src, update_pyproject=False, ignore_packages=True)
-    lp.package(dst)
+    lp = LambdaPackager(src, dst, update_pyproject=False, ignore_packages=True)
+    lp.package()
     aw = dst / "awswrangler"
     pkg = dst / "test_package"
     assert aw.exists() and aw.is_dir()
@@ -54,8 +55,8 @@ def test_export_ignore_packages_no_update_pyproject(temp_path_filled):
 def test_export_no_ignore_packages_no_update_pyproject(temp_path_filled):
     src, dst = temp_path_filled
 
-    lp = LambdaPackager(src, update_pyproject=False, ignore_packages=False)
-    lp.package(dst)
+    lp = LambdaPackager(src, dst, update_pyproject=False, ignore_packages=False)
+    lp.package()
     aw = dst / "awswrangler"
     pkg = dst / "test_package"
     assert aw.exists() and aw.is_dir()
@@ -71,7 +72,36 @@ def test_export_no_ignore_packages_no_update_pyproject(temp_path_filled):
 
 def test_arm64(temp_path_filled):
     src, dst = temp_path_filled
-    lp = LambdaPackager(src, update_pyproject=False, ignore_packages=False, architecture="arm64")
-    lp.package(dst)
+    lp = LambdaPackager(src, dst, update_pyproject=False, ignore_packages=False, architecture="arm64")
+    lp.package()
     numpy_file = list(dst.glob("numpy*dist-info/WHEEL"))[0]
     assert "manylinux2014_aarch64" in numpy_file.read_text()
+
+
+def test_full_optimize(temp_path_filled):
+    src, dst = temp_path_filled
+    main_args([str(a) for a in ["-v", "-O", src, dst]])
+    pyarrow_file = list(dst.glob("**/pyarrow/**/libarrow.so.*"))[0]
+    assert 32_000_000 < os.path.getsize(pyarrow_file) < 40_000_000
+    # make sure we aren't using the aws wrangler version
+    assert list(dst.glob("**/pyarrow/**/libarrow_flight.so.*"))[0].exists()
+
+
+def test_full_optimize_w_awswrangler(temp_path_filled):
+    src, dst = temp_path_filled
+    main_args([str(a) for a in ["-v", "-O", "--use-aws-pyarrow", src, dst]])
+    pyarrow_file = list(dst.glob("**/pyarrow/**/libarrow.so.*"))[0]
+    assert os.path.getsize(pyarrow_file) < 32_000_000
+    # make sure we are using the aws wrangler version
+    assert len(list(dst.glob("**/pyarrow/**/libarrow_flight.so.*"))) == 0
+
+
+def test_optimize_all_arm(temp_path_filled):
+    # TODO: improve tests for optimization
+    src, dst = temp_path_filled
+    zip_file = src.parent / "test_package.zip"
+    main_args([str(a) for a in ["-v", "-OO", "-z", zip_file, "--architecture", "arm64", src, dst]])
+
+    numpy_file = list(dst.glob("numpy*dist-info/WHEEL"))[0]
+    assert "manylinux2014_aarch64" in numpy_file.read_text()
+    assert zip_file.exists() and zip_file.stat().st_size > 1 * 1024 * 1024
