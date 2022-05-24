@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>aws_lambda_python_packager.lambda_packager &mdash; aws-lambda-python-packager v0.1.1 documentation</title>
+  <title>aws_lambda_python_packager.lambda_packager &mdash; aws-lambda-python-packager v1.0.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -208,7 +208,7 @@
                 <span class="n">app</span><span class="o">.</span><span class="n">_configure_io</span><span class="p">(</span><span class="n">_io</span><span class="p">)</span>  <span class="c1"># pylint: disable=protected-access</span>
                 <span class="c1"># use the poetry env to get pip binary</span>
                 <span class="n">env_manager</span> <span class="o">=</span> <span class="n">EnvManager</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">poetry</span><span class="p">)</span>
-                <span class="n">em</span> <span class="o">=</span> <span class="n">env_manager</span><span class="o">.</span><span class="n">create_venv</span><span class="p">(</span><span class="n">_io</span><span class="p">)</span>
+                <span class="n">em</span> <span class="o">=</span> <span class="n">env_manager</span><span class="o">.</span><span class="n">create_venv</span><span class="p">(</span><span class="n">_io</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="n">pip</span> <span class="o">=</span> <span class="n">em</span><span class="o">.</span><span class="n">get_pip_command</span><span class="p">(</span><span class="n">embedded</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_poetry_app</span> <span class="o">=</span> <span class="n">PoetryApp</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">pip</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_poetry_app</span>
