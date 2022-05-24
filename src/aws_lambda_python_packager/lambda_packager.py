@@ -142,7 +142,7 @@ class LambdaPackager:
                 app._configure_io(_io)  # pylint: disable=protected-access
                 # use the poetry env to get pip binary
                 env_manager = EnvManager(app.poetry)
-                em = env_manager.create_venv(_io)
+                em = env_manager.create_venv(_io, force=True)
                 pip = em.get_pip_command(embedded=True)
                 self._poetry_app = PoetryApp(app, output, error, pip)
         return self._poetry_app
