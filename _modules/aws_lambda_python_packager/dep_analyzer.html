@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aws_lambda_python_packager.dep_analyzer &mdash; aws-lambda-python-packager v1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> aws-lambda-python-packager
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">aws-lambda-python-packager</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>aws_lambda_python_packager.dep_analyzer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aws_lambda_python_packager.dep_analyzer</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>  <span class="c1"># nosec</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">PathLike</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Iterable</span><span class="p">,</span>
+    <span class="n">Tuple</span><span class="p">,</span>
+    <span class="n">Union</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">chdir_cm</span>
+
+
+<div class="viewcode-block" id="CommandNotFoundError"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.CommandNotFoundError">[docs]</a><span class="k">class</span> <span class="nc">CommandNotFoundError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<span class="n">PackageInfo</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;PackageInfo&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="s2">&quot;version_spec&quot;</span><span class="p">])</span>
+
+<span class="n">PACKAGE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/mumblepins/aws-get-lambda-python-pkg-versions/main/</span><span class="si">{region}</span><span class="s2">-python</span><span class="si">{python_version}</span><span class="s2">-</span><span class="si">{architecture}</span><span class="s2">.json&quot;</span>
+
+
+<div class="viewcode-block" id="DepAnalyzer"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer">[docs]</a><span class="k">class</span> <span class="nc">DepAnalyzer</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="n">project_root</span><span class="p">:</span> <span class="n">Path</span>
+
+    <span class="n">analyzer_name</span><span class="p">:</span> <span class="nb">str</span>
+
+<div class="viewcode-block" id="DepAnalyzer.copy_from_temp_dir"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.copy_from_temp_dir">[docs]</a>    <span class="k">def</span> <span class="nf">copy_from_temp_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="n">fp</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_temp_proj_dir</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">/</span> <span class="n">f</span>
+            <span class="k">if</span> <span class="n">fp</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_root</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DepAnalyzer.copy_to_temp_dir"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.copy_to_temp_dir">[docs]</a>    <span class="k">def</span> <span class="nf">copy_to_temp_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="n">fp</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_root</span><span class="p">)</span> <span class="o">/</span> <span class="n">f</span>
+            <span class="k">if</span> <span class="n">fp</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temp_proj_dir</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DepAnalyzer.backup_files"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.backup_files">[docs]</a>    <span class="k">def</span> <span class="nf">backup_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="n">date_str</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H-%M-%SZ&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="n">fp</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_root</span><span class="p">)</span> <span class="o">/</span> <span class="n">f</span>
+            <span class="k">if</span> <span class="n">fp</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">fp</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;.</span><span class="si">{</span><span class="n">date_str</span><span class="si">}{</span><span class="n">fp</span><span class="o">.</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">project_root</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">PathLike</span><span class="p">],</span>
+        <span class="n">python_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;3.9&quot;</span><span class="p">,</span>
+        <span class="n">architecture</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;x86_64&quot;</span><span class="p">,</span>
+        <span class="n">region</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;us-east-1&quot;</span><span class="p">,</span>
+        <span class="n">ignore_packages</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">update_dependencies</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exported_reqs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reqs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pkgs_to_ignore_dict</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">project_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">project_root</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">project_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">project_root</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pip</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s2">&quot;pip&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pip</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CommandNotFoundError</span><span class="p">(</span><span class="s2">&quot;pip not found, please install and add to PATH&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">python_version</span> <span class="o">=</span> <span class="n">python_version</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span> <span class="o">=</span> <span class="n">architecture</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="o">=</span> <span class="n">region</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ignore_packages</span> <span class="o">=</span> <span class="n">ignore_packages</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_dependencies</span> <span class="o">=</span> <span class="n">update_dependencies</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_temp_proj_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chdir</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">chdir_cm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temp_proj_dir</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_target</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_temp_proj_dir</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_get_packages_to_ignore</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">PACKAGE_URL</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">region</span><span class="p">,</span> <span class="n">architecture</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">architecture</span><span class="p">,</span> <span class="n">python_version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">python_version</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="n">pkgs_to_ignore_dict</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to get packages to ignore: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">pkgs_to_ignore_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">return</span> <span class="n">pkgs_to_ignore_dict</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pkgs_to_ignore_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_packages</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pkgs_to_ignore_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pkgs_to_ignore_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_packages_to_ignore</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pkgs_to_ignore_dict</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pkgs_to_ignore</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">==</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pkgs_to_ignore_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pkgs_to_ignore_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">PackageInfo</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">==</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pkgs_to_ignore_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="nd">@contextmanager</span>
+    <span class="k">def</span> <span class="nf">_change_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chdir</span><span class="p">():</span>
+            <span class="k">yield</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_get_requirements</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">PackageInfo</span><span class="p">]:</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="DepAnalyzer.get_requirements"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.get_requirements">[docs]</a>    <span class="k">def</span> <span class="nf">get_requirements</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">PackageInfo</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Getting requirements info using </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzer_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_requirements</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DepAnalyzer.process_requirements"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.process_requirements">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">process_requirements</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">requirements</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">PackageInfo</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">requirements</span><span class="p">:</span>
+            <span class="n">pkg_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^([^= \n]*)(==)?([^\s;]*).*$&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pkg_match</span><span class="p">:</span>
+                <span class="n">pkg_name</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">pkg_version</span> <span class="o">=</span> <span class="n">pkg_match</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+
+                <span class="k">yield</span> <span class="n">PackageInfo</span><span class="p">(</span><span class="n">pkg_name</span><span class="p">,</span> <span class="n">pkg_version</span><span class="p">,</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">())</span></div>
+
+    <span class="k">def</span> <span class="nf">_log_popen_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">output</span><span class="p">:</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">o</span><span class="o">.</span><span class="n">rstrip</span><span class="p">())</span>
+            <span class="n">data</span> <span class="o">+=</span> <span class="n">o</span>
+        <span class="k">return</span> <span class="n">data</span>
+
+<div class="viewcode-block" id="DepAnalyzer.run_command"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.run_command">[docs]</a>    <span class="k">def</span> <span class="nf">run_command</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">return_state</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+        <span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running command: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">context</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_change_context</span>
+        <span class="k">if</span> <span class="n">quiet</span><span class="p">:</span>
+            <span class="n">loglevel</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">loglevel</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
+        <span class="k">with</span> <span class="n">context</span><span class="p">():</span>
+            <span class="k">with</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>  <span class="c1"># nosec</span>
+                <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">],</span>
+                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+            <span class="p">)</span> <span class="k">as</span> <span class="n">proc</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+                    <span class="n">stdout_fut</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_log_popen_output</span><span class="p">,</span>
+                        <span class="n">proc</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span>
+                        <span class="n">loglevel</span><span class="p">,</span>
+                        <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;(OUT)&gt;  &quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">stderr_fut</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_log_popen_output</span><span class="p">,</span>
+                        <span class="n">proc</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
+                        <span class="n">loglevel</span><span class="p">,</span>
+                        <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;(ERR)&gt;  &quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">stdout_fut</span><span class="o">.</span><span class="n">result</span><span class="p">(),</span> <span class="n">stderr_fut</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+                <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">return_state</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="n">proc</span><span class="o">.</span><span class="n">returncode</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">proc</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">(</span><span class="n">proc</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="p">)</span>
+
+                <span class="k">return</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span></div>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_update_dependency_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs_to_add</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PackageInfo</span><span class="p">]):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="DepAnalyzer.update_dependency_file"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.update_dependency_file">[docs]</a>    <span class="k">def</span> <span class="nf">update_dependency_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_packages</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_dependencies</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Checking to see if any dependencies need to be changed in the dependency file to match the AWS Lambda environment&quot;</span>
+        <span class="p">)</span>
+        <span class="n">cur_requires</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_requirements</span><span class="p">()</span>
+        <span class="n">pkgs_to_add</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">pkg_name</span><span class="p">,</span> <span class="n">pkg_version</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">cur_requires</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pkg_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pkgs_to_ignore_dict</span> <span class="ow">and</span> <span class="n">pkg_version</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pkgs_to_ignore_dict</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is currently </span><span class="si">%s</span><span class="s2"> but should be </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">pkg_name</span><span class="p">,</span> <span class="n">pkg_version</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pkgs_to_ignore_dict</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="n">pkgs_to_add</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pkgs_to_ignore_info</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pkgs_to_add</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Updating dependency file to add </span><span class="si">%s</span><span class="s2"> requirements&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">pkgs_to_add</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_dependency_file</span><span class="p">(</span><span class="n">pkgs_to_add</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">requirements</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PackageInfo</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reqs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Exporting requirements&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_dependency_file</span><span class="p">()</span>
+            <span class="n">reqs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_requirements</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reqs</span> <span class="o">=</span> <span class="p">{</span><span class="n">r</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">reqs</span><span class="p">}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reqs</span>
+
+<div class="viewcode-block" id="DepAnalyzer.export_requirements"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.export_requirements">[docs]</a>    <span class="k">def</span> <span class="nf">export_requirements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exported_reqs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">pkg_name</span><span class="p">,</span> <span class="n">pkg_version</span><span class="p">,</span> <span class="n">pkg_spec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">requirements</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_packages</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">pkgs_to_ignore_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pkg_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">pkg_version</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s2">&quot;Ignoring </span><span class="si">%s</span><span class="s2"> as it should be in the AWS Lambda Environment already&quot;</span><span class="p">,</span>
+                        <span class="n">pkg_spec</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pkg_spec</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_exported_reqs</span> <span class="o">=</span> <span class="n">output</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exported_reqs</span></div>
+
+<div class="viewcode-block" id="DepAnalyzer.run_pip"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.run_pip">[docs]</a>    <span class="k">def</span> <span class="nf">run_pip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">return_state</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pip</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">return_state</span><span class="o">=</span><span class="n">return_state</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="n">quiet</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_install_pip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">return_state</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">pip_command</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;install&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--disable-pip-version-check&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--ignore-installed&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--no-compile&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--python-version&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">python_version</span><span class="p">,</span>
+            <span class="s2">&quot;--implementation&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;cp&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span> <span class="o">==</span> <span class="s2">&quot;arm64&quot;</span><span class="p">:</span>
+            <span class="n">pip_command</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="s2">&quot;--platform&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;manylinux2014_aarch64&quot;</span><span class="p">,</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span> <span class="o">==</span> <span class="s2">&quot;x86_64&quot;</span><span class="p">:</span>
+            <span class="n">pip_command</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="s2">&quot;--platform&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;manylinux2014_x86_64&quot;</span><span class="p">,</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="n">pip_command</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_pip</span><span class="p">(</span><span class="o">*</span><span class="n">pip_command</span><span class="p">,</span> <span class="n">return_state</span><span class="o">=</span><span class="n">return_state</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="n">quiet</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DepAnalyzer.install_dependencies"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.install_dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">install_dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">pip_command</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;--target&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;--no-deps&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">pip_command</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">export_requirements</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Installing dependencies using pip&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_install_pip</span><span class="p">(</span><span class="o">*</span><span class="n">pip_command</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="n">quiet</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Installing dependencies done&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DepAnalyzer.install_root"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.install_root">[docs]</a>    <span class="k">def</span> <span class="nf">install_root</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">src_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_root</span> <span class="o">/</span> <span class="s2">&quot;src&quot;</span>
+        <span class="k">if</span> <span class="n">src_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">src_path</span> <span class="o">/</span> <span class="s2">&quot;__init__.py&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;src/__init__.py exists, installing as package in target&quot;</span><span class="p">)</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">src_path</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;src&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;src/__init__.py does not exist, installing files from src directly into target&quot;</span><span class="p">)</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">src_path</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="n">dirs_exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_root</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.py&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_root</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.py&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Copying </span><span class="si">%s</span><span class="s2"> to target&quot;</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No src/__init__.py or *.py files found, no root program is being installed&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DepAnalyzer.copy_from_target"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.copy_from_target">[docs]</a>    <span class="k">def</span> <span class="nf">copy_from_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dst</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PathLike</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Copying </span><span class="si">%s</span><span class="s2"> from target to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DepAnalyzer.direct_dependencies"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.direct_dependencies">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">direct_dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="k">pass</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Daniel Sullivan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,5 +1,5 @@
-aws_lambda_python_packager
-==========================
+src
+===
 
 .. toctree::
    :maxdepth: 4
