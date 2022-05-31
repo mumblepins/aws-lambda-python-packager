@@ -18,7 +18,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="src" href="modules.html" /> 
+    <link rel="next" title="aws_lambda_python_packager" href="modules.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -38,7 +38,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">aws_lambda_python_packager</a></li>
 </ul>
 
         </div>
@@ -70,12 +70,65 @@
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">src</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">aws_lambda_python_packager</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="aws_lambda_python_packager.html">aws_lambda_python_packager package</a></li>
 </ul>
 </li>
 </ul>
 </div>
+</section>
+<section id="readme">
+<h1>Readme<a class="headerlink" href="#readme" title="Permalink to this headline"></a></h1>
+<section id="aws-lambda-python-packager">
+<h2>AWS Lambda Python Packager<a class="headerlink" href="#aws-lambda-python-packager" title="Permalink to this headline"></a></h2>
+<p>An alternate way to package Python functions for AWS Lambda. Works cross-platform and cross-architecture if binary packages are available for all packages.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ lambda-packager -h
+usage: lambda-packager <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>--ignore-packages<span class="o">]</span> <span class="o">[</span>--update-pyproject<span class="o">]</span>
+                       <span class="o">[</span>--python-version PYTHON_VERSION<span class="o">]</span> <span class="o">[</span>--architecture <span class="o">{</span>x86_64,arm64<span class="o">}]</span>
+                       <span class="o">[</span>--region REGION<span class="o">]</span> <span class="o">[</span>--verbose<span class="o">]</span> <span class="o">[</span>--zip-output <span class="o">[</span>ZIP_OUTPUT<span class="o">]]</span>
+                       <span class="o">[</span>--compile-python<span class="o">]</span> <span class="o">[</span>--use-aws-pyarrow<span class="o">]</span> <span class="o">[</span>--strip-tests<span class="o">]</span> <span class="o">[</span>--strip-libraries<span class="o">]</span>
+                       <span class="o">[</span>--strip-python<span class="o">]</span> <span class="o">[</span>--strip-other<span class="o">]</span> <span class="o">[</span>--optimize-all<span class="o">]</span>
+                       pyproject_path output_path
+
+AWS Lambda Python Packager
+
+positional arguments:
+  pyproject_path        Path to pyproject.toml
+  output_path           Path to output directory
+
+optional arguments:
+  -h, --help            show this <span class="nb">help</span> message and <span class="nb">exit</span>
+  --ignore-packages     Ignore packages that are already present <span class="k">in</span> the AWS Lambda Python runtime
+                        <span class="o">(</span>default: False<span class="o">)</span>
+  --update-pyproject    Update pyproject.toml with the ignored packages <span class="o">(</span>ignored <span class="k">if</span> not --ignore-
+                        packages<span class="o">)</span> <span class="o">(</span>default: False<span class="o">)</span>
+  --python-version PYTHON_VERSION, -pyv PYTHON_VERSION
+                        Python version to target <span class="o">(</span>default: <span class="m">3</span>.9<span class="o">)</span>
+  --architecture <span class="o">{</span>x86_64,arm64<span class="o">}</span>, -a <span class="o">{</span>x86_64,arm64<span class="o">}</span>
+                        Architecture to target <span class="o">(</span>default: x86_64<span class="o">)</span>
+  --region REGION       AWS region to target <span class="o">(</span>default: us-east-1<span class="o">)</span>
+  --verbose, -v         Verbose output <span class="o">(</span>may be specified multiple <span class="nb">times</span><span class="o">)</span> <span class="o">(</span>default: <span class="m">0</span><span class="o">)</span>
+  --zip-output <span class="o">[</span>ZIP_OUTPUT<span class="o">]</span>, -z <span class="o">[</span>ZIP_OUTPUT<span class="o">]</span>
+                        Output zip file <span class="k">in</span> addition to directory <span class="o">(</span>default: False<span class="o">)</span>
+
+Optimization Options:
+  --compile-python      Compile the python bytecode <span class="o">(</span>default: None<span class="o">)</span>
+  --use-aws-pyarrow     Use AWS wrangler pyarrow <span class="o">(</span>may result <span class="k">in</span> smaller file size<span class="o">)</span>. Pulls from
+                        https://github.com/awslabs/aws-data-wrangler/releases/ <span class="k">until</span> it finds a
+                        Lambda layer that includes the proper PyArrow version. <span class="o">(</span>default: False<span class="o">)</span>
+  --strip-tests         Strip tests from the package
+  --strip-libraries     Strip debugging symbols from libraries
+  --strip-python        Strip python scripts from the package <span class="o">(</span>requires --compile-python<span class="o">)</span> <span class="o">(</span>note,
+                        may need to <span class="nb">set</span> an ENV variable of <span class="nv">PYTHONOPTIMIZE</span><span class="o">=</span><span class="m">2</span><span class="o">)</span> <span class="o">(</span>default: False<span class="o">)</span>
+  --strip-other         Strip other files from the package <span class="o">(</span><span class="s1">&#39;.pyx&#39;</span>, <span class="s1">&#39;.pyi&#39;</span>, <span class="s1">&#39;.pxi&#39;</span>, <span class="s1">&#39;.pxd&#39;</span>, <span class="s1">&#39;.c&#39;</span>,
+                        <span class="s1">&#39;.h&#39;</span>, <span class="s1">&#39;.cc&#39;</span><span class="o">)</span>
+  --optimize-all, -O    Turns on all size optimizations <span class="o">(</span>equivalent to --strip-tests --strip-
+                        libraries --ignore-packages --update-pyproject --strip-other<span class="o">)</span>. May be
+                        specified multiple times. Second <span class="nb">time</span> will also <span class="nb">enable</span> --compile-python
+                        --strip-python --use-aws-pyarrow <span class="o">(</span>default: <span class="m">0</span><span class="o">)</span>
+</pre></div>
+</div>
+</section>
 </section>
 <section id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline"></a></h1>
@@ -90,7 +143,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="modules.html" class="btn btn-neutral float-right" title="src" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="modules.html" class="btn btn-neutral float-right" title="aws_lambda_python_packager" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
