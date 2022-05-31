@@ -326,3 +326,4 @@ $RECYCLE.BIN/
 src/requirements.txt
 
 /.idea/GitLink.xml
+tdist*

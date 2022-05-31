@@ -21,8 +21,8 @@ def arg_parser():
         action="store_true",
     )
     parser.add_argument(
-        "--update-pyproject",
-        help="Update pyproject.toml with the ignored packages (ignored if not --ignore-packages)",
+        "--update-dependencies",
+        help="Update project dependency file with the ignored packages (ignored if not --ignore-packages)",
         action="store_true",
     )
     parser.add_argument("--python-version", "-pyv", help="Python version to target", default="3.9")
@@ -128,7 +128,7 @@ def main(
     pyproject_path,
     output_path,
     ignore_packages=False,
-    update_pyproject=False,
+    update_dependencies=False,
     python_version="3.9",
     architecture="x86_64",
     region="us-east-1",
@@ -139,17 +139,17 @@ def main(
     strip_libraries=False,
     strip_python=False,
     strip_other=False,
-    **kwargs,
+    **_,
 ):  # pylint: disable=too-many-arguments,too-many-locals
     pp_path = Path(pyproject_path)
     if pp_path.is_file() and pp_path.name == "pyproject.toml":
         pp_path = pp_path.parent
 
     lp = lambda_packager.LambdaPackager(
-        pyproject_path=pp_path,
+        project_path=pp_path,
         output_dir=output_path,
         ignore_packages=ignore_packages,
-        update_pyproject=update_pyproject,
+        update_dependencies=update_dependencies,
         python_version=python_version,
         architecture=architecture,
         region=region,

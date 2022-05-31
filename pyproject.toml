@@ -13,15 +13,15 @@ packages = [{ include = "aws_lambda_python_packager", from = "src" }]
 lambda-packager = "aws_lambda_python_packager.cli:main_cli"
 
 [tool.poetry.dependencies]
-python = "^3.9"
-poetry = { version = ">1.2.0a1", allow-prereleases = true }
+python = "^3.8"
 requests = "*"
 python-certifi-win32 = { version = "*", markers = "platform_system == 'Windows'" }
 fsspec = "*"
 appdirs = "*"
 aiohttp = "*"
-cleo = { version = "*", allow-prereleases = true }
 packaging = "*"
+colorama = "^0.4.4"
+toml = "^0.10.2"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.13.0"
@@ -36,12 +36,21 @@ pytest-cov = "^3.0.0"
 pylint-pytest = "^1.1.2"
 types-requests = "^2.27.19"
 pytest-xdist = "^2.5.0"
+types-colorama = "^0.4.14"
+types-toml = "^0.10.7"
+types-setuptools = "^57.4.17"
 
 [tool.poetry.extras]
 
 [build-system]
 requires = ["poetry-core>=1.1.0a7"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
 
 [tool.isort]
 profile = "black"
