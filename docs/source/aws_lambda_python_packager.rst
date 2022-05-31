@@ -12,14 +12,6 @@ aws\_lambda\_python\_packager.aws\_wrangler module
    :undoc-members:
    :show-inheritance:
 
-aws\_lambda\_python\_packager.cli module
-----------------------------------------
-
-.. automodule:: aws_lambda_python_packager.cli
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 aws\_lambda\_python\_packager.dep\_analyzer module
 --------------------------------------------------
 
@@ -32,14 +24,6 @@ aws\_lambda\_python\_packager.lambda\_packager module
 -----------------------------------------------------
 
 .. automodule:: aws_lambda_python_packager.lambda_packager
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-aws\_lambda\_python\_packager.log\_formatter module
----------------------------------------------------
-
-.. automodule:: aws_lambda_python_packager.log_formatter
    :members:
    :undoc-members:
    :show-inheritance:

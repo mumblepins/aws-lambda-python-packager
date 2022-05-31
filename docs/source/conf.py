@@ -58,10 +58,16 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx_rtd_theme",
     "sphinx.ext.viewcode",
+    "myst_parser",
 ]
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "pandas": ("https://pandas.pydata.org/docs", None),
+}
+
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".txt": "markdown",
 }
 
 # Add any paths that contain templates here, relative to this directory.

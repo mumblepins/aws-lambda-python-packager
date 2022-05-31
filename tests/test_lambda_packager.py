@@ -2,7 +2,7 @@
 import os
 from pathlib import Path
 
-from aws_lambda_python_packager.cli import main_args
+from aws_lambda_python_packager import main_args
 from aws_lambda_python_packager.lambda_packager import LambdaPackager
 
 resources = Path(os.path.realpath(__file__)).parent / "resources"

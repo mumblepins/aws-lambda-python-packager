@@ -11,7 +11,7 @@ init()
 
 
 # https://stackoverflow.com/questions/384076/how-can-i-color-python-logging-output
-class CustomLogFormatter(logging.Formatter):
+class _CustomLogFormatter(logging.Formatter):
     """Logging Formatter to add colors and count warning / errors"""
 
     log_format = "%(asctime)s - %(name)s|(%(filename)s:%(lineno)d) - %(levelname)s - %(message)s"
