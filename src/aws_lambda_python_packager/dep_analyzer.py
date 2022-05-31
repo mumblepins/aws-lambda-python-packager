@@ -191,6 +191,9 @@ class DepAnalyzer(ABC):
                 if return_state:
                     return not bool(proc.returncode)
                 if proc.returncode:
+                    self.log.error("ERROR IN CALL: %s", args)
+                    self.log.error("STDOUT: %s", stdout)
+                    self.log.error("STDERR: %s", stderr)
                     raise subprocess.CalledProcessError(proc.returncode, args, stdout, stderr)
 
                 return stdout, stderr
