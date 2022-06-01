@@ -37,25 +37,7 @@ class DepAnalyzer(ABC):
 
     analyzer_name: str
 
-    def copy_from_temp_dir(self, files: Iterable[str]):
-        for f in files:
-            fp = Path(self._temp_proj_dir.name) / f
-            if fp.exists():
-                shutil.copy(fp, self.project_root)
-
-    def copy_to_temp_dir(self, files: Iterable[str]):
-        for f in files:
-            fp = Path(self.project_root) / f
-            if fp.exists():
-                shutil.copy(fp, self._temp_proj_dir.name)
-
-    def backup_files(self, files: Iterable[str]):
-        date_str = datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%SZ")
-        for f in files:
-            fp = Path(self.project_root) / f
-            if fp.exists():
-                shutil.copy(fp, fp.with_suffix(f".{date_str}{fp.suffix}"))
-
+    # region init and teardown
     def __init__(
         self,
         project_root: Union[None, str, PathLike],
@@ -94,21 +76,24 @@ class DepAnalyzer(ABC):
         except OSError:
             pass
 
-    def _get_packages_to_ignore(self):
-        try:
-            r = requests.get(
-                PACKAGE_URL.format(
-                    region=self.region, architecture=self.architecture, python_version=self.python_version
-                )
-            )
-            r.raise_for_status()
-            data = r.json()
-            pkgs_to_ignore_dict = data
-        except Exception as e:
-            self.log.warning(f"Failed to get packages to ignore: {e}", exc_info=True)
-            pkgs_to_ignore_dict = {}
-        return pkgs_to_ignore_dict
+    # endregion
 
+    # region abstract methods
+    @abstractmethod
+    def _get_requirements(self) -> Iterable[PackageInfo]:
+        pass
+
+    @abstractmethod
+    def _update_dependency_file(self, pkgs_to_add: dict[str, PackageInfo]):
+        pass
+
+    @abstractmethod
+    def direct_dependencies(self) -> dict[str, str]:
+        pass
+
+    # endregion
+
+    # region properties
     @property
     def pkgs_to_ignore_dict(self):
         if not self.ignore_packages:
@@ -125,15 +110,77 @@ class DepAnalyzer(ABC):
     def pkgs_to_ignore_info(self):
         return {k: PackageInfo(k, v, f"{k}=={v}") for k, v in self.pkgs_to_ignore_dict.items()}
 
+    @property
+    def requirements(self) -> dict[str, PackageInfo]:
+        if self._reqs is None:
+            self.log.warning("Exporting requirements")
+            self.update_dependency_file()
+            reqs = self.get_requirements()
+            self._reqs = {r.name: r for r in reqs}
+        return self._reqs
+
+    # endregion
+
+    # region private methods
     @contextmanager
     def _change_context(self):
         with self._chdir():
             yield
 
-    @abstractmethod
-    def _get_requirements(self) -> Iterable[PackageInfo]:
-        pass
+    def _log_popen_output(self, output, level=logging.DEBUG, prefix=""):
+        data = ""
+        for line in output:
+            o = line.decode("utf-8")
+            self.log.log(level, prefix + o.rstrip())
+            data += o
+        return data
 
+    def _install_pip(self, *args, return_state=False, quiet=False):
+        pip_command = [
+            "install",
+            "--disable-pip-version-check",
+            "--ignore-installed",
+            "--no-compile",
+            "--python-version",
+            self.python_version,
+            "--implementation",
+            "cp",
+        ]
+        if self.architecture == "arm64":
+            pip_command.extend(
+                [
+                    "--platform",
+                    "manylinux2014_aarch64",
+                ]
+            )
+        elif self.architecture == "x86_64":
+            pip_command.extend(
+                [
+                    "--platform",
+                    "manylinux2014_x86_64",
+                ]
+            )
+        pip_command.extend(args)
+        return self.run_pip(*pip_command, return_state=return_state, quiet=quiet)
+
+    def _get_packages_to_ignore(self):
+        try:
+            r = requests.get(
+                PACKAGE_URL.format(
+                    region=self.region, architecture=self.architecture, python_version=self.python_version
+                )
+            )
+            r.raise_for_status()
+            data = r.json()
+            pkgs_to_ignore_dict = data
+        except Exception as e:
+            self.log.warning(f"Failed to get packages to ignore: {e}", exc_info=True)
+            pkgs_to_ignore_dict = {}
+        return pkgs_to_ignore_dict
+
+    # endregion
+
+    # region public methods
     def get_requirements(self) -> Iterable[PackageInfo]:
         self.log.info("Getting requirements info using %s", self.analyzer_name)
         return self._get_requirements()
@@ -146,14 +193,6 @@ class DepAnalyzer(ABC):
                 pkg_name, _, pkg_version = pkg_match.groups()
 
                 yield PackageInfo(pkg_name, pkg_version, line.rstrip())
-
-    def _log_popen_output(self, output, level=logging.DEBUG, prefix=""):
-        data = ""
-        for line in output:
-            o = line.decode("utf-8")
-            self.log.log(level, prefix + o.rstrip())
-            data += o
-        return data
 
     def run_command(
         self, *args, return_state=False, quiet=False, prefix=None, context=None
@@ -198,10 +237,6 @@ class DepAnalyzer(ABC):
 
                 return stdout, stderr
 
-    @abstractmethod
-    def _update_dependency_file(self, pkgs_to_add: dict[str, PackageInfo]):
-        pass
-
     def update_dependency_file(self):
         if not self.ignore_packages or not self.update_dependencies:
             return
@@ -220,15 +255,6 @@ class DepAnalyzer(ABC):
             self.log.info("Updating dependency file to add %s requirements", len(pkgs_to_add))
             self._update_dependency_file(pkgs_to_add)
 
-    @property
-    def requirements(self) -> dict[str, PackageInfo]:
-        if self._reqs is None:
-            self.log.warning("Exporting requirements")
-            self.update_dependency_file()
-            reqs = self.get_requirements()
-            self._reqs = {r.name: r for r in reqs}
-        return self._reqs
-
     def export_requirements(self):
         if self._exported_reqs is None:
             output = []
@@ -245,34 +271,6 @@ class DepAnalyzer(ABC):
 
     def run_pip(self, *args, return_state=False, quiet=False, context=None):
         self.run_command(self._pip, *args, return_state=return_state, quiet=quiet, context=context)
-
-    def _install_pip(self, *args, return_state=False, quiet=False):
-        pip_command = [
-            "install",
-            "--disable-pip-version-check",
-            "--ignore-installed",
-            "--no-compile",
-            "--python-version",
-            self.python_version,
-            "--implementation",
-            "cp",
-        ]
-        if self.architecture == "arm64":
-            pip_command.extend(
-                [
-                    "--platform",
-                    "manylinux2014_aarch64",
-                ]
-            )
-        elif self.architecture == "x86_64":
-            pip_command.extend(
-                [
-                    "--platform",
-                    "manylinux2014_x86_64",
-                ]
-            )
-        pip_command.extend(args)
-        return self.run_pip(*pip_command, return_state=return_state, quiet=quiet)
 
     def install_dependencies(self, quiet=True):
         pip_command = [
@@ -305,6 +303,23 @@ class DepAnalyzer(ABC):
         self.log.warning("Copying %s from target to %s", self._target.name, dst)
         shutil.copytree(self._target.name, dst)
 
-    @abstractmethod
-    def direct_dependencies(self) -> dict[str, str]:
-        pass
+    def copy_from_temp_dir(self, files: Iterable[str]):
+        for f in files:
+            fp = Path(self._temp_proj_dir.name) / f
+            if fp.exists():
+                shutil.copy(fp, self.project_root)
+
+    def copy_to_temp_dir(self, files: Iterable[str]):
+        for f in files:
+            fp = Path(self.project_root) / f
+            if fp.exists():
+                shutil.copy(fp, self._temp_proj_dir.name)
+
+    def backup_files(self, files: Iterable[str]):
+        date_str = datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%SZ")
+        for f in files:
+            fp = Path(self.project_root) / f
+            if fp.exists():
+                shutil.copy(fp, fp.with_suffix(f".{date_str}{fp.suffix}"))
+
+    # endregion

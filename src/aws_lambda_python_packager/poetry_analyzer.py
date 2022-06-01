@@ -57,6 +57,9 @@ class PoetryAnalyzer(DepAnalyzer):
             self.run_poetry(
                 "export", "--format=requirements.txt", "-o", output_file.name, "--without-hashes", quiet=True
             )
+            self.run_command("printenv")
+            self.log.debug(open(output_file.name).read())
+            self.log.debug((self._temp_proj_dir / "poetry.lock").read_text())
             with open(output_file.name, "r") as f:
                 yield from self.process_requirements(f)
         finally:
@@ -68,12 +71,6 @@ class PoetryAnalyzer(DepAnalyzer):
         self.log.debug("Updating pyproject.toml with %s", ", ".join(f"{k}=={v}" for k, v in pkgs_to_add.items()))
         self.run_poetry("add", "--lock", *[f"{k}=={v.version}" for k, v in pkgs_to_add.items()])
         self.copy_from_temp_dir(["poetry.lock", "pyproject.toml"])
-
-    def locked(self):
-        return self.run_poetry("lock", "--check", return_state=True, quiet=True)
-
-    def lock(self):
-        return self.run_poetry("lock", "--no-update")
 
     @contextmanager
     def _change_context(self):
