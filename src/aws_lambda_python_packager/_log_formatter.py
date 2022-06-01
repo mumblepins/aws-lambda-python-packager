@@ -15,6 +15,9 @@ class _CustomLogFormatter(logging.Formatter):
     """Logging Formatter to add colors and count warning / errors"""
 
     log_format = "%(asctime)s - %(name)s|(%(filename)s:%(lineno)d) - %(levelname)s - %(message)s"
+    # log_cli_format = "%(asctime)s [%(levelname)8s] %(level %(message)s (%(filename)s:%(lineno)s)"
+
+    log_date_format = "%Y-%m-%d %H:%M:%S"
 
     FORMATS = {
         logging.DEBUG: Fore.CYAN + log_format + Fore.RESET,
@@ -26,5 +29,5 @@ class _CustomLogFormatter(logging.Formatter):
 
     def format(self, record):
         log_fmt = self.FORMATS.get(record.levelno)
-        formatter = logging.Formatter(log_fmt)
+        formatter = logging.Formatter(log_fmt, datefmt=self.log_date_format)
         return formatter.format(record)

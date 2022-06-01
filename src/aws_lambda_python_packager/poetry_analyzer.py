@@ -5,6 +5,7 @@ import tempfile
 from contextlib import contextmanager
 from functools import partial
 from os import PathLike
+from pathlib import Path
 from typing import Iterable, Union
 
 import toml
@@ -59,7 +60,7 @@ class PoetryAnalyzer(DepAnalyzer):
             )
             self.run_command("printenv")
             self.log.debug(open(output_file.name).read())
-            self.log.debug((self._temp_proj_dir / "poetry.lock").read_text())
+            self.log.debug((Path(self._temp_proj_dir.name) / "poetry.lock").read_text())
             with open(output_file.name, "r") as f:
                 yield from self.process_requirements(f)
         finally:
