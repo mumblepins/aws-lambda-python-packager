@@ -64,8 +64,10 @@ def test_export_no_ignore_packages_no_update_pyproject(temp_path_filled):
 
 def test_arm64(temp_path_filled):
     src, dst, _ = temp_path_filled
-    lp = LambdaPackager(src, dst, update_dependencies=False, ignore_packages=False, architecture="arm64")
-    lp.package()
+    main_args([str(a) for a in ["-vv", "--architecture", "arm64", src, dst]])
+
+    # lp = LambdaPackager(src, dst, update_dependencies=False, ignore_packages=False, architecture="arm64")
+    # lp.package()
     numpy_file = list(dst.glob("numpy*dist-info/WHEEL"))[0]
     assert "manylinux2014_aarch64" in numpy_file.read_text()
 
