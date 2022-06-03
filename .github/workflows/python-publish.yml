@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python-version: [ '3.9' ]
+        python-version: [ '3.9' ,'3.10','3.8' ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -51,7 +51,7 @@ jobs:
 
       - name: run pre-commit
         uses: pre-commit/action@v2.0.3
-#        run: poetry run pre-commit run --all-files
+      #        run: poetry run pre-commit run --all-files
       - name: run tests
         run: |
           poetry run pytest "tests/" \
