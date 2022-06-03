@@ -4,8 +4,8 @@ import logging
 import sys
 from pathlib import Path
 
-from aws_lambda_python_packager._log_formatter import _CustomLogFormatter
-from aws_lambda_python_packager.lambda_packager import LambdaPackager
+from ._log_formatter import _CustomLogFormatter
+from .lambda_packager import LambdaPackager
 
 LOG = logging.getLogger(__name__)
 

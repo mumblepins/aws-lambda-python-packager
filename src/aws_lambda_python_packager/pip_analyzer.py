@@ -1,13 +1,23 @@
 # -*- coding: utf-8 -*-
-import sys
 import tempfile
+from importlib.metadata import distributions
 from os import PathLike
 from pathlib import Path
-from typing import Iterable, Union
-
-import pkg_resources  # nodep
+from typing import (
+    Dict,
+    Iterable,
+    Union,
+)
 
 from .dep_analyzer import DepAnalyzer, PackageInfo
+
+
+def get_packages(path):
+    if not isinstance(path, list):
+        path = [str(path)]
+    dists = distributions(path=path)
+    # noinspection PyProtectedMember
+    return {b.metadata["Name"]: b.version for b in dists}
 
 
 class PipAnalyzer(DepAnalyzer):
@@ -23,6 +33,11 @@ class PipAnalyzer(DepAnalyzer):
         update_dependencies=False,
     ):
         super().__init__(project_root, python_version, architecture, region, ignore_packages, update_dependencies)
+        # try:
+        #     import pkg_resources
+        # except ImportError:
+        #     self.log.error("pip is not installed")
+        #     raise
         self.copy_to_temp_dir(("requirements.txt",))
 
     def _get_requirements(self) -> Iterable[PackageInfo]:
@@ -35,36 +50,25 @@ class PipAnalyzer(DepAnalyzer):
                 Path(self._temp_proj_dir.name) / "requirements.txt",
                 quiet=True,
             )
-            old_path = sys.path.copy()
-            try:
-                sys.path = [tmpdir]
-                # sys.path.insert(0, tmpdir)
 
-                # noinspection PyProtectedMember
-                pkg_resources._initialize_master_working_set()  # type: ignore
-                pkg_list = [pkg for pkg in pkg_resources.working_set if pkg.location.startswith(tmpdir)]
-            finally:
-                sys.path = old_path
-                # noinspection PyProtectedMember
-                pkg_resources._initialize_master_working_set()  # type: ignore
-            for pkg in pkg_list:
-                yield PackageInfo(pkg.project_name, pkg.version, str(pkg.as_requirement()))
+            for pkg, version in get_packages(tmpdir).items():
+                yield PackageInfo(pkg, version, f"{pkg}=={version}")
 
-    def _update_dependency_file(self, pkgs_to_add: dict[str, PackageInfo]):
+    def _update_dependency_file(self, pkgs_to_add: Dict[str, PackageInfo]):
         self.backup_files(["requirements.txt"])
         self.log.debug("Updating requirements.txt with %s", ", ".join(f"{k}=={v}" for k, v in pkgs_to_add.items()))
         new_lines = []
-        with open(Path(self._temp_proj_dir.name) / "requirements.txt", "r") as f:
+        with open(Path(self._temp_proj_dir.name) / "requirements.txt", "r", encoding="utf8") as f:
             for pkg in self.process_requirements(f):
                 if pkg.name not in pkgs_to_add:
                     new_lines.append(pkg.version_spec)
             for pkg in pkgs_to_add.values():
                 new_lines.append(pkg.version_spec)
-        with open(Path(self._temp_proj_dir.name) / "requirements.txt", "w") as f:
+        with open(Path(self._temp_proj_dir.name) / "requirements.txt", "w", encoding="utf8") as f:
             f.write("\n".join(new_lines))
             f.write("\n")
         self.copy_from_temp_dir(["requirements.txt"])
 
-    def direct_dependencies(self) -> dict[str, str]:
+    def direct_dependencies(self) -> Dict[str, str]:
         with (self.project_root / "requirements.txt").open() as f:
             return {a.name: a.version for a in self.process_requirements(f)}

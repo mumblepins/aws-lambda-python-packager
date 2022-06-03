@@ -19,9 +19,9 @@ python-certifi-win32 = { version = "*", markers = "platform_system == 'Windows'"
 fsspec = "*"
 appdirs = "*"
 aiohttp = "*"
+colorama = ">=0.4"
+toml = ">=0.10"
 packaging = "*"
-colorama = "^0.4.4"
-toml = "^0.10.2"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.13.0"
@@ -44,7 +44,7 @@ myst-parser = "^0.17.2"
 [tool.poetry.extras]
 
 [build-system]
-requires = ["poetry-core>=1.1.0a7"]
+requires = ["poetry-core>=1.1.0b2"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
@@ -128,3 +128,5 @@ ignore_missing_imports = true
 
 [tool.dep_checker]
 allowed_unused = ["python_certifi_win32", 'aiohttp']
+[tool.dep_checker.name_mapping]
+setuptools="pkg_resources"

@@ -17,11 +17,11 @@ from pathlib import Path
 from typing import Type, Union
 from zipfile import ZIP_DEFLATED, ZipFile
 
-from aws_lambda_python_packager.aws_wrangler import fetch_package
-from aws_lambda_python_packager.dep_analyzer import DepAnalyzer
-from aws_lambda_python_packager.pip_analyzer import PipAnalyzer
-from aws_lambda_python_packager.poetry_analyzer import PoetryAnalyzer
-from aws_lambda_python_packager.util import get_lambda_runtimes
+from .aws_wrangler import fetch_package
+from .dep_analyzer import DepAnalyzer
+from .pip_analyzer import PipAnalyzer
+from .poetry_analyzer import PoetryAnalyzer
+from .util import get_lambda_runtimes
 
 LOG = logging.getLogger(__name__)
 PLATFORMS = get_lambda_runtimes()

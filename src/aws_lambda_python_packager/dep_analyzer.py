@@ -13,7 +13,10 @@ from functools import partial
 from os import PathLike
 from pathlib import Path
 from typing import (
+    Any,
+    Dict,
     Iterable,
+    Optional,
     Tuple,
     Union,
 )
@@ -32,7 +35,8 @@ PackageInfo = namedtuple("PackageInfo", ["name", "version", "version_spec"])
 PACKAGE_URL = "https://raw.githubusercontent.com/mumblepins/aws-get-lambda-python-pkg-versions/main/{region}-python{python_version}-{architecture}.json"
 
 
-class DepAnalyzer(ABC):
+class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
+
     project_root: Path
 
     analyzer_name: str
@@ -48,7 +52,7 @@ class DepAnalyzer(ABC):
         update_dependencies=False,
     ):
         self._exported_reqs = None
-        self._reqs = None
+        self._reqs: Optional[Dict[Any, PackageInfo]] = None
         self._pkgs_to_ignore_dict = None
         if project_root is None:
             self.project_root = Path.cwd()
@@ -64,9 +68,9 @@ class DepAnalyzer(ABC):
 
         self.ignore_packages = ignore_packages
         self.update_dependencies = update_dependencies
-        self._temp_proj_dir = tempfile.TemporaryDirectory()
+        self._temp_proj_dir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
         self._chdir = partial(chdir_cm, self._temp_proj_dir.name)
-        self._target = tempfile.TemporaryDirectory()
+        self._target = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
         self.log = logging.getLogger(self.__class__.__name__)
 
     def __del__(self):
@@ -84,11 +88,11 @@ class DepAnalyzer(ABC):
         pass
 
     @abstractmethod
-    def _update_dependency_file(self, pkgs_to_add: dict[str, PackageInfo]):
+    def _update_dependency_file(self, pkgs_to_add: Dict[str, PackageInfo]):
         pass
 
     @abstractmethod
-    def direct_dependencies(self) -> dict[str, str]:
+    def direct_dependencies(self) -> Dict[str, str]:
         pass
 
     # endregion
@@ -111,7 +115,7 @@ class DepAnalyzer(ABC):
         return {k: PackageInfo(k, v, f"{k}=={v}") for k, v in self.pkgs_to_ignore_dict.items()}
 
     @property
-    def requirements(self) -> dict[str, PackageInfo]:
+    def requirements(self) -> Dict[str, PackageInfo]:
         if self._reqs is None:
             self.log.warning("Exporting requirements")
             self.update_dependency_file()
@@ -173,8 +177,8 @@ class DepAnalyzer(ABC):
             r.raise_for_status()
             data = r.json()
             pkgs_to_ignore_dict = data
-        except Exception as e:
-            self.log.warning(f"Failed to get packages to ignore: {e}", exc_info=True)
+        except Exception as e:  # pylint: disable=broad-except
+            self.log.warning("Failed to get packages to ignore: %s", e, exc_info=True)
             pkgs_to_ignore_dict = {}
         return pkgs_to_ignore_dict
 

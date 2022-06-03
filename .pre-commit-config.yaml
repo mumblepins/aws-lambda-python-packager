@@ -1,10 +1,22 @@
 exclude: ^(buildspec.yml|.pre-commit-config.yaml)$
 fail_fast: false
 repos:
-  - repo: https://github.com/mumblepins/pre-commit-poetry
-    rev: v0.0.3
+  - repo: https://github.com/python-poetry/poetry
+    rev: 89e3f7ba019e89c0901215d97e8af3694291cb28
     hooks:
-      - id: pre_commit_poetry
+      - id: poetry-lock
+        args: [ "--no-update" ]
+#      - id: poetry-export
+#        args:
+#          - "-o"
+#          - "src/requirements.txt"
+#          - "-f"
+#          - "requirements.txt"
+#          - "--without-hashes"
+  #  - repo: https://github.com/mumblepins/pre-commit-poetry
+  #    rev: v0.0.3
+  #    hooks:
+  #      - id: pre_commit_poetry
   - repo: https://github.com/pycqa/isort
     rev: 5.10.1
     hooks:
@@ -65,35 +77,36 @@ repos:
     hooks:
       - id: flake2lint
   - repo: https://github.com/mumblepins/dep_checker
-    rev: v0.6.3
+    rev: 4823f489cf748e4cef85d73520900874cd0b4dc7
     hooks:
       - id: dep_checker
         args:
-          - -dsrc
-          - aws_lambda_python_packager
+          - --req-file
+          - pyproject.toml
+          - src/aws_lambda_python_packager
   - repo: local
     hooks:
       - id: mypy
         name: mypy
         entry: mypy
         language: system
-        stages: [manual]
+        stages: [ manual ]
         pass_filenames: false
         args: [ "--config-file", "pyproject.toml","--no-incremental" ]
       - id: pylint
         name: pylint
         entry: pylint
-        stages: [manual]
+        stages: [ manual ]
         language: system
         types: [ python ]
         args:
           [
             "-rn", # Only display messages
-            "-sn", # Don't display the score
+#            "-sn", # Don't display the score
           ]
       - id: pytest-local
         name: pytest-local
-        stages: [manual]
+        stages: [ manual ]
         description: Run pytest in the local virtualenv
         entry: >
           pytest

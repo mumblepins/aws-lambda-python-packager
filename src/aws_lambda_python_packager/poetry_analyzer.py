@@ -6,7 +6,11 @@ from contextlib import contextmanager
 from functools import partial
 from os import PathLike
 from pathlib import Path
-from typing import Iterable, Union
+from typing import (
+    Dict,
+    Iterable,
+    Union,
+)
 
 import toml
 
@@ -15,6 +19,7 @@ from .dep_analyzer import (
     DepAnalyzer,
     PackageInfo,
 )
+from .poetry_hack import export_requirements
 from .util import chdir_cm, chgenv_cm
 
 
@@ -40,34 +45,40 @@ class PoetryAnalyzer(DepAnalyzer):
             raise CommandNotFoundError("poetry not found, please install and add to PATH")
         self.copy_to_temp_dir(("poetry.lock", "pyproject.toml"))
 
-        self._poetry_env = tempfile.TemporaryDirectory()
+        self._poetry_env = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
         self._chgenv = partial(
             chgenv_cm,
-            POETRY_VIRTUALENVS_CREATE="true",
+            # POETRY_VIRTUALENVS_CREATE="false",
             POETRY_VIRTUALENVS_IN_PROJECT="false",
             POETRY_VIRTUALENVS_PATH=self._poetry_env.name,
             VIRTUAL_ENV=None,
         )
 
+    def locked(self):
+        return self.run_poetry("lock", "--check", return_state=True, quiet=True)
+
+    def lock(self):
+        return self.run_poetry("lock", "--no-update", quiet=True)
+
     def _get_requirements(self) -> Iterable[PackageInfo]:
         output_file = None
-
+        if not self.locked():
+            self.log.info("Locking dependencies")
+            self.lock()
         try:
-            output_file = tempfile.NamedTemporaryFile(delete=False)
-            output_file.close()
-            self.run_poetry(
-                "export", "--format=requirements.txt", "-o", output_file.name, "--without-hashes", quiet=True
+            with self._change_context():
+                reqs = export_requirements(Path(self._temp_proj_dir.name))
+
+            self.log.debug(  # pylint: disable=logging-not-lazy
+                "\n" + "".join([f"requirements.txt>>  {a}" for a in reqs.splitlines(keepends=True)])
             )
-            self.run_command("printenv")
-            self.log.debug(open(output_file.name).read())
-            self.log.debug((Path(self._temp_proj_dir.name) / "poetry.lock").read_text())
-            with open(output_file.name, "r") as f:
-                yield from self.process_requirements(f)
+
+            yield from self.process_requirements(reqs.splitlines(keepends=True))
         finally:
             if output_file:
                 os.remove(output_file.name)
 
-    def _update_dependency_file(self, pkgs_to_add: dict[str, PackageInfo]):
+    def _update_dependency_file(self, pkgs_to_add: Dict[str, PackageInfo]):
         self.backup_files(["pyproject.toml", "poetry.lock"])
         self.log.debug("Updating pyproject.toml with %s", ", ".join(f"{k}=={v}" for k, v in pkgs_to_add.items()))
         self.run_poetry("add", "--lock", *[f"{k}=={v.version}" for k, v in pkgs_to_add.items()])
@@ -105,7 +116,7 @@ class PoetryAnalyzer(DepAnalyzer):
             self.log.warning("Package not built with poetry, falling back to .py files")
             super().install_root()
 
-    def direct_dependencies(self) -> dict[str, str]:
+    def direct_dependencies(self) -> Dict[str, str]:
 
         pyproject = self.project_root / "pyproject.toml"
         with pyproject.open() as f:

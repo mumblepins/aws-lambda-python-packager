@@ -1,15 +1,14 @@
 [MASTER]
 
-ignore=CVS
-jobs=1
-persistent=yes
+ignore = CVS
+jobs = 1
+persistent = yes
 
 [MESSAGES CONTROL]
 
-disable=
+disable =
     missing-docstring,          # not everything needs a docstring
     fixme,                      # work in progress
-    bad-continuation,           # clashes with black
     duplicate-code,             # finds dupes between tests and plugins
     too-few-public-methods,     # triggers when inheriting
     ungrouped-imports,          # clashes with isort
@@ -17,9 +16,12 @@ disable=
 
 [BASIC]
 
-good-names=e,ex,f,fp,i,j,k,n,_
+good-names = e,ex,f,fp,i,j,k,n,_
 
 [FORMAT]
 
-indent-string='    '
-max-line-length=160
+indent-string = '    '
+max-line-length = 160
+
+[DESIGN]
+max-args = 8
