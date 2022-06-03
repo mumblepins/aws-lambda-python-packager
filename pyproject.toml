@@ -41,6 +41,8 @@ types-toml = "^0.10.7"
 types-setuptools = "^57.4.17"
 myst-parser = "^0.17.2"
 
+importlib-resources = { version = "^5.7.1", python = "<3.9" }
+
 [tool.poetry.extras]
 
 [build-system]
@@ -129,4 +131,4 @@ ignore_missing_imports = true
 [tool.dep_checker]
 allowed_unused = ["python_certifi_win32", 'aiohttp']
 [tool.dep_checker.name_mapping]
-setuptools="pkg_resources"
+setuptools = "pkg_resources"
