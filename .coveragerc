@@ -1,6 +1,6 @@
 [run]
 branch = False
-concurrency = multiprocessing
+concurrency = multiprocessing,thread
 parallel = true
 
 [report]
