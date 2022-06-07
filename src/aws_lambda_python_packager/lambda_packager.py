@@ -113,29 +113,31 @@ class LambdaPackager:
             LOG.warning("pyarrow version %s not found", vers_str)
 
     def strip_tests(self):
-        LOG.info("Stripping tests")
+        LOG.warning("Stripping tests")
         for p in self.output_dir.glob("**/*"):
             if p.is_file() and "tests" in p.relative_to(self.output_dir).parts:
                 LOG.debug("Stripping test file %s", p)
-                p.unlink()
+                p.unlink(missing_ok=True)
 
     def compile_python(self):
         if self.python_version.lstrip("python") == ".".join(platform.python_version_tuple()[:2]):
-            LOG.info("Compiling package")
+            LOG.warning("Compiling package")
+            LOG.debug('Target Python version: "%s"', self.python_version)
+            LOG.debug('Build Python Version: "%s"', ".".join(platform.python_version_tuple()))
             compile_dir(self.output_dir, quiet=2, optimize=2, workers=0, legacy=True)
             return True
         LOG.warning("Not compiling package, python version mismatch")
         return False
 
     def strip_python(self):
-        LOG.info("Stripping pythons scripts")
+        LOG.warning("Stripping python scripts")
         for p in self.output_dir.glob("**/*"):
             if p.is_file() and p.name.endswith(".py"):
                 LOG.debug("Stripping python file %s", p)
                 p.unlink()
 
     def strip_other_files(self):
-        LOG.info("Stripping other files")
+        LOG.warning("Stripping other files")
         for p in self.output_dir.glob("**/*"):
             if p.is_file() and p.suffix in (".pyx", ".pyi", ".pxi", ".pxd", ".c", ".h", ".cc"):
                 LOG.debug("Stripping file %s", p)
@@ -143,13 +145,13 @@ class LambdaPackager:
 
     def strip_libraries(self):
         try:
-            LOG.info("Stripping libraries")
+            LOG.warning("Stripping libraries")
             strip_command = get_strip_binary(self.architecture)
             for p in self.output_dir.glob("**/*.so*"):
                 LOG.debug('Stripping library "%s"', p)
                 subprocess.run([strip_command, str(p)])  # nosec: B603 pylint: disable=subprocess-run-check
         except Exception:  # pylint: disable=broad-except
-            LOG.warning("Failed to strip libraries, perhaps we don't have the 'strip' command?")
+            LOG.error("Failed to strip libraries, perhaps we don't have the 'strip' command?")
 
     def zip_output(self, zip_output):
         if isinstance(zip_output, bool):
@@ -203,12 +205,13 @@ class LambdaPackager:
             self.strip_libraries()
         size_out = self.get_total_size()
         if size_out > MAX_LAMBDA_SIZE:
-            LOG.warning(
+            LOG.error(
                 "Package size %s exceeds maximum lambda size %s", sizeof_fmt(size_out), sizeof_fmt(MAX_LAMBDA_SIZE)
             )
         else:
-            LOG.info("Package size: %s", sizeof_fmt(size_out))
+            LOG.warning("Package size: %s", sizeof_fmt(size_out))
         if zip_output:
+            LOG.warning("Zipping output")
             self.zip_output(zip_output)
 
 

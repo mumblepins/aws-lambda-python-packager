@@ -23,6 +23,9 @@ jobs:
       fail-fast: true
       matrix:
         python-version: [ '3.9' ,'3.10','3.8' ]
+    env:
+      OS: ${{ matrix.os }}
+      PYTHON: ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -63,6 +66,7 @@ jobs:
       - uses: codecov/codecov-action@v2
         with:
           files: ./coverage.xml
+          env_vars: OS,PYTHON
   deploy:
     needs:
       - pre_job

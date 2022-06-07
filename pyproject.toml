@@ -10,7 +10,7 @@ readme = "README.md"
 packages = [{ include = "aws_lambda_python_packager", from = "src" }]
 
 [tool.poetry.scripts]
-lambda-packager = "aws_lambda_python_packager:main_cli"
+lambda-packager = "aws_lambda_python_packager.__main__:main_cli"
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -42,6 +42,7 @@ types-setuptools = "^57.4.17"
 myst-parser = "^0.17.2"
 
 importlib-resources = { version = "^5.7.1", python = "<3.9" }
+bump2version = "^1.0.1"
 
 [tool.poetry.extras]
 

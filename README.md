@@ -1,5 +1,10 @@
 # AWS Lambda Python Packager
 
+[![Checks][checks-shield]][checks-url]
+[![Codecov][codecov-shield]][codecov-url]
+
+
+
 An alternate way to package Python functions for AWS Lambda. Works cross-platform and cross-architecture if binary packages are available for all packages.
 
 ```shell
@@ -49,3 +54,8 @@ Optimization Options:
                         --strip-python --use-aws-pyarrow (default: 0)
 
 ```
+
+
+
+[codecov-shield]: https://img.shields.io/codecov/c/github/mumblepins/aws-lambda-python-packager
+[codecov-url]: https://app.codecov.io/gh/mumblepins/aws-lambda-python-packager

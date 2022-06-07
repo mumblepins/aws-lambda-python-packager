@@ -101,6 +101,14 @@ python-versions = ">=3.6"
 pytz = ">=2015.7"
 
 [[package]]
+name = "bump2version"
+version = "1.0.1"
+description = "Version-bump your software with a single command!"
+category = "dev"
+optional = false
+python-versions = ">=3.5"
+
+[[package]]
 name = "certifi"
 version = "2022.5.18.1"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -535,7 +543,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "pylint"
-version = "2.14.0"
+version = "2.14.1"
 description = "python code static checker"
 category = "dev"
 optional = false
@@ -694,7 +702,7 @@ use_chardet_on_py3 = ["chardet (>=3.0.2,<5)"]
 
 [[package]]
 name = "setuptools"
-version = "62.3.2"
+version = "62.3.3"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 category = "main"
 optional = false
@@ -997,7 +1005,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "219439d89c70788f3474bfa037dc46f3a09d0994bd72d0ed24912f8b37ae8265"
+content-hash = "7efa4e5e57b461425879c9e40d1cf0097e8eddceefc5179b520a11088ab24d94"
 
 [metadata.files]
 aiohttp = [
@@ -1105,6 +1113,10 @@ attrs = [
 babel = [
     {file = "Babel-2.10.1-py3-none-any.whl", hash = "sha256:3f349e85ad3154559ac4930c3918247d319f21910d5ce4b25d439ed8693b98d2"},
     {file = "Babel-2.10.1.tar.gz", hash = "sha256:98aeaca086133efb3e1e2aad0396987490c8425929ddbcfe0550184fdc54cd13"},
+]
+bump2version = [
+    {file = "bump2version-1.0.1-py2.py3-none-any.whl", hash = "sha256:37f927ea17cde7ae2d7baf832f8e80ce3777624554a653006c9144f8017fe410"},
+    {file = "bump2version-1.0.1.tar.gz", hash = "sha256:762cb2bfad61f4ec8e2bdf452c7c267416f8c70dd9ecb1653fd0bbb01fa936e6"},
 ]
 certifi = [
     {file = "certifi-2022.5.18.1-py3-none-any.whl", hash = "sha256:f1d53542ee8cbedbe2118b5686372fb33c297fcd6379b050cca0ef13a597382a"},
@@ -1502,8 +1514,8 @@ pygments = [
     {file = "Pygments-2.12.0.tar.gz", hash = "sha256:5eb116118f9612ff1ee89ac96437bb6b49e8f04d8a13b514ba26f620208e26eb"},
 ]
 pylint = [
-    {file = "pylint-2.14.0-py3-none-any.whl", hash = "sha256:ef64ce5d4c17b8906caeaf2c2914ef3036a3a1b7f4a86f5fbf6caff9067c5f63"},
-    {file = "pylint-2.14.0.tar.gz", hash = "sha256:10d291ea5133645f73fc1b51ca137ad6531223c1461a5632a1db029a9bc033b5"},
+    {file = "pylint-2.14.1-py3-none-any.whl", hash = "sha256:bb71e6d169506de585edea997e48d9ff20c0dc0e2fbc1d166bad6b640120326b"},
+    {file = "pylint-2.14.1.tar.gz", hash = "sha256:549261e0762c3466cc001024c4419c08252cb8c8d40f5c2c6966fea690e7fe2a"},
 ]
 pylint-pytest = [
     {file = "pylint_pytest-1.1.2-py2.py3-none-any.whl", hash = "sha256:fb20ef318081cee3d5febc631a7b9c40fa356b05e4f769d6e60a337e58c8879b"},
@@ -1575,8 +1587,8 @@ requests = [
     {file = "requests-2.27.1.tar.gz", hash = "sha256:68d7c56fd5a8999887728ef304a6d12edc7be74f1cfa47714fc8b414525c9a61"},
 ]
 setuptools = [
-    {file = "setuptools-62.3.2-py3-none-any.whl", hash = "sha256:68e45d17c9281ba25dc0104eadd2647172b3472d9e01f911efa57965e8d51a36"},
-    {file = "setuptools-62.3.2.tar.gz", hash = "sha256:a43bdedf853c670e5fed28e5623403bad2f73cf02f9a2774e91def6bda8265a7"},
+    {file = "setuptools-62.3.3-py3-none-any.whl", hash = "sha256:d1746e7fd520e83bbe210d02fff1aa1a425ad671c7a9da7d246ec2401a087198"},
+    {file = "setuptools-62.3.3.tar.gz", hash = "sha256:e7d11f3db616cda0751372244c2ba798e8e56a28e096ec4529010b803485f3fe"},
 ]
 setuptools-scm = [
     {file = "setuptools_scm-6.4.2-py3-none-any.whl", hash = "sha256:acea13255093849de7ccb11af9e1fb8bde7067783450cee9ef7a93139bddf6d4"},

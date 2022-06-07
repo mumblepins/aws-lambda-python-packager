@@ -18,7 +18,7 @@
       <excludeFolder url="file://$MODULE_DIR$/tdist3/pandas/_libs/src/ujson/lib" />
       <excludeFolder url="file://$MODULE_DIR$/tdist4" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Poetry (aws-lambda-python-packager)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PackageRequirementsSettings">
