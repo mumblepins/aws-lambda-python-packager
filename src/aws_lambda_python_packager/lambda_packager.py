@@ -21,10 +21,9 @@ from .aws_wrangler import fetch_package
 from .dep_analyzer import DepAnalyzer
 from .pip_analyzer import PipAnalyzer
 from .poetry_analyzer import PoetryAnalyzer
-from .util import get_lambda_runtimes
+from .util import PLATFORMS
 
 LOG = logging.getLogger(__name__)
-PLATFORMS = get_lambda_runtimes()
 MAX_LAMBDA_SIZE = 250 * 1024 * 1024  # 250MB
 
 
