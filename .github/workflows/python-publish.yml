@@ -9,15 +9,14 @@ jobs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
     steps:
       - id: skip_check
-        uses: fkirc/skip-duplicate-actions@master
+        uses: fkirc/skip-duplicate-actions@v4.0.0
         with:
-          concurrent_skipping: 'same_content'
+          concurrent_skipping: 'same_content_newer'
           do_not_skip: '["pull_request", "workflow_dispatch", "schedule", "create", "release"]'
-
 
   test:
     needs: pre_job
-    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' || contains(github.ref, 'refs/tags/v')}}
 
     strategy:
       fail-fast: true
@@ -71,7 +70,7 @@ jobs:
     needs:
       - pre_job
       - test
-    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' || contains(github.ref, 'refs/tags/v') }}
     runs-on: ubuntu-latest
 
     steps:
