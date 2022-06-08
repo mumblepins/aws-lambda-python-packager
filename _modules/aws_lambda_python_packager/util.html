@@ -68,6 +68,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
 <span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">PathLike</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
@@ -83,6 +84,12 @@
 <span class="p">)</span>
 
 <span class="n">PACKAGE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/mumblepins/aws-get-lambda-python-pkg-versions/main/</span><span class="si">{region}</span><span class="s2">-</span><span class="si">{python_version}</span><span class="s2">-</span><span class="si">{architecture}</span><span class="s2">.json&quot;</span>
+
+
+<div class="viewcode-block" id="ArchitectureUnsupported"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.util.ArchitectureUnsupported">[docs]</a><span class="k">class</span> <span class="nc">ArchitectureUnsupported</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Exception raised when the architecture is not supported&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="get_lambda_runtimes"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.util.get_lambda_runtimes">[docs]</a><span class="k">def</span> <span class="nf">get_lambda_runtimes</span><span class="p">():</span>
@@ -103,6 +110,53 @@
             <span class="k">for</span> <span class="n">arch</span> <span class="ow">in</span> <span class="n">archs</span><span class="p">:</span>
                 <span class="n">runtimes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">runtime</span><span class="p">,</span> <span class="n">arch</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">runtimes</span></div>
+
+
+<div class="viewcode-block" id="check_architecture"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.util.check_architecture">[docs]</a><span class="k">def</span> <span class="nf">check_architecture</span><span class="p">(</span><span class="n">architecture</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Checks if the given architecture is supported</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        architecture: Architecture to check</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        True if the architecture is supported, False otherwise</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">architecture</span> <span class="o">=</span> <span class="n">architecture</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">architecture</span> <span class="o">==</span> <span class="s2">&quot;aarch64&quot;</span><span class="p">:</span>
+        <span class="n">architecture</span> <span class="o">=</span> <span class="s2">&quot;arm64&quot;</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">arch</span> <span class="ow">in</span> <span class="n">PLATFORMS</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">arch</span> <span class="o">==</span> <span class="n">architecture</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">architecture</span>
+    <span class="k">raise</span> <span class="n">ArchitectureUnsupported</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">architecture</span><span class="si">}</span><span class="s2"> not supported&quot;</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span></div>
+
+
+<div class="viewcode-block" id="get_python_runtime"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.util.get_python_runtime">[docs]</a><span class="k">def</span> <span class="nf">get_python_runtime</span><span class="p">(</span><span class="n">architecture</span><span class="o">=</span><span class="s2">&quot;x86_64&quot;</span><span class="p">,</span> <span class="n">target_version</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets an allowed python runtime for the given architecture</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        architecture: Architecture to target (x86_64 or arm64)</span>
+<span class="sd">        target_version: Python version to target</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A tuple of (python_version, architecture)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">architecture</span> <span class="o">=</span> <span class="n">check_architecture</span><span class="p">(</span><span class="n">architecture</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">target_version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">py_version</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_version</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">target_version</span> <span class="o">=</span> <span class="n">target_version</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;python&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+        <span class="n">py_version</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">target_version</span><span class="p">)</span>
+
+    <span class="n">filtered_platforms</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">architecture</span><span class="p">,</span>
+        <span class="p">[(</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pv</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;python&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)),</span> <span class="n">ar</span><span class="p">)</span> <span class="k">for</span> <span class="n">pv</span><span class="p">,</span> <span class="n">ar</span> <span class="ow">in</span> <span class="n">PLATFORMS</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">allowed_py_version</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">filtered_platforms</span><span class="p">]</span>
+    <span class="n">py_version_constrained</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">py_version</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">allowed_py_version</span><span class="p">)),</span> <span class="nb">min</span><span class="p">(</span><span class="n">allowed_py_version</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">py_version_constrained</span><span class="p">,</span> <span class="n">architecture</span></div>
 
 
 <div class="viewcode-block" id="chdir_cm"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.util.chdir_cm">[docs]</a><span class="nd">@contextmanager</span>
@@ -129,6 +183,9 @@
     <span class="k">finally</span><span class="p">:</span>
         <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">old_env</span><span class="p">)</span></div>
+
+
+<span class="n">PLATFORMS</span> <span class="o">=</span> <span class="n">get_lambda_runtimes</span><span class="p">()</span>
 </pre></div>
 
            </div>

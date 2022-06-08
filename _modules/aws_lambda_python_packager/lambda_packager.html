@@ -87,10 +87,9 @@
 <span class="kn">from</span> <span class="nn">.dep_analyzer</span> <span class="kn">import</span> <span class="n">DepAnalyzer</span>
 <span class="kn">from</span> <span class="nn">.pip_analyzer</span> <span class="kn">import</span> <span class="n">PipAnalyzer</span>
 <span class="kn">from</span> <span class="nn">.poetry_analyzer</span> <span class="kn">import</span> <span class="n">PoetryAnalyzer</span>
-<span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">get_lambda_runtimes</span>
+<span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">PLATFORMS</span>
 
 <span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-<span class="n">PLATFORMS</span> <span class="o">=</span> <span class="n">get_lambda_runtimes</span><span class="p">()</span>
 <span class="n">MAX_LAMBDA_SIZE</span> <span class="o">=</span> <span class="mi">250</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>  <span class="c1"># 250MB</span>
 
 

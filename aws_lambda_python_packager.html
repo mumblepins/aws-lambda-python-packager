@@ -383,10 +383,31 @@ from the AWS lambda environment (ignored if ignore_packages is False)</p></li>
 </section>
 <section id="module-aws_lambda_python_packager.util">
 <span id="aws-lambda-python-packager-util-module"></span><h2>aws_lambda_python_packager.util module<a class="headerlink" href="#module-aws_lambda_python_packager.util" title="Permalink to this headline"></a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="aws_lambda_python_packager.util.ArchitectureUnsupported">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.util.</span></span><span class="sig-name descname"><span class="pre">ArchitectureUnsupported</span></span><a class="reference internal" href="_modules/aws_lambda_python_packager/util.html#ArchitectureUnsupported"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.util.ArchitectureUnsupported" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Exception raised when the architecture is not supported</p>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.util.chdir_cm">
 <span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.util.</span></span><span class="sig-name descname"><span class="pre">chdir_cm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.10)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.10)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/util.html#chdir_cm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.util.chdir_cm" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aws_lambda_python_packager.util.check_architecture">
+<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.util.</span></span><span class="sig-name descname"><span class="pre">check_architecture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">architecture</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/util.html#check_architecture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.util.check_architecture" title="Permalink to this definition"></a></dt>
+<dd><p>Checks if the given architecture is supported</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>architecture</strong> – Architecture to check</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if the architecture is supported, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.util.chgenv_cm">
@@ -398,6 +419,23 @@ from the AWS lambda environment (ignored if ignore_packages is False)</p></li>
 <span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.util.</span></span><span class="sig-name descname"><span class="pre">get_lambda_runtimes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/util.html#get_lambda_runtimes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.util.get_lambda_runtimes" title="Permalink to this definition"></a></dt>
 <dd><p>Gets a list of supported Lambda runtimes from the AWS docs</p>
 <p>Returns:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aws_lambda_python_packager.util.get_python_runtime">
+<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.util.</span></span><span class="sig-name descname"><span class="pre">get_python_runtime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">architecture</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x86_64'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/util.html#get_python_runtime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.util.get_python_runtime" title="Permalink to this definition"></a></dt>
+<dd><p>Gets an allowed python runtime for the given architecture</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>architecture</strong> – Architecture to target (x86_64 or arm64)</p></li>
+<li><p><strong>target_version</strong> – Python version to target</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A tuple of (python_version, architecture)</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
