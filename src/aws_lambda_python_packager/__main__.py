@@ -4,6 +4,7 @@ import logging
 import sys
 from pathlib import Path
 
+from . import __version__
 from ._log_formatter import _CustomLogFormatter
 from .lambda_packager import LambdaPackager
 
@@ -38,7 +39,7 @@ def arg_parser():
         "--zip-output", "-z", help="Output zip file in addition to directory", const=True, nargs="?", default=False
     )
 
-    parser.add_argument("--version", action="version", version="%(prog)s 2.0")
+    parser.add_argument("--version", "-V", action="version", version=f"%(prog)s {__version__}")
 
     opt_group = parser.add_argument_group("Optimization Options")
     opt_group.add_argument(

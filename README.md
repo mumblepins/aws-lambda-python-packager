@@ -9,9 +9,9 @@ An alternate way to package Python functions for AWS Lambda. Works cross-platfor
 
 ```shell
 $ lambda-packager -h
-usage: lambda-packager [-h] [--ignore-packages] [--update-pyproject]
+usage: lambda-packager [-h] [--ignore-packages] [--update-dependencies]
                        [--python-version PYTHON_VERSION] [--architecture {x86_64,arm64}]
-                       [--region REGION] [--verbose] [--zip-output [ZIP_OUTPUT]]
+                       [--region REGION] [--verbose] [--zip-output [ZIP_OUTPUT]] [--version]
                        [--compile-python] [--use-aws-pyarrow] [--strip-tests] [--strip-libraries]
                        [--strip-python] [--strip-other] [--optimize-all]
                        pyproject_path output_path
@@ -26,8 +26,9 @@ optional arguments:
   -h, --help            show this help message and exit
   --ignore-packages     Ignore packages that are already present in the AWS Lambda Python runtime
                         (default: False)
-  --update-pyproject    Update pyproject.toml with the ignored packages (ignored if not --ignore-
-                        packages) (default: False)
+  --update-dependencies
+                        Update project dependency file with the ignored packages (ignored if not
+                        --ignore-packages) (default: False)
   --python-version PYTHON_VERSION, -pyv PYTHON_VERSION
                         Python version to target (default: 3.9)
   --architecture {x86_64,arm64}, -a {x86_64,arm64}
@@ -36,6 +37,7 @@ optional arguments:
   --verbose, -v         Verbose output (may be specified multiple times) (default: 0)
   --zip-output [ZIP_OUTPUT], -z [ZIP_OUTPUT]
                         Output zip file in addition to directory (default: False)
+  --version, -V         show program's version number and exit
 
 Optimization Options:
   --compile-python      Compile the python bytecode (default: None)
@@ -59,3 +61,6 @@ Optimization Options:
 
 [codecov-shield]: https://img.shields.io/codecov/c/github/mumblepins/aws-lambda-python-packager
 [codecov-url]: https://app.codecov.io/gh/mumblepins/aws-lambda-python-packager
+
+[checks-shield]: https://img.shields.io/github/workflow/status/mumblepins/aws-lambda-python-packager/Python%20Publish?style=flat-square
+[checks-url]: https://github.com/mumblepins/aws-lambda-python-packager/actions/workflows/python-publish.yml
