@@ -50,7 +50,7 @@ jobs:
       - name: install dependencies
         run: |
           poetry install --sync
-          apt-get install -y binutils-aarch64-linux-gnu
+          sudo apt-get install -y binutils-aarch64-linux-gnu
 
       - name: run pre-commit
         uses: pre-commit/action@v2.0.3
