@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>aws_lambda_python_packager.lambda_packager &mdash; aws-lambda-python-packager v1.0.4 documentation</title>
+  <title>aws_lambda_python_packager.lambda_packager &mdash; aws-lambda-python-packager v1.0.6 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -246,35 +246,40 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">analyzer</span><span class="o">.</span><span class="n">install_dependencies</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">analyzer</span><span class="o">.</span><span class="n">install_root</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">analyzer</span><span class="o">.</span><span class="n">copy_from_target</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">)</span>
+        <span class="n">initial_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_total_size</span><span class="p">()</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Pre-strip size: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">initial_size</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">use_wrangler_pyarrow</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">get_aws_wrangler_pyarrow</span><span class="p">()</span>
+            <span class="n">new_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_total_size</span><span class="p">()</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Switched PyArrow size: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%0.1f%%</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">new_size</span><span class="p">),</span> <span class="n">new_size</span> <span class="o">/</span> <span class="n">initial_size</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">strip_python</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">compile_python</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Not stripping python, since compile_python is set to False&quot;</span><span class="p">)</span>
+            <span class="n">strip_python</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">if</span> <span class="n">compile_python</span><span class="p">:</span>
             <span class="n">compiled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compile_python</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">strip_python</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">compiled</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">strip_python</span><span class="p">()</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Unabled to compile python, not stripping python&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">strip_python</span><span class="p">:</span>
-            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Not stripping python, since compile_python is set to False&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">strip_python</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">compiled</span><span class="p">:</span>
+                <span class="n">strip_python</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Unable to compile python, not stripping python&quot;</span><span class="p">)</span>
+            <span class="n">new_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_total_size</span><span class="p">()</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Compiled size: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%0.1f%%</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">new_size</span><span class="p">),</span> <span class="n">new_size</span> <span class="o">/</span> <span class="n">initial_size</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">strip_func</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;strip_python&quot;</span><span class="p">,</span> <span class="s2">&quot;strip_tests&quot;</span><span class="p">,</span> <span class="s2">&quot;strip_libraries&quot;</span><span class="p">,</span> <span class="s2">&quot;strip_other_files&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">locals</span><span class="p">()[</span><span class="n">strip_func</span><span class="p">]:</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strip_func</span><span class="p">)()</span>
+                <span class="n">new_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_total_size</span><span class="p">()</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> done, new size: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%0.1f%%</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">strip_func</span><span class="p">,</span> <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">new_size</span><span class="p">),</span> <span class="n">new_size</span> <span class="o">/</span> <span class="n">initial_size</span> <span class="o">*</span> <span class="mi">100</span>
+                <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">strip_other_files</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">strip_other_files</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="n">strip_tests</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">strip_tests</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="n">strip_libraries</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">strip_libraries</span><span class="p">()</span>
         <span class="n">size_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_total_size</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">size_out</span> <span class="o">&gt;</span> <span class="n">MAX_LAMBDA_SIZE</span><span class="p">:</span>
             <span class="n">LOG</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
                 <span class="s2">&quot;Package size </span><span class="si">%s</span><span class="s2"> exceeds maximum lambda size </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">size_out</span><span class="p">),</span> <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">MAX_LAMBDA_SIZE</span><span class="p">)</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Package size: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">size_out</span><span class="p">))</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Package size: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%0.1f%%</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">size_out</span><span class="p">),</span> <span class="n">size_out</span> <span class="o">/</span> <span class="n">initial_size</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">zip_output</span><span class="p">:</span>
             <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Zipping output&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">zip_output</span><span class="p">(</span><span class="n">zip_output</span><span class="p">)</span></div></div>
