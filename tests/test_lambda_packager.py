@@ -2,12 +2,15 @@
 import os
 from pathlib import Path
 
+import pytest
+
 from aws_lambda_python_packager.__main__ import main_args
 from aws_lambda_python_packager.lambda_packager import LambdaPackager
 
 resources = Path(os.path.realpath(__file__)).parent / "resources"
 
 pkg_type_map = {"poetry": "test_package", "pip": "test_app.py"}
+architectures = [("x86_64", "x86_64"), ("arm64", "aarch64")]
 
 
 def test_export_ignore_packages_update_reqs(temp_path_filled):
@@ -62,40 +65,45 @@ def test_export_no_ignore_packages_no_update_pyproject(temp_path_filled):
     assert "urllib3" not in d_deps
 
 
-def test_arm64(temp_path_filled):
+@pytest.mark.parametrize("arch,pyarch", architectures)
+def test_cli_regular(arch, pyarch, temp_path_filled):
     src, dst, _ = temp_path_filled
-    main_args([str(a) for a in ["-vv", "--architecture", "arm64", src, dst]])
+    main_args([str(a) for a in ["-v", "--architecture", arch, src, dst]])
 
     # lp = LambdaPackager(src, dst, update_dependencies=False, ignore_packages=False, architecture="arm64")
     # lp.package()
     numpy_file = list(dst.glob("numpy*dist-info/WHEEL"))[0]
-    assert "manylinux2014_aarch64" in numpy_file.read_text()
+    assert f"manylinux2014_{pyarch}" in numpy_file.read_text()
 
 
-def test_full_optimize(temp_path_filled):
+@pytest.mark.parametrize("arch,pyarch", architectures)
+def test_optimize(arch, pyarch, temp_path_filled):
+    # TODO: improve tests for optimization
     src, dst, _ = temp_path_filled
-    main_args([str(a) for a in ["-v", "-O", src, dst]])
+    main_args([str(a) for a in ["-v", "-O", "--architecture", arch, src, dst]])
     pyarrow_file = list(dst.glob("**/pyarrow/**/libarrow.so.*"))[0]
-    assert 32_000_000 < os.path.getsize(pyarrow_file) < 40_000_000
+    assert 31_000_000 < os.path.getsize(pyarrow_file) < 40_000_000
     # make sure we aren't using the aws wrangler version
     assert list(dst.glob("**/pyarrow/**/libarrow_flight.so.*"))[0].exists()
 
+    numpy_file = list(dst.glob("numpy*dist-info/WHEEL"))[0]
+    assert f"manylinux2014_{pyarch}" in numpy_file.read_text()
 
-def test_full_optimize_w_awswrangler(temp_path_filled):
+
+@pytest.mark.parametrize("arch,pyarch", architectures)
+def test_full_optimize(arch, pyarch, temp_path_filled):
     src, dst, _ = temp_path_filled
-    main_args([str(a) for a in ["-v", "-O", "--use-aws-pyarrow", src, dst]])
+    main_args([str(a) for a in ["-v", "-OO", "--architecture", arch, src, dst]])
     pyarrow_file = list(dst.glob("**/pyarrow/**/libarrow.so.*"))[0]
     assert os.path.getsize(pyarrow_file) < 32_000_000
     # make sure we are using the aws wrangler version
     assert len(list(dst.glob("**/pyarrow/**/libarrow_flight.so.*"))) == 0
+    numpy_file = list(dst.glob("numpy*dist-info/WHEEL"))[0]
+    assert f"manylinux2014_{pyarch}" in numpy_file.read_text()
 
 
-def test_optimize_all_arm(temp_path_filled):
-    # TODO: improve tests for optimization
+def test_zip(temp_path_filled):
     src, dst, _ = temp_path_filled
     zip_file = src.parent / "test_package.zip"
-    main_args([str(a) for a in ["-v", "-OO", "-z", zip_file, "--architecture", "arm64", src, dst]])
-
-    numpy_file = list(dst.glob("numpy*dist-info/WHEEL"))[0]
-    assert "manylinux2014_aarch64" in numpy_file.read_text()
+    main_args([str(a) for a in ["-v", "-z", zip_file, src, dst]])
     assert zip_file.exists() and zip_file.stat().st_size > 1 * 1024 * 1024

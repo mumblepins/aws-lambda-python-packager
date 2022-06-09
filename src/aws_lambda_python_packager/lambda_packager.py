@@ -180,35 +180,40 @@ class LambdaPackager:
         self.analyzer.install_dependencies()
         self.analyzer.install_root()
         self.analyzer.copy_from_target(self.output_dir)
+        initial_size = self.get_total_size()
+        LOG.info("Pre-strip size: %s", sizeof_fmt(initial_size))
 
         if use_wrangler_pyarrow:
             self.get_aws_wrangler_pyarrow()
+            new_size = self.get_total_size()
+            LOG.info("Switched PyArrow size: %s (%0.1f%%)", sizeof_fmt(new_size), new_size / initial_size * 100)
+
+        if strip_python and not compile_python:
+            LOG.warning("Not stripping python, since compile_python is set to False")
+            strip_python = False
 
         if compile_python:
             compiled = self.compile_python()
-            if strip_python:
-                if compiled:
-                    self.strip_python()
-                else:
-                    LOG.warning("Unabled to compile python, not stripping python")
-        elif strip_python:
-            LOG.warning("Not stripping python, since compile_python is set to False")
+            if strip_python and not compiled:
+                strip_python = False
+                LOG.warning("Unable to compile python, not stripping python")
+            new_size = self.get_total_size()
+            LOG.info("Compiled size: %s (%0.1f%%)", sizeof_fmt(new_size), new_size / initial_size * 100)
+        for strip_func in ("strip_python", "strip_tests", "strip_libraries", "strip_other_files"):
+            if locals()[strip_func]:
+                getattr(self, strip_func)()
+                new_size = self.get_total_size()
+                LOG.info(
+                    "%s done, new size: %s (%0.1f%%)", strip_func, sizeof_fmt(new_size), new_size / initial_size * 100
+                )
 
-        if strip_other_files:
-            self.strip_other_files()
-
-        if strip_tests:
-            self.strip_tests()
-
-        if strip_libraries:
-            self.strip_libraries()
         size_out = self.get_total_size()
         if size_out > MAX_LAMBDA_SIZE:
             LOG.error(
                 "Package size %s exceeds maximum lambda size %s", sizeof_fmt(size_out), sizeof_fmt(MAX_LAMBDA_SIZE)
             )
         else:
-            LOG.warning("Package size: %s", sizeof_fmt(size_out))
+            LOG.warning("Package size: %s (%0.1f%%)", sizeof_fmt(size_out), size_out / initial_size * 100)
         if zip_output:
             LOG.warning("Zipping output")
             self.zip_output(zip_output)
