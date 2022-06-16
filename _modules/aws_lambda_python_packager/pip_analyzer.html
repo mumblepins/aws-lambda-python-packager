@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>aws_lambda_python_packager.pip_analyzer &mdash; aws-lambda-python-packager v1.0.6 documentation</title>
+  <title>aws_lambda_python_packager.pip_analyzer &mdash; aws-lambda-python-packager v1.0.7 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -75,7 +75,11 @@
     <span class="n">Union</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">.dep_analyzer</span> <span class="kn">import</span> <span class="n">DepAnalyzer</span><span class="p">,</span> <span class="n">PackageInfo</span>
+<span class="kn">from</span> <span class="nn">.dep_analyzer</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DepAnalyzer</span><span class="p">,</span>
+    <span class="n">ExtraLine</span><span class="p">,</span>
+    <span class="n">PackageInfo</span><span class="p">,</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="get_packages"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.pip_analyzer.get_packages">[docs]</a><span class="k">def</span> <span class="nf">get_packages</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
@@ -106,7 +110,7 @@
         <span class="c1">#     raise</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">copy_to_temp_dir</span><span class="p">((</span><span class="s2">&quot;requirements.txt&quot;</span><span class="p">,))</span>
 
-    <span class="k">def</span> <span class="nf">_get_requirements</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">PackageInfo</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">_get_requirements</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">PackageInfo</span><span class="p">,</span> <span class="n">ExtraLine</span><span class="p">]]:</span>
         <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_install_pip</span><span class="p">(</span>
                 <span class="s2">&quot;--only-binary=:all:&quot;</span><span class="p">,</span>
@@ -115,10 +119,23 @@
                 <span class="s2">&quot;-r&quot;</span><span class="p">,</span>
                 <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_temp_proj_dir</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;requirements.txt&quot;</span><span class="p">,</span>
                 <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">requirements_file</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="p">)</span>
 
             <span class="k">for</span> <span class="n">pkg</span><span class="p">,</span> <span class="n">version</span> <span class="ow">in</span> <span class="n">get_packages</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">yield</span> <span class="n">PackageInfo</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pkg</span><span class="si">}</span><span class="s2">==</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">extra_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_extra_lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">req_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_root</span> <span class="o">/</span> <span class="s2">&quot;requirements.txt&quot;</span>
+        <span class="k">with</span> <span class="n">req_file</span><span class="o">.</span><span class="n">open</span><span class="p">()</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_requirements</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">ExtraLine</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_extra_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extra_lines</span>
 
     <span class="k">def</span> <span class="nf">_update_dependency_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs_to_add</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PackageInfo</span><span class="p">]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">backup_files</span><span class="p">([</span><span class="s2">&quot;requirements.txt&quot;</span><span class="p">])</span>
@@ -126,6 +143,9 @@
         <span class="n">new_lines</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_temp_proj_dir</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;requirements.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_requirements</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="n">ExtraLine</span><span class="p">):</span>
+                    <span class="n">new_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pkg</span><span class="p">))</span>
+                    <span class="k">continue</span>
                 <span class="k">if</span> <span class="n">pkg</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pkgs_to_add</span><span class="p">:</span>
                     <span class="n">new_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pkg</span><span class="o">.</span><span class="n">version_spec</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="n">pkgs_to_add</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
@@ -137,7 +157,12 @@
 
 <div class="viewcode-block" id="PipAnalyzer.direct_dependencies"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.pip_analyzer.PipAnalyzer.direct_dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">direct_dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="k">with</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_root</span> <span class="o">/</span> <span class="s2">&quot;requirements.txt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">()</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">{</span><span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">version</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_requirements</span><span class="p">(</span><span class="n">f</span><span class="p">)}</span></div></div>
+            <span class="n">ret</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_requirements</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="n">ExtraLine</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="n">ret</span><span class="p">[</span><span class="n">pkg</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pkg</span><span class="o">.</span><span class="n">version</span>
+            <span class="k">return</span> <span class="n">ret</span></div></div>
 </pre></div>
 
            </div>
