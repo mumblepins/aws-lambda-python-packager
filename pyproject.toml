@@ -127,6 +127,10 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = "packaging.*"
 ignore_missing_imports = true
+[[tool.mypy.overrides]]
+module = "pytest.*"
+ignore_missing_imports = true
+
 
 [tool.dep_checker]
 allowed_unused = ["python_certifi_win32", 'aiohttp']
