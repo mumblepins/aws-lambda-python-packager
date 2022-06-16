@@ -168,10 +168,10 @@ class LambdaPackager:
         zip_output: Union[bool, str] = False,
         compile_python: bool = False,
         use_wrangler_pyarrow: bool = False,
-        strip_tests: bool = False,
-        strip_libraries: bool = False,
+        strip_tests: bool = False,  # pylint: disable=unused-argument
+        strip_libraries: bool = False,  # pylint: disable=unused-argument
         strip_python: bool = False,
-        strip_other_files: bool = False,
+        strip_other_files: bool = False,  # pylint: disable=unused-argument
     ):  # pylint: disable=too-many-arguments,too-many-branches
         if not no_clobber and os.path.exists(self.output_dir):
             LOG.warning("Output directory %s already exists, removing it", self.output_dir)

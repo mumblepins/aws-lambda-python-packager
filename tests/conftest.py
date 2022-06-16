@@ -2,12 +2,12 @@
 import shutil
 import sys
 
+import pytest
+
 if sys.version_info >= (3, 9):
     from importlib.resources import files
 else:
     from importlib_resources import files
-
-import pytest
 
 
 @pytest.fixture(params=["poetry", "pip"])

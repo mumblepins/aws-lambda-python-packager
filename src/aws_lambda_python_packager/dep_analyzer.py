@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import re
+import shlex
 import shutil
 import subprocess  # nosec
 import tempfile
@@ -16,6 +17,7 @@ from typing import (
     Any,
     Dict,
     Iterable,
+    List,
     Optional,
     Tuple,
     Union,
@@ -31,6 +33,11 @@ class CommandNotFoundError(Exception):
 
 
 PackageInfo = namedtuple("PackageInfo", ["name", "version", "version_spec"])
+
+
+class ExtraLine(list):
+    pass
+
 
 PACKAGE_URL = "https://raw.githubusercontent.com/mumblepins/aws-get-lambda-python-pkg-versions/main/{region}-python{python_version}-{architecture}.json"
 
@@ -51,6 +58,7 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
         ignore_packages=False,
         update_dependencies=False,
     ):
+        self._extra_lines: Optional[List[ExtraLine]] = None
         self._exported_reqs = None
         self._reqs: Optional[Dict[Any, PackageInfo]] = None
         self._pkgs_to_ignore_dict = None
@@ -84,7 +92,7 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
 
     # region abstract methods
     @abstractmethod
-    def _get_requirements(self) -> Iterable[PackageInfo]:
+    def _get_requirements(self) -> Iterable[Union[PackageInfo, ExtraLine]]:
         pass
 
     @abstractmethod
@@ -118,10 +126,19 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
     def requirements(self) -> Dict[str, PackageInfo]:
         if self._reqs is None:
             self.log.warning("Exporting requirements")
-            self.update_dependency_file()
-            reqs = self.get_requirements()
-            self._reqs = {r.name: r for r in reqs}
+            reqs = self.update_dependency_file()
+            if reqs is None:
+                reqs = list(self.get_requirements())
+            if self._extra_lines is None:
+                self._extra_lines = [r for r in reqs if isinstance(r, ExtraLine)]
+            self._reqs = {r.name: r for r in reqs if not isinstance(r, ExtraLine)}
         return self._reqs
+
+    @property
+    def extra_lines(self):
+        if self._extra_lines is None:
+            _ = self.requirements
+        return self._extra_lines
 
     # endregion
 
@@ -139,7 +156,7 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
             data += o
         return data
 
-    def _install_pip(self, *args, return_state=False, quiet=False):
+    def _install_pip(self, *args, return_state=False, quiet=False, requirements_file=False):
         pip_command = [
             "install",
             "--disable-pip-version-check",
@@ -150,6 +167,9 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
             "--implementation",
             "cp",
         ]
+        if not requirements_file:
+            for el in self.extra_lines:
+                pip_command.extend(el)
         if self.architecture == "arm64":
             pip_command.extend(
                 [
@@ -185,13 +205,18 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
     # endregion
 
     # region public methods
-    def get_requirements(self) -> Iterable[PackageInfo]:
+    def get_requirements(self) -> Iterable[Union[PackageInfo, ExtraLine]]:
         self.log.info("Getting requirements info using %s", self.analyzer_name)
         return self._get_requirements()
 
     @classmethod
-    def process_requirements(cls, requirements: Iterable[str]) -> Iterable[PackageInfo]:
+    def process_requirements(cls, requirements: Iterable[str]) -> Iterable[Union[PackageInfo, ExtraLine]]:
         for line in requirements:
+            if line.startswith("#") or line.strip() == "":
+                continue
+            if line.startswith("-"):
+                yield ExtraLine(shlex.split(line))
+                continue
             pkg_match = re.match(r"^([^= \n]*)(==)?([^\s;]*).*$", line)
             if pkg_match:
                 pkg_name, _, pkg_version = pkg_match.groups()
@@ -243,13 +268,16 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
 
     def update_dependency_file(self):
         if not self.ignore_packages or not self.update_dependencies:
-            return
+            return None
         self.log.info(
             "Checking to see if any dependencies need to be changed in the dependency file to match the AWS Lambda environment"
         )
-        cur_requires = self.get_requirements()
+        cur_requires = list(self.get_requirements())
         pkgs_to_add = {}
-        for pkg_name, pkg_version, _ in cur_requires:
+        for pkg in cur_requires:
+            if isinstance(pkg, ExtraLine):
+                continue
+            pkg_name, pkg_version, _ = pkg
             if pkg_name in self.pkgs_to_ignore_dict and pkg_version != self.pkgs_to_ignore_dict[pkg_name]:
                 self.log.warning(
                     "%s is currently %s but should be %s", pkg_name, pkg_version, self.pkgs_to_ignore_dict[pkg_name]
@@ -258,6 +286,9 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
         if len(pkgs_to_add) > 0:
             self.log.info("Updating dependency file to add %s requirements", len(pkgs_to_add))
             self._update_dependency_file(pkgs_to_add)
+            return None
+        self.log.info("No changes needed in the dependency file")
+        return cur_requires
 
     def export_requirements(self):
         if self._exported_reqs is None:

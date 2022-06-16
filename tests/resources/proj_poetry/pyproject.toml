@@ -10,8 +10,14 @@ packages = [{ include = 'test_package' }]
 python = ">=3.8,<3.11"
 awswrangler = "*"
 boto3 = "1.20.32"
-
+test-pypi-package-9hfklcw8fq = "^0.1.2"
 
 [build-system]
 requires = ["poetry-core>=1.1.0a7", ]
 build-backend = "poetry.core.masonry.api"
+
+[[tool.poetry.source]]
+name = 'gitlab_test'
+# read only package registry token only
+url = 'https://gitlab+deploy-token-1133237:Mtkgy8WPxaaCyAcULBjj@gitlab.com/api/v4/projects/37091437/packages/pypi/simple'
+secondary = true

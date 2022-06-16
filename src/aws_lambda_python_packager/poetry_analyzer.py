@@ -17,6 +17,7 @@ import toml
 from .dep_analyzer import (
     CommandNotFoundError,
     DepAnalyzer,
+    ExtraLine,
     PackageInfo,
 )
 from .poetry_hack import export_requirements
@@ -60,7 +61,7 @@ class PoetryAnalyzer(DepAnalyzer):
     def lock(self):
         return self.run_poetry("lock", "--no-update", quiet=True)
 
-    def _get_requirements(self) -> Iterable[PackageInfo]:
+    def _get_requirements(self) -> Iterable[Union[PackageInfo, ExtraLine]]:
         output_file = None
         if not self.locked():
             self.log.info("Locking dependencies")

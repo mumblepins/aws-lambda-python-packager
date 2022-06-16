@@ -9,7 +9,11 @@ from typing import (
     Union,
 )
 
-from .dep_analyzer import DepAnalyzer, PackageInfo
+from .dep_analyzer import (
+    DepAnalyzer,
+    ExtraLine,
+    PackageInfo,
+)
 
 
 def get_packages(path):
@@ -40,7 +44,7 @@ class PipAnalyzer(DepAnalyzer):
         #     raise
         self.copy_to_temp_dir(("requirements.txt",))
 
-    def _get_requirements(self) -> Iterable[PackageInfo]:
+    def _get_requirements(self) -> Iterable[Union[PackageInfo, ExtraLine]]:
         with tempfile.TemporaryDirectory() as tmpdir:
             self._install_pip(
                 "--only-binary=:all:",
@@ -49,10 +53,23 @@ class PipAnalyzer(DepAnalyzer):
                 "-r",
                 Path(self._temp_proj_dir.name) / "requirements.txt",
                 quiet=True,
+                requirements_file=True,
             )
 
             for pkg, version in get_packages(tmpdir).items():
                 yield PackageInfo(pkg, version, f"{pkg}=={version}")
+
+    @property
+    def extra_lines(self):
+
+        self._extra_lines = []
+        req_file = self.project_root / "requirements.txt"
+        with req_file.open() as f:
+            for line in self.process_requirements(f):
+                if not isinstance(line, ExtraLine):
+                    continue
+                self._extra_lines.append(line)
+        return self._extra_lines
 
     def _update_dependency_file(self, pkgs_to_add: Dict[str, PackageInfo]):
         self.backup_files(["requirements.txt"])
@@ -60,6 +77,9 @@ class PipAnalyzer(DepAnalyzer):
         new_lines = []
         with open(Path(self._temp_proj_dir.name) / "requirements.txt", "r", encoding="utf8") as f:
             for pkg in self.process_requirements(f):
+                if isinstance(pkg, ExtraLine):
+                    new_lines.append(" ".join(pkg))
+                    continue
                 if pkg.name not in pkgs_to_add:
                     new_lines.append(pkg.version_spec)
             for pkg in pkgs_to_add.values():
@@ -71,4 +91,9 @@ class PipAnalyzer(DepAnalyzer):
 
     def direct_dependencies(self) -> Dict[str, str]:
         with (self.project_root / "requirements.txt").open() as f:
-            return {a.name: a.version for a in self.process_requirements(f)}
+            ret = {}
+            for pkg in self.process_requirements(f):
+                if isinstance(pkg, ExtraLine):
+                    continue
+                ret[pkg.name] = pkg.version
+            return ret

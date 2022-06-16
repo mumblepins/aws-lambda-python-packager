@@ -23,8 +23,6 @@ PACKAGE_URL = "https://raw.githubusercontent.com/mumblepins/aws-get-lambda-pytho
 class ArchitectureUnsupported(Exception):
     """Exception raised when the architecture is not supported"""
 
-    pass
-
 
 def get_lambda_runtimes():
     """Gets a list of supported Lambda runtimes from the AWS docs
