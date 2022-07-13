@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>aws_lambda_python_packager.lambda_packager &mdash; aws-lambda-python-packager v1.0.7 documentation</title>
+  <title>aws_lambda_python_packager.lambda_packager &mdash; aws-lambda-python-packager v1.1.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -78,9 +78,15 @@
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>  <span class="c1"># nosec B404</span>
 <span class="kn">from</span> <span class="nn">compileall</span> <span class="kn">import</span> <span class="n">compile_dir</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">PathLike</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">py_compile</span> <span class="kn">import</span> <span class="n">PycInvalidationMode</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Optional</span><span class="p">,</span>
+    <span class="n">Type</span><span class="p">,</span>
+    <span class="n">Union</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">zipfile</span> <span class="kn">import</span> <span class="n">ZIP_DEFLATED</span><span class="p">,</span> <span class="n">ZipFile</span>
 
 <span class="kn">from</span> <span class="nn">.aws_wrangler</span> <span class="kn">import</span> <span class="n">fetch_package</span>
@@ -189,7 +195,16 @@
             <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Compiling package&quot;</span><span class="p">)</span>
             <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Target Python version: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">python_version</span><span class="p">)</span>
             <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Build Python Version: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">python_version_tuple</span><span class="p">()))</span>
-            <span class="n">compile_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">optimize</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">workers</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">legacy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">compile_dir</span><span class="p">(</span>
+                <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="o">.</span><span class="n">absolute</span><span class="p">()),</span>
+                <span class="n">ddir</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">quiet</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">optimize</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">workers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">legacy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">invalidation_mode</span><span class="o">=</span><span class="n">PycInvalidationMode</span><span class="o">.</span><span class="n">UNCHECKED_HASH</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Not compiling package, python version mismatch&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span></div>
@@ -258,6 +273,7 @@
             <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Not stripping python, since compile_python is set to False&quot;</span><span class="p">)</span>
             <span class="n">strip_python</span> <span class="o">=</span> <span class="kc">False</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_utime</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">compile_python</span><span class="p">:</span>
             <span class="n">compiled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compile_python</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">strip_python</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">compiled</span><span class="p">:</span>
@@ -282,7 +298,15 @@
             <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Package size: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%0.1f%%</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">size_out</span><span class="p">),</span> <span class="n">size_out</span> <span class="o">/</span> <span class="n">initial_size</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">zip_output</span><span class="p">:</span>
             <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Zipping output&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">zip_output</span><span class="p">(</span><span class="n">zip_output</span><span class="p">)</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">zip_output</span><span class="p">(</span><span class="n">zip_output</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LambdaPackager.set_utime"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.set_utime">[docs]</a>    <span class="k">def</span> <span class="nf">set_utime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">set_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">set_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">set_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">timestamp</span><span class="p">())</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1e9</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">dirpath</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">):</span>  <span class="c1"># noqa: B007</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">:</span>
+                <span class="n">fp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">utime</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">ns</span><span class="o">=</span><span class="p">(</span><span class="n">set_time</span><span class="p">,</span> <span class="n">set_time</span><span class="p">))</span></div></div>
 
 
 <div class="viewcode-block" id="sizeof_fmt"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.sizeof_fmt">[docs]</a><span class="k">def</span> <span class="nf">sizeof_fmt</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">):</span>
