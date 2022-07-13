@@ -137,7 +137,7 @@ def export_requirements(path: Path, with_urls=True, with_credentials=True):  # n
 
 
 def get_authenticated_url(repository: HTTPRepository, url):
-    auth = repository._authenticator
+    auth = repository._authenticator  # pylint: disable=protected-access
     parsed = urllib.parse.urlparse(url)
     credential = auth.get_credentials_for_url(url)
 

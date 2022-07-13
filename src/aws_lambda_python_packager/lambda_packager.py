@@ -12,9 +12,15 @@ import platform
 import shutil
 import subprocess  # nosec B404
 from compileall import compile_dir
+from datetime import datetime
 from os import PathLike
 from pathlib import Path
-from typing import Type, Union
+from py_compile import PycInvalidationMode
+from typing import (
+    Optional,
+    Type,
+    Union,
+)
 from zipfile import ZIP_DEFLATED, ZipFile
 
 from .aws_wrangler import fetch_package
@@ -123,7 +129,16 @@ class LambdaPackager:
             LOG.warning("Compiling package")
             LOG.debug('Target Python version: "%s"', self.python_version)
             LOG.debug('Build Python Version: "%s"', ".".join(platform.python_version_tuple()))
-            compile_dir(self.output_dir, quiet=2, optimize=2, workers=0, legacy=True)
+            compile_dir(
+                str(self.output_dir.absolute()),
+                ddir="",
+                quiet=2,
+                optimize=2,
+                workers=1,
+                legacy=True,
+                force=True,
+                invalidation_mode=PycInvalidationMode.UNCHECKED_HASH,
+            )
             return True
         LOG.warning("Not compiling package, python version mismatch")
         return False
@@ -192,6 +207,7 @@ class LambdaPackager:
             LOG.warning("Not stripping python, since compile_python is set to False")
             strip_python = False
 
+        self.set_utime()
         if compile_python:
             compiled = self.compile_python()
             if strip_python and not compiled:
@@ -217,6 +233,14 @@ class LambdaPackager:
         if zip_output:
             LOG.warning("Zipping output")
             self.zip_output(zip_output)
+
+    def set_utime(self, set_time: Optional[int] = None):
+        if set_time is None:
+            set_time = int(datetime(2020, 1, 1, 1, 1).timestamp()) * int(1e9)
+        for dirpath, _, filenames in os.walk(self.output_dir):  # noqa: B007
+            for f in filenames:
+                fp = os.path.join(dirpath, f)
+                os.utime(fp, ns=(set_time, set_time))
 
 
 def sizeof_fmt(num, suffix="B"):

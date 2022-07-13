@@ -12,6 +12,9 @@ resources = Path(os.path.realpath(__file__)).parent / "resources"
 pkg_type_map = {"poetry": "test_package", "pip": "test_app.py"}
 architectures = [("x86_64", "x86_64"), ("arm64", "aarch64")]
 
+URL_LIB_VERSION = "1.26.9"
+BOTO3_VERSION = "1.20.32"
+
 
 def test_export_ignore_packages_update_reqs(temp_path_filled):
     src, dst, pkg_type = temp_path_filled
@@ -27,7 +30,7 @@ def test_export_ignore_packages_update_reqs(temp_path_filled):
     assert not (dst / "botocore").exists()
 
     d_deps = lp.analyzer.direct_dependencies()
-    assert d_deps["urllib3"] == "1.26.6"
+    assert d_deps["urllib3"] == URL_LIB_VERSION
 
 
 def test_export_ignore_packages_no_update_pyproject(temp_path_filled):
@@ -43,7 +46,7 @@ def test_export_ignore_packages_no_update_pyproject(temp_path_filled):
     assert (dst / "botocore").exists()
 
     d_deps = lp.analyzer.direct_dependencies()
-    assert d_deps["boto3"] == "1.20.32"
+    assert d_deps["boto3"] == BOTO3_VERSION
     assert "urllib3" not in d_deps
 
 
