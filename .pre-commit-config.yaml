@@ -3,10 +3,10 @@ fail_fast: false
 repos:
   - repo: https://github.com/python-poetry/poetry
     rev: 1.2.0b2
-    stages: [ manual ]
     hooks:
       - id: poetry-lock
         args: [ "--no-update" ]
+        stages: [ manual ]
   #      - id: poetry-export
   #        args:
   #          - "-o"
