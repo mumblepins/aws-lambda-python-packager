@@ -260,9 +260,9 @@ class LambdaPackager:
                 lp = self.output_dir / lp
                 if not lp.exists():
                     continue
-                shutil.move(lp, layer_td)
+                shutil.move(str(lp.resolve()), layer_td)
             for p in self.output_dir.iterdir():
-                shutil.move(p, main_td)
+                shutil.move(str(p.resolve()), main_td)
             main_dir = self.output_dir / "main"
             layer_dir = self.output_dir / "layer"
             shutil.move(layer_td, layer_dir)
