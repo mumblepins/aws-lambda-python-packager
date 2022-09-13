@@ -65,13 +65,13 @@
              
   <h1>Source code for aws_lambda_python_packager.poetry_analyzer</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">PathLike</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Dict</span><span class="p">,</span>
     <span class="n">Iterable</span><span class="p">,</span>
@@ -86,8 +86,11 @@
     <span class="n">ExtraLine</span><span class="p">,</span>
     <span class="n">PackageInfo</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.poetry_hack</span> <span class="kn">import</span> <span class="n">export_requirements</span>
-<span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">chdir_cm</span><span class="p">,</span> <span class="n">chgenv_cm</span>
+<span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PathType</span><span class="p">,</span>
+    <span class="n">chdir_cm</span><span class="p">,</span>
+    <span class="n">chgenv_cm</span><span class="p">,</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="PoetryAnalyzer"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer">[docs]</a><span class="k">class</span> <span class="nc">PoetryAnalyzer</span><span class="p">(</span><span class="n">DepAnalyzer</span><span class="p">):</span>
@@ -99,7 +102,7 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">project_root</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">PathLike</span><span class="p">],</span>
+        <span class="n">project_root</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">python_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;3.9&quot;</span><span class="p">,</span>
         <span class="n">architecture</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;x86_64&quot;</span><span class="p">,</span>
         <span class="n">region</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;us-east-1&quot;</span><span class="p">,</span>
@@ -113,13 +116,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">copy_to_temp_dir</span><span class="p">((</span><span class="s2">&quot;poetry.lock&quot;</span><span class="p">,</span> <span class="s2">&quot;pyproject.toml&quot;</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_poetry_env</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span>  <span class="c1"># pylint: disable=consider-using-with</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_chgenv</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
-            <span class="n">chgenv_cm</span><span class="p">,</span>
-            <span class="c1"># POETRY_VIRTUALENVS_CREATE=&quot;false&quot;,</span>
-            <span class="n">POETRY_VIRTUALENVS_IN_PROJECT</span><span class="o">=</span><span class="s2">&quot;false&quot;</span><span class="p">,</span>
-            <span class="n">POETRY_VIRTUALENVS_PATH</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_poetry_env</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">VIRTUAL_ENV</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_env_kwargs</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@contextmanager</span>
+    <span class="k">def</span> <span class="nf">_chgenv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;POETRY_VIRTUALENVS_IN_PROJECT&quot;</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;POETRY_VIRTUALENVS_PATH&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_poetry_env</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="s2">&quot;VIRTUAL_ENV&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_credentials</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_env_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="k">with</span> <span class="n">chgenv_cm</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_env_kwargs</span><span class="p">):</span>
+            <span class="k">yield</span>
 
 <div class="viewcode-block" id="PoetryAnalyzer.locked"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.locked">[docs]</a>    <span class="k">def</span> <span class="nf">locked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_poetry</span><span class="p">(</span><span class="s2">&quot;lock&quot;</span><span class="p">,</span> <span class="s2">&quot;--check&quot;</span><span class="p">,</span> <span class="n">return_state</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
@@ -133,12 +143,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Locking dependencies&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_change_context</span><span class="p">():</span>
-                <span class="n">reqs</span> <span class="o">=</span> <span class="n">export_requirements</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_temp_proj_dir</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>  <span class="c1"># pylint: disable=logging-not-lazy</span>
-                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;requirements.txt&gt;&gt;  </span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">reqs</span><span class="o">.</span><span class="n">splitlines</span><span class="p">(</span><span class="n">keepends</span><span class="o">=</span><span class="kc">True</span><span class="p">)])</span>
-            <span class="p">)</span>
+            <span class="n">reqs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_poetry</span><span class="p">(</span><span class="s2">&quot;export&quot;</span><span class="p">,</span> <span class="s2">&quot;--without-hashes&quot;</span><span class="p">,</span> <span class="s2">&quot;--with-credentials&quot;</span><span class="p">,</span> <span class="s2">&quot;--only&quot;</span><span class="p">,</span> <span class="s2">&quot;main&quot;</span><span class="p">)</span>
+            <span class="c1"># with self._change_context():</span>
+            <span class="c1">#     reqs = export_requirements(Path(self._temp_proj_dir.name))</span>
+            <span class="c1">#</span>
+            <span class="c1"># self.log.debug(  # pylint: disable=logging-not-lazy</span>
+            <span class="c1">#     &quot;\n&quot; + &quot;&quot;.join([f&quot;requirements.txt&gt;&gt;  {a}&quot; for a in reqs.splitlines(keepends=True)])</span>
+            <span class="c1"># )</span>
 
             <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_requirements</span><span class="p">(</span><span class="n">reqs</span><span class="o">.</span><span class="n">splitlines</span><span class="p">(</span><span class="n">keepends</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
         <span class="k">finally</span><span class="p">:</span>
@@ -183,11 +194,34 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Package not built with poetry, falling back to .py files&quot;</span><span class="p">)</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">install_root</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="PoetryAnalyzer.direct_dependencies"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.direct_dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">direct_dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-
+<div class="viewcode-block" id="PoetryAnalyzer.load_toml"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.load_toml">[docs]</a>    <span class="k">def</span> <span class="nf">load_toml</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
         <span class="n">pyproject</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_root</span> <span class="o">/</span> <span class="s2">&quot;pyproject.toml&quot;</span>
         <span class="k">with</span> <span class="n">pyproject</span><span class="o">.</span><span class="n">open</span><span class="p">()</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">toml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">data</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_credentials</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_toml</span><span class="p">()</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="s2">&quot;tool&quot;</span> <span class="ow">in</span> <span class="n">t</span>
+            <span class="ow">and</span> <span class="s2">&quot;aws-deployment&quot;</span> <span class="ow">in</span> <span class="n">t</span><span class="p">[</span><span class="s2">&quot;tool&quot;</span><span class="p">]</span>
+            <span class="ow">and</span> <span class="s2">&quot;source&quot;</span> <span class="ow">in</span> <span class="n">t</span><span class="p">[</span><span class="s2">&quot;tool&quot;</span><span class="p">][</span><span class="s2">&quot;aws-deployment&quot;</span><span class="p">]</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s2">&quot;tool&quot;</span><span class="p">][</span><span class="s2">&quot;aws-deployment&quot;</span><span class="p">][</span><span class="s2">&quot;source&quot;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">for</span> <span class="n">src_name</span><span class="p">,</span> <span class="n">src_cfg</span> <span class="ow">in</span> <span class="n">t</span><span class="p">[</span><span class="s2">&quot;tool&quot;</span><span class="p">][</span><span class="s2">&quot;aws-deployment&quot;</span><span class="p">][</span><span class="s2">&quot;source&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">src_name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[^A-Z0-9]&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">src_name</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">src_cfg</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">k</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[^A-Z0-9]&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s2">&quot;TOKEN&quot;</span><span class="p">:</span>
+                        <span class="n">out</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;POETRY_PYPI_TOKEN_</span><span class="si">{</span><span class="n">src_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">out</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;POETRY_HTTP_BASIC_</span><span class="si">{</span><span class="n">src_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="PoetryAnalyzer.direct_dependencies"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.direct_dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">direct_dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_toml</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;tool&quot;</span><span class="p">][</span><span class="s2">&quot;poetry&quot;</span><span class="p">][</span><span class="s2">&quot;dependencies&quot;</span><span class="p">]</span></div></div>
 </pre></div>
 

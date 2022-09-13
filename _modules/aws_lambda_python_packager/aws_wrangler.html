@@ -93,7 +93,7 @@
 
 
 <div class="viewcode-block" id="get_all_versions"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.aws_wrangler.get_all_versions">[docs]</a><span class="k">def</span> <span class="nf">get_all_versions</span><span class="p">(</span><span class="n">python_version</span><span class="o">=</span><span class="s2">&quot;3.9&quot;</span><span class="p">,</span> <span class="n">arch</span><span class="o">=</span><span class="s2">&quot;x86_64&quot;</span><span class="p">):</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">AWS_WRANGLER_RELEASES</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">AWS_WRANGLER_RELEASES</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
     <span class="n">rj</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
     <span class="n">rj</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">to_version</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;tag_name&quot;</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rj</span><span class="p">)</span>
 

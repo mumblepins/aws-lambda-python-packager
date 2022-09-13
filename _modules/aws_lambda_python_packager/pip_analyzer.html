@@ -65,9 +65,10 @@
              
   <h1>Source code for aws_lambda_python_packager.pip_analyzer</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">from</span> <span class="nn">importlib.metadata</span> <span class="kn">import</span> <span class="n">distributions</span>
-<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">PathLike</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Dict</span><span class="p">,</span>
@@ -80,6 +81,7 @@
     <span class="n">ExtraLine</span><span class="p">,</span>
     <span class="n">PackageInfo</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">PathType</span>
 
 
 <div class="viewcode-block" id="get_packages"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.pip_analyzer.get_packages">[docs]</a><span class="k">def</span> <span class="nf">get_packages</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
@@ -95,7 +97,7 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">project_root</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">PathLike</span><span class="p">],</span>
+        <span class="n">project_root</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">python_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;3.9&quot;</span><span class="p">,</span>
         <span class="n">architecture</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;x86_64&quot;</span><span class="p">,</span>
         <span class="n">region</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;us-east-1&quot;</span><span class="p">,</span>

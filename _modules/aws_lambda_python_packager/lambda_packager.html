@@ -72,6 +72,8 @@
 <span class="sd">It is an alternative to `sam build` and uses poetry to manage dependencies.</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">platform</span>
@@ -79,10 +81,11 @@
 <span class="kn">import</span> <span class="nn">subprocess</span>  <span class="c1"># nosec B404</span>
 <span class="kn">from</span> <span class="nn">compileall</span> <span class="kn">import</span> <span class="n">compile_dir</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">PathLike</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">py_compile</span> <span class="kn">import</span> <span class="n">PycInvalidationMode</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">List</span><span class="p">,</span>
     <span class="n">Optional</span><span class="p">,</span>
     <span class="n">Type</span><span class="p">,</span>
     <span class="n">Union</span><span class="p">,</span>
@@ -93,7 +96,7 @@
 <span class="kn">from</span> <span class="nn">.dep_analyzer</span> <span class="kn">import</span> <span class="n">DepAnalyzer</span>
 <span class="kn">from</span> <span class="nn">.pip_analyzer</span> <span class="kn">import</span> <span class="n">PipAnalyzer</span>
 <span class="kn">from</span> <span class="nn">.poetry_analyzer</span> <span class="kn">import</span> <span class="n">PoetryAnalyzer</span>
-<span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">PLATFORMS</span>
+<span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">PLATFORMS</span><span class="p">,</span> <span class="n">PathType</span>
 
 <span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">MAX_LAMBDA_SIZE</span> <span class="o">=</span> <span class="mi">250</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>  <span class="c1"># 250MB</span>
@@ -101,16 +104,18 @@
 
 <div class="viewcode-block" id="LambdaPackager"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager">[docs]</a><span class="k">class</span> <span class="nc">LambdaPackager</span><span class="p">:</span>
     <span class="c1"># pylint: disable=too-many-instance-attributes</span>
+    <span class="n">layer_dir</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">|</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">project_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PathLike</span><span class="p">],</span>
-        <span class="n">output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PathLike</span><span class="p">],</span>
+        <span class="n">project_path</span><span class="p">:</span> <span class="n">PathType</span><span class="p">,</span>
+        <span class="n">output_dir</span><span class="p">:</span> <span class="n">PathType</span><span class="p">,</span>
         <span class="n">python_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;3.9&quot;</span><span class="p">,</span>
         <span class="n">architecture</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;x86_64&quot;</span><span class="p">,</span>
         <span class="n">region</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;us-east-1&quot;</span><span class="p">,</span>
         <span class="n">update_dependencies</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">ignore_packages</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">split_layer</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="sd">&quot;&quot;&quot;Initialize the Lambda Packager</span>
 
@@ -134,16 +139,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="o">=</span> <span class="n">region</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_dependencies</span> <span class="o">=</span> <span class="n">update_dependencies</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ignore_packages</span> <span class="o">=</span> <span class="n">ignore_packages</span>
-        <span class="n">analyzer</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">DepAnalyzer</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">split_layer</span> <span class="o">=</span> <span class="n">split_layer</span>
+        <span class="n">analyzer_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">DepAnalyzer</span><span class="p">]</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="o">/</span> <span class="s2">&quot;pyproject.toml&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="o">/</span> <span class="s2">&quot;requirements.txt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;pyproject.toml found and not requirements.txt, assuming poetry&quot;</span><span class="p">)</span>
-            <span class="n">analyzer</span> <span class="o">=</span> <span class="n">PoetryAnalyzer</span>
+            <span class="n">analyzer_type</span> <span class="o">=</span> <span class="n">PoetryAnalyzer</span>
         <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="o">/</span> <span class="s2">&quot;requirements.txt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="o">/</span> <span class="s2">&quot;pyproject.toml&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;requirements.txt found, assuming pip&quot;</span><span class="p">)</span>
-            <span class="n">analyzer</span> <span class="o">=</span> <span class="n">PipAnalyzer</span>
+            <span class="n">analyzer_type</span> <span class="o">=</span> <span class="n">PipAnalyzer</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Ambiguous project type, quitting&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">analyzer</span> <span class="o">=</span> <span class="n">analyzer</span><span class="p">(</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">analyzer</span> <span class="o">=</span> <span class="n">analyzer_type</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span><span class="p">,</span>
             <span class="n">python_version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">python_version</span><span class="p">,</span>
             <span class="n">architecture</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">architecture</span><span class="p">,</span>
@@ -152,13 +159,20 @@
             <span class="n">update_dependencies</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">update_dependencies</span><span class="p">,</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="LambdaPackager.get_total_size"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.get_total_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_total_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_dir_size</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
         <span class="n">total_size</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">dirpath</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">):</span>  <span class="c1"># noqa: B007</span>
+        <span class="k">for</span> <span class="n">dirpath</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>  <span class="c1"># noqa: B007</span>
             <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">:</span>
                 <span class="n">fp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
                 <span class="n">total_size</span> <span class="o">+=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">total_size</span></div>
+        <span class="k">return</span> <span class="n">total_size</span>
+
+<div class="viewcode-block" id="LambdaPackager.get_total_size"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.get_total_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_total_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_dir_size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">)</span>
+        <span class="c1"># if self.layer_dir:</span>
+        <span class="c1">#     total += self._get_dir_size(self.layer_dir)</span>
+        <span class="k">return</span> <span class="n">total</span></div>
 
 <div class="viewcode-block" id="LambdaPackager.get_aws_wrangler_pyarrow"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.get_aws_wrangler_pyarrow">[docs]</a>    <span class="k">def</span> <span class="nf">get_aws_wrangler_pyarrow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="s2">&quot;pyarrow&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzer</span><span class="o">.</span><span class="n">requirements</span><span class="p">:</span>
@@ -259,6 +273,8 @@
             <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">analyzer</span><span class="o">.</span><span class="n">install_dependencies</span><span class="p">()</span>
+
+        <span class="n">layer_paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzer</span><span class="o">.</span><span class="n">get_layer_files</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">analyzer</span><span class="o">.</span><span class="n">install_root</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">analyzer</span><span class="o">.</span><span class="n">copy_from_target</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">)</span>
         <span class="n">initial_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_total_size</span><span class="p">()</span>
@@ -288,7 +304,8 @@
                 <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
                     <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> done, new size: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%0.1f%%</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">strip_func</span><span class="p">,</span> <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">new_size</span><span class="p">),</span> <span class="n">new_size</span> <span class="o">/</span> <span class="n">initial_size</span> <span class="o">*</span> <span class="mi">100</span>
                 <span class="p">)</span>
-
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_layer</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_layer_splitter</span><span class="p">(</span><span class="n">layer_paths</span><span class="p">)</span>
         <span class="n">size_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_total_size</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">size_out</span> <span class="o">&gt;</span> <span class="n">MAX_LAMBDA_SIZE</span><span class="p">:</span>
             <span class="n">LOG</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
@@ -298,7 +315,24 @@
             <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Package size: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%0.1f%%</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">size_out</span><span class="p">),</span> <span class="n">size_out</span> <span class="o">/</span> <span class="n">initial_size</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">zip_output</span><span class="p">:</span>
             <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Zipping output&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">zip_output</span><span class="p">(</span><span class="n">zip_output</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">zip_output</span><span class="p">(</span><span class="n">zip_output</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_layer</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="s2">&quot;main&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="s2">&quot;layer&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="kc">None</span></div>
+
+    <span class="k">def</span> <span class="nf">_layer_splitter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]):</span>
+        <span class="k">with</span> <span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">layer_td</span><span class="p">,</span> <span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">main_td</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">lp</span> <span class="ow">in</span> <span class="n">layer_paths</span><span class="p">:</span>
+                <span class="n">lp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="n">lp</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">lp</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="k">continue</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">lp</span><span class="p">,</span> <span class="n">layer_td</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">main_td</span><span class="p">)</span>
+            <span class="n">main_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="s2">&quot;main&quot;</span>
+            <span class="n">layer_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="s2">&quot;layer&quot;</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">layer_td</span><span class="p">,</span> <span class="n">layer_dir</span><span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">main_td</span><span class="p">,</span> <span class="n">main_dir</span><span class="p">)</span>
 
 <div class="viewcode-block" id="LambdaPackager.set_utime"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.set_utime">[docs]</a>    <span class="k">def</span> <span class="nf">set_utime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">set_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">set_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
