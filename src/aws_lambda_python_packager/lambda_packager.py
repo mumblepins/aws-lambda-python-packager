@@ -6,6 +6,8 @@ This script is used to package the lambda function code into a zip file.
 It is an alternative to `sam build` and uses poetry to manage dependencies.
 
 """
+from __future__ import annotations
+
 import logging
 import os
 import platform
@@ -13,10 +15,11 @@ import shutil
 import subprocess  # nosec B404
 from compileall import compile_dir
 from datetime import datetime
-from os import PathLike
 from pathlib import Path
 from py_compile import PycInvalidationMode
+from tempfile import TemporaryDirectory
 from typing import (
+    List,
     Optional,
     Type,
     Union,
@@ -27,7 +30,7 @@ from .aws_wrangler import fetch_package
 from .dep_analyzer import DepAnalyzer
 from .pip_analyzer import PipAnalyzer
 from .poetry_analyzer import PoetryAnalyzer
-from .util import PLATFORMS
+from .util import PLATFORMS, PathType
 
 LOG = logging.getLogger(__name__)
 MAX_LAMBDA_SIZE = 250 * 1024 * 1024  # 250MB
@@ -35,16 +38,18 @@ MAX_LAMBDA_SIZE = 250 * 1024 * 1024  # 250MB
 
 class LambdaPackager:
     # pylint: disable=too-many-instance-attributes
+    layer_dir: PathType | None
 
     def __init__(
         self,
-        project_path: Union[str, PathLike],
-        output_dir: Union[str, PathLike],
+        project_path: PathType,
+        output_dir: PathType,
         python_version: str = "3.9",
         architecture: str = "x86_64",
         region: str = "us-east-1",
         update_dependencies: bool = False,
         ignore_packages: bool = False,
+        split_layer: bool = False,
     ):  # pylint: disable=too-many-arguments
         """Initialize the Lambda Packager
 
@@ -68,16 +73,18 @@ class LambdaPackager:
         self.region = region
         self.update_dependencies = update_dependencies
         self.ignore_packages = ignore_packages
-        analyzer: Type[DepAnalyzer]
+        self.split_layer = split_layer
+        analyzer_type: Type[DepAnalyzer]
         if (self.project_path / "pyproject.toml").exists() and not (self.project_path / "requirements.txt").exists():
             LOG.info("pyproject.toml found and not requirements.txt, assuming poetry")
-            analyzer = PoetryAnalyzer
+            analyzer_type = PoetryAnalyzer
         elif (self.project_path / "requirements.txt").exists() and not (self.project_path / "pyproject.toml").exists():
             LOG.info("requirements.txt found, assuming pip")
-            analyzer = PipAnalyzer
+            analyzer_type = PipAnalyzer
         else:
             raise Exception("Ambiguous project type, quitting")
-        self.analyzer = analyzer(
+
+        self.analyzer = analyzer_type(
             self.project_path,
             python_version=self.python_version,
             architecture=self.architecture,
@@ -86,13 +93,20 @@ class LambdaPackager:
             update_dependencies=self.update_dependencies,
         )
 
-    def get_total_size(self):
+    @classmethod
+    def _get_dir_size(cls, d):
         total_size = 0
-        for dirpath, _, filenames in os.walk(self.output_dir):  # noqa: B007
+        for dirpath, _, filenames in os.walk(d):  # noqa: B007
             for f in filenames:
                 fp = os.path.join(dirpath, f)
                 total_size += os.path.getsize(fp)
         return total_size
+
+    def get_total_size(self):
+        total = self._get_dir_size(self.output_dir)
+        # if self.layer_dir:
+        #     total += self._get_dir_size(self.layer_dir)
+        return total
 
     def get_aws_wrangler_pyarrow(self):
         if "pyarrow" not in self.analyzer.requirements:
@@ -193,6 +207,8 @@ class LambdaPackager:
             shutil.rmtree(self.output_dir, ignore_errors=True)
 
         self.analyzer.install_dependencies()
+
+        layer_paths = self.analyzer.get_layer_files()
         self.analyzer.install_root()
         self.analyzer.copy_from_target(self.output_dir)
         initial_size = self.get_total_size()
@@ -222,7 +238,8 @@ class LambdaPackager:
                 LOG.info(
                     "%s done, new size: %s (%0.1f%%)", strip_func, sizeof_fmt(new_size), new_size / initial_size * 100
                 )
-
+        if self.split_layer:
+            self._layer_splitter(layer_paths)
         size_out = self.get_total_size()
         if size_out > MAX_LAMBDA_SIZE:
             LOG.error(
@@ -233,6 +250,23 @@ class LambdaPackager:
         if zip_output:
             LOG.warning("Zipping output")
             self.zip_output(zip_output)
+        if self.split_layer:
+            return self.output_dir / "main", self.output_dir / "layer"
+        return self.output_dir, None
+
+    def _layer_splitter(self, layer_paths: List[Path]):
+        with TemporaryDirectory() as layer_td, TemporaryDirectory() as main_td:
+            for lp in layer_paths:
+                lp = self.output_dir / lp
+                if not lp.exists():
+                    continue
+                shutil.move(lp, layer_td)
+            for p in self.output_dir.iterdir():
+                shutil.move(p, main_td)
+            main_dir = self.output_dir / "main"
+            layer_dir = self.output_dir / "layer"
+            shutil.move(layer_td, layer_dir)
+            shutil.move(main_td, main_dir)
 
     def set_utime(self, set_time: Optional[int] = None):
         if set_time is None:

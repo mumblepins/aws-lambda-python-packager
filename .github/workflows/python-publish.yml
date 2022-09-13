@@ -37,7 +37,7 @@ jobs:
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-${{ matrix.python-version }}
-      - run: pip install --upgrade --pre poetry
+      - run: pip install --upgrade poetry
       - uses: actions/cache@v3
         id: cache-poetry
         with:
@@ -71,6 +71,10 @@ jobs:
       - pre_job
       - test
     if: ${{ needs.pre_job.outputs.should_skip != 'true' || contains(github.ref, 'refs/tags/v') }}
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: [ '3.10' ]
     runs-on: ubuntu-latest
 
     steps:
@@ -78,20 +82,25 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: '3.10'
-
-      - name: Install Poetry
-        uses: abatilo/actions-poetry@v2.0.0
+          python-version: ${{ matrix.python-version }}
+      - uses: actions/cache@v3
+        id: cache-pip
         with:
-          poetry-version: '1.2.0b1'
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-${{ matrix.python-version }}
+      - run: pip install --upgrade poetry
 
       - uses: actions/cache@v3
+        id: cache-poetry
         with:
           path: ~/.cache/pypoetry/virtualenvs
-          key: ${{ runner.os }}-3.10-poetry-${{ hashFiles('poetry.lock') }}
+          key: ${{ runner.os }}-${{ matrix.python-version }}-poetry-${{ hashFiles('poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.python-version }}-poetry-
+            ${{ runner.os }}-
       - name: install dependencies
         run: |
-          poetry install
+          poetry install --sync
 
       - name: build
         run: |

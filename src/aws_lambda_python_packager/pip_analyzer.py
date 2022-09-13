@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import tempfile
 from importlib.metadata import distributions
-from os import PathLike
 from pathlib import Path
 from typing import (
     Dict,
@@ -14,6 +15,7 @@ from .dep_analyzer import (
     ExtraLine,
     PackageInfo,
 )
+from .util import PathType
 
 
 def get_packages(path):
@@ -29,7 +31,7 @@ class PipAnalyzer(DepAnalyzer):
 
     def __init__(
         self,
-        project_root: Union[None, str, PathLike],
+        project_root: PathType | None,
         python_version: str = "3.9",
         architecture: str = "x86_64",
         region: str = "us-east-1",

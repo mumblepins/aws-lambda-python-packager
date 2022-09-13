@@ -22,7 +22,6 @@ aiohttp = "*"
 colorama = ">=0.4"
 toml = ">=0.10"
 packaging = "*"
-
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.13.0"
 pytest = "^7.1.1"
@@ -38,6 +37,8 @@ myst-parser = "^0.17.2"
 
 importlib-resources = { version = "^5.7.1", python = "<3.9" }
 bump2version = "^1.0.1"
+pytest-randomly = "^3.12.0"
+
 
 [tool.poetry.extras]
 
@@ -110,6 +111,10 @@ exclude = '''(?x)(
 
 [[tool.mypy.overrides]]
 module = "poetry.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "poetry_plugin_export.*"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]

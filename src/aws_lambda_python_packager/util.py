@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import logging
 import os
 import re
@@ -19,6 +21,8 @@ LAMBDA_RUNTIME_DOCS_URL = (
 
 PACKAGE_URL = "https://raw.githubusercontent.com/mumblepins/aws-get-lambda-python-pkg-versions/main/{region}-{python_version}-{architecture}.json"
 
+PathType = Union[str, PathLike]
+
 
 class ArchitectureUnsupported(Exception):
     """Exception raised when the architecture is not supported"""
@@ -30,7 +34,7 @@ def get_lambda_runtimes():
     Returns:
 
     """
-    r = requests.get(LAMBDA_RUNTIME_DOCS_URL)
+    r = requests.get(LAMBDA_RUNTIME_DOCS_URL, timeout=10)
     r.raise_for_status()
     runtimes = []
     for line in r.text.splitlines():
@@ -92,7 +96,7 @@ def get_python_runtime(architecture="x86_64", target_version=None):
 
 
 @contextmanager
-def chdir_cm(path: Union[str, PathLike]):
+def chdir_cm(path: PathType):
     old_dir = os.getcwd()
     os.chdir(path)
     try:
@@ -118,3 +122,5 @@ def chgenv_cm(**kwargs):
 
 
 PLATFORMS = get_lambda_runtimes()
+
+__all__ = ["PathType", "PLATFORMS", "chdir_cm", "chgenv_cm"]

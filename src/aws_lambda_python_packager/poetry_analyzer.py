@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import os
+import re
 import shutil
 import tempfile
 from contextlib import contextmanager
-from functools import partial
-from os import PathLike
-from pathlib import Path
 from typing import (
     Dict,
     Iterable,
@@ -20,8 +20,11 @@ from .dep_analyzer import (
     ExtraLine,
     PackageInfo,
 )
-from .poetry_hack import export_requirements
-from .util import chdir_cm, chgenv_cm
+from .util import (
+    PathType,
+    chdir_cm,
+    chgenv_cm,
+)
 
 
 class PoetryAnalyzer(DepAnalyzer):
@@ -33,7 +36,7 @@ class PoetryAnalyzer(DepAnalyzer):
 
     def __init__(
         self,
-        project_root: Union[None, str, PathLike],
+        project_root: PathType | None,
         python_version: str = "3.9",
         architecture: str = "x86_64",
         region: str = "us-east-1",
@@ -47,13 +50,20 @@ class PoetryAnalyzer(DepAnalyzer):
         self.copy_to_temp_dir(("poetry.lock", "pyproject.toml"))
 
         self._poetry_env = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
-        self._chgenv = partial(
-            chgenv_cm,
-            # POETRY_VIRTUALENVS_CREATE="false",
-            POETRY_VIRTUALENVS_IN_PROJECT="false",
-            POETRY_VIRTUALENVS_PATH=self._poetry_env.name,
-            VIRTUAL_ENV=None,
-        )
+        self._env_kwargs = None
+
+    @contextmanager
+    def _chgenv(self):
+        if self._env_kwargs is None:
+            kwargs = {
+                "POETRY_VIRTUALENVS_IN_PROJECT": "false",
+                "POETRY_VIRTUALENVS_PATH": self._poetry_env.name,
+                "VIRTUAL_ENV": None,
+            }
+            kwargs.update(self._get_credentials())
+            self._env_kwargs = kwargs
+        with chgenv_cm(**self._env_kwargs):
+            yield
 
     def locked(self):
         return self.run_poetry("lock", "--check", return_state=True, quiet=True)
@@ -67,12 +77,13 @@ class PoetryAnalyzer(DepAnalyzer):
             self.log.info("Locking dependencies")
             self.lock()
         try:
-            with self._change_context():
-                reqs = export_requirements(Path(self._temp_proj_dir.name))
-
-            self.log.debug(  # pylint: disable=logging-not-lazy
-                "\n" + "".join([f"requirements.txt>>  {a}" for a in reqs.splitlines(keepends=True)])
-            )
+            reqs, _ = self.run_poetry("export", "--without-hashes", "--with-credentials", "--only", "main")
+            # with self._change_context():
+            #     reqs = export_requirements(Path(self._temp_proj_dir.name))
+            #
+            # self.log.debug(  # pylint: disable=logging-not-lazy
+            #     "\n" + "".join([f"requirements.txt>>  {a}" for a in reqs.splitlines(keepends=True)])
+            # )
 
             yield from self.process_requirements(reqs.splitlines(keepends=True))
         finally:
@@ -117,9 +128,32 @@ class PoetryAnalyzer(DepAnalyzer):
             self.log.warning("Package not built with poetry, falling back to .py files")
             super().install_root()
 
-    def direct_dependencies(self) -> Dict[str, str]:
-
+    def load_toml(self) -> Dict:
         pyproject = self.project_root / "pyproject.toml"
         with pyproject.open() as f:
             data = toml.load(f)
+            return data
+
+    def _get_credentials(self) -> Dict[str, str]:
+        t = self.load_toml()
+        out = {}
+        if (
+            "tool" in t
+            and "aws-deployment" in t["tool"]
+            and "source" in t["tool"]["aws-deployment"]
+            and isinstance(t["tool"]["aws-deployment"]["source"], dict)
+        ):
+            for src_name, src_cfg in t["tool"]["aws-deployment"]["source"].items():
+                src_name = re.sub(r"[^A-Z0-9]", "_", src_name.upper())
+
+                for k, v in src_cfg.items():
+                    k = re.sub(r"[^A-Z0-9]", "_", k.upper())
+                    if k == "TOKEN":
+                        out[f"POETRY_PYPI_TOKEN_{src_name}"] = v
+                    else:
+                        out[f"POETRY_HTTP_BASIC_{src_name}_{k}"] = v
+        return out
+
+    def direct_dependencies(self) -> Dict[str, str]:
+        data = self.load_toml()
         return data["tool"]["poetry"]["dependencies"]

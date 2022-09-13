@@ -27,7 +27,7 @@ def to_version(version):
 
 
 def get_all_versions(python_version="3.9", arch="x86_64"):
-    r = requests.get(AWS_WRANGLER_RELEASES)
+    r = requests.get(AWS_WRANGLER_RELEASES, timeout=10)
     rj = r.json()
     rj = filter(lambda x: to_version(x["tag_name"]) is not None, rj)
 

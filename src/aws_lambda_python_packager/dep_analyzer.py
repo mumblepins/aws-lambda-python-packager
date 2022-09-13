@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import logging
 import re
 import shlex
@@ -11,7 +13,6 @@ from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 from datetime import datetime
 from functools import partial
-from os import PathLike
 from pathlib import Path
 from typing import (
     Any,
@@ -25,21 +26,18 @@ from typing import (
 
 import requests
 
-from .util import chdir_cm
+from .util import PathType, chdir_cm
+
+PackageInfo = namedtuple("PackageInfo", ["name", "version", "version_spec"])
+PACKAGE_URL = "https://raw.githubusercontent.com/mumblepins/aws-get-lambda-python-pkg-versions/main/{region}-python{python_version}-{architecture}.json"
 
 
 class CommandNotFoundError(Exception):
     pass
 
 
-PackageInfo = namedtuple("PackageInfo", ["name", "version", "version_spec"])
-
-
 class ExtraLine(list):
     pass
-
-
-PACKAGE_URL = "https://raw.githubusercontent.com/mumblepins/aws-get-lambda-python-pkg-versions/main/{region}-python{python_version}-{architecture}.json"
 
 
 class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
@@ -51,7 +49,7 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
     # region init and teardown
     def __init__(
         self,
-        project_root: Union[None, str, PathLike],
+        project_root: PathType | None,
         python_version: str = "3.9",
         architecture: str = "x86_64",
         region: str = "us-east-1",
@@ -79,6 +77,7 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
         self._temp_proj_dir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
         self._chdir = partial(chdir_cm, self._temp_proj_dir.name)
         self._target = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+
         self.log = logging.getLogger(self.__class__.__name__)
 
     def __del__(self):
@@ -192,7 +191,8 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
             r = requests.get(
                 PACKAGE_URL.format(
                     region=self.region, architecture=self.architecture, python_version=self.python_version
-                )
+                ),
+                timeout=30,
             )
             r.raise_for_status()
             data = r.json()
@@ -334,7 +334,11 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
         else:
             self.log.warning("No src/__init__.py or *.py files found, no root program is being installed")
 
-    def copy_from_target(self, dst: Union[str, PathLike]):
+    def get_layer_files(self):
+        target_path = Path(self._target.name)
+        return [a.relative_to(target_path) for a in target_path.iterdir()]
+
+    def copy_from_target(self, dst: PathType):
         self.log.warning("Copying %s from target to %s", self._target.name, dst)
         shutil.copytree(self._target.name, dst)
 
