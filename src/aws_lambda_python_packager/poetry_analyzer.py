@@ -85,7 +85,8 @@ class PoetryAnalyzer(DepAnalyzer):
             #     "\n" + "".join([f"requirements.txt>>  {a}" for a in reqs.splitlines(keepends=True)])
             # )
 
-            yield from self.process_requirements(reqs.splitlines(keepends=True))
+            reqs = [r for r in reqs.splitlines(keepends=True) if not r.startswith("Using p")]
+            yield from self.process_requirements(reqs)
         finally:
             if output_file:
                 os.remove(output_file.name)
