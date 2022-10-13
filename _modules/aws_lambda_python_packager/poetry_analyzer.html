@@ -108,8 +108,17 @@
         <span class="n">region</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;us-east-1&quot;</span><span class="p">,</span>
         <span class="n">ignore_packages</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">update_dependencies</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">additional_packages_to_ignore</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">project_root</span><span class="p">,</span> <span class="n">python_version</span><span class="p">,</span> <span class="n">architecture</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">ignore_packages</span><span class="p">,</span> <span class="n">update_dependencies</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">project_root</span><span class="p">,</span>
+            <span class="n">python_version</span><span class="p">,</span>
+            <span class="n">architecture</span><span class="p">,</span>
+            <span class="n">region</span><span class="p">,</span>
+            <span class="n">ignore_packages</span><span class="p">,</span>
+            <span class="n">update_dependencies</span><span class="p">,</span>
+            <span class="n">additional_packages_to_ignore</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_poetry</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s2">&quot;poetry&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_poetry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">CommandNotFoundError</span><span class="p">(</span><span class="s2">&quot;poetry not found, please install and add to PATH&quot;</span><span class="p">)</span>
