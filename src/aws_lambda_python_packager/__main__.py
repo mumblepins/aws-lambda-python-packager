@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import argparse
 import logging
 import sys
@@ -6,6 +8,7 @@ from pathlib import Path
 
 from . import __version__
 from ._log_formatter import _CustomLogFormatter
+from .dep_analyzer import DepAnalyzer
 from .lambda_packager import LambdaPackager
 
 LOG = logging.getLogger(__name__)
@@ -29,7 +32,13 @@ def arg_parser():
     parser.add_argument(
         "--zip-output", "-z", help="Output zip file in addition to directory", const=True, nargs="?", default=False
     )
-
+    parser.add_argument(
+        "--export-requirements",
+        help="export installed packages",
+        default=False,
+        const="requirements.installed.txt",
+        nargs="?",
+    )
     parser.add_argument("--version", "-V", action="version", version=f"%(prog)s {__version__}")
 
     opt_group = parser.add_argument_group("Optimization Options")
@@ -83,6 +92,9 @@ def arg_parser():
         default=argparse.SUPPRESS,
     )
     opt_group.add_argument(
+        "--ignore-additional", help="ignore additional dependencies using requirements file", action="append"
+    )
+    opt_group.add_argument(
         "--optimize-all",
         "-O",
         help="Turns on all size optimizations (equivalent to --strip-tests --strip-libraries --ignore-packages --update-dependencies --strip-other). "
@@ -124,10 +136,18 @@ def main_args(args):
     else:
         log_level = logging.DEBUG
     ch.setLevel(log_level)
+    if args_dict["ignore_additional"]:
+        addl_reqs = {}
+        for ia in args_dict["ignore_additional"]:
+            with open(ia, encoding="utf8") as fh:
+                for req in DepAnalyzer.process_requirements(list(fh)):
+                    addl_reqs[req.name] = req.version
+        args_dict["additional_packages_to_ignore"] = addl_reqs
+
     logging.getLogger().setLevel(log_level)
     logging.getLogger().addHandler(ch)
     logging.getLogger("fsspec").setLevel(logging.INFO)
-    LOG.debug("Processed Args: %s", args)
+    LOG.debug("Processed Args: %s", args_dict)
 
     if "optimize_all" in args_dict:
         del args_dict["optimize_all"]
@@ -150,6 +170,8 @@ def main(
     strip_libraries=False,
     strip_python=False,
     strip_other=False,
+    additional_packages_to_ignore: dict | None = None,
+    export_requirements=False,
     **_,
 ):  # pylint: disable=too-many-arguments,too-many-locals
     pp_path = Path(project_path)
@@ -164,6 +186,7 @@ def main(
         python_version=python_version,
         architecture=architecture,
         region=region,
+        additional_packages_to_ignore=additional_packages_to_ignore,
     )
     lp.package(
         zip_output=zip_output,
@@ -174,6 +197,11 @@ def main(
         strip_python=strip_python,
         strip_other_files=strip_other,
     )
+    if export_requirements:
+        print(export_requirements)
+        with open(export_requirements, "wt", encoding="utf8") as f:
+            for pkg in lp.analyzer.export_requirements():
+                f.write(pkg + "\n")
 
 
 if __name__ == "__main__":  # pragma: no cover

@@ -42,8 +42,17 @@ class PoetryAnalyzer(DepAnalyzer):
         region: str = "us-east-1",
         ignore_packages=False,
         update_dependencies=False,
+        additional_packages_to_ignore: dict | None = None,
     ):
-        super().__init__(project_root, python_version, architecture, region, ignore_packages, update_dependencies)
+        super().__init__(
+            project_root,
+            python_version,
+            architecture,
+            region,
+            ignore_packages,
+            update_dependencies,
+            additional_packages_to_ignore,
+        )
         self._poetry = shutil.which("poetry")
         if self._poetry is None:
             raise CommandNotFoundError("poetry not found, please install and add to PATH")

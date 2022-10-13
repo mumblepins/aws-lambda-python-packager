@@ -55,7 +55,12 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
         region: str = "us-east-1",
         ignore_packages=False,
         update_dependencies=False,
+        additional_packages_to_ignore: dict | None = None,
     ):
+        if additional_packages_to_ignore is None:
+            self._additional_packages_to_ignore = {}
+        else:
+            self._additional_packages_to_ignore = additional_packages_to_ignore
         self._extra_lines: Optional[List[ExtraLine]] = None
         self._exported_reqs = None
         self._reqs: Optional[Dict[Any, PackageInfo]] = None
@@ -110,7 +115,10 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
         if not self.ignore_packages:
             return {}
         if self._pkgs_to_ignore_dict is None:
-            self._pkgs_to_ignore_dict = self._get_packages_to_ignore()
+            self._pkgs_to_ignore_dict = {}
+            for pk, pv in {**self._get_packages_to_ignore(), **self._additional_packages_to_ignore}.items():
+                pk = re.sub(r"\[[^\]]+\]$", "", pk)
+                self._pkgs_to_ignore_dict[pk] = pv
         return self._pkgs_to_ignore_dict
 
     @property
@@ -291,10 +299,14 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
         return cur_requires
 
     def export_requirements(self):
+        strip_extras = re.compile(r"\[[^\]]+\]$")
         if self._exported_reqs is None:
             output = []
             for pkg_name, pkg_version, pkg_spec in self.requirements.values():
-                if self.ignore_packages and self.pkgs_to_ignore_dict.get(pkg_name, None) == pkg_version:
+                if (
+                    self.ignore_packages
+                    and self.pkgs_to_ignore_dict.get(strip_extras.sub("", pkg_name), None) == pkg_version
+                ):
                     self.log.warning(
                         "Ignoring %s as it should be in the AWS Lambda Environment already",
                         pkg_spec.strip().split(";")[0],
@@ -303,6 +315,12 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
                 output.append(pkg_spec)
             self._exported_reqs = output
         return self._exported_reqs
+
+    def exported_requirements(self):
+        ret = {}
+        for r in self.process_requirements(self.export_requirements()):
+            ret[r.name] = r
+        return ret
 
     def run_pip(self, *args, return_state=False, quiet=False, context=None):
         self.run_command(self._pip, *args, return_state=return_state, quiet=quiet, context=context)

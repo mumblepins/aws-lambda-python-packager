@@ -50,6 +50,7 @@ class LambdaPackager:
         update_dependencies: bool = False,
         ignore_packages: bool = False,
         split_layer: bool = False,
+        additional_packages_to_ignore: dict | None = None,
     ):  # pylint: disable=too-many-arguments
         """Initialize the Lambda Packager
 
@@ -91,6 +92,7 @@ class LambdaPackager:
             region=self.region,
             ignore_packages=self.ignore_packages,
             update_dependencies=self.update_dependencies,
+            additional_packages_to_ignore=additional_packages_to_ignore,
         )
 
     @classmethod
@@ -109,7 +111,7 @@ class LambdaPackager:
         return total
 
     def get_aws_wrangler_pyarrow(self):
-        if "pyarrow" not in self.analyzer.requirements:
+        if "pyarrow" not in self.analyzer.exported_requirements():
             LOG.warning(
                 "No pyarrow requirement found in requirements.txt, not bothering to get the aws_wrangler version"
             )

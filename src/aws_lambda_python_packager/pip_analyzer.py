@@ -37,8 +37,17 @@ class PipAnalyzer(DepAnalyzer):
         region: str = "us-east-1",
         ignore_packages=False,
         update_dependencies=False,
+        additional_packages_to_ignore: dict | None = None,
     ):
-        super().__init__(project_root, python_version, architecture, region, ignore_packages, update_dependencies)
+        super().__init__(
+            project_root,
+            python_version,
+            architecture,
+            region,
+            ignore_packages,
+            update_dependencies,
+            additional_packages_to_ignore,
+        )
         # try:
         #     import pkg_resources
         # except ImportError:
