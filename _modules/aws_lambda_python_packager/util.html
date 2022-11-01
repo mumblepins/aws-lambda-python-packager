@@ -52,9 +52,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>aws_lambda_python_packager.util</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aws_lambda_python_packager.util</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -84,6 +84,7 @@
 <span class="p">)</span>
 
 <span class="n">LAMBDA_RUNTIME_DOCS_URL</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/awsdocs/aws-lambda-developer-guide/main/doc_source/lambda-runtimes.md&quot;</span>
+<span class="n">GLUE_LIBRARIES_DOCS_URL</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/awsdocs/aws-glue-developer-guide/master/doc_source/aws-glue-programming-python-libraries.md&quot;</span>
 
 <span class="n">PACKAGE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/mumblepins/aws-get-lambda-python-pkg-versions/main/</span><span class="si">{region}</span><span class="s2">-</span><span class="si">{python_version}</span><span class="s2">-</span><span class="si">{architecture}</span><span class="s2">.json&quot;</span>
 
@@ -112,6 +113,28 @@
             <span class="k">for</span> <span class="n">arch</span> <span class="ow">in</span> <span class="n">archs</span><span class="p">:</span>
                 <span class="n">runtimes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">runtime</span><span class="p">,</span> <span class="n">arch</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">runtimes</span>
+
+
+<div class="viewcode-block" id="get_glue_libraries"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.util.get_glue_libraries">[docs]</a><span class="k">def</span> <span class="nf">get_glue_libraries</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Gets libraries included in AWS Glue&quot;&quot;&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">GLUE_LIBRARIES_DOCS_URL</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+    <span class="n">section</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">glue_libraries</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">ln</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">section</span> <span class="o">%</span> <span class="mi">1</span> <span class="o">==</span> <span class="mf">0.5</span><span class="p">:</span>
+            <span class="n">mch</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;AWS Glue version (\d).*out of the box&quot;</span><span class="p">,</span> <span class="n">ln</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mch</span><span class="p">:</span>
+                <span class="n">section</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mch</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                <span class="n">glue_libraries</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">section</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ln</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">section</span> <span class="o">+=</span> <span class="mf">0.5</span>
+                <span class="k">continue</span>
+            <span class="n">grp</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\+\s+([^=]+)==([</span><span class="se">\\</span><span class="s2">.\d]+)&quot;</span><span class="p">,</span> <span class="n">ln</span><span class="p">)</span>
+            <span class="n">glue_libraries</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">grp</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">grp</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">glue_libraries</span></div>
 
 
 <span class="k">def</span> <span class="nf">check_architecture</span><span class="p">(</span><span class="n">architecture</span><span class="p">):</span>
@@ -189,7 +212,7 @@
 
 <span class="n">PLATFORMS</span> <span class="o">=</span> <span class="n">get_lambda_runtimes</span><span class="p">()</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;PathType&quot;</span><span class="p">,</span> <span class="s2">&quot;PLATFORMS&quot;</span><span class="p">,</span> <span class="s2">&quot;chdir_cm&quot;</span><span class="p">,</span> <span class="s2">&quot;chgenv_cm&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;PathType&quot;</span><span class="p">,</span> <span class="s2">&quot;PLATFORMS&quot;</span><span class="p">,</span> <span class="s2">&quot;chdir_cm&quot;</span><span class="p">,</span> <span class="s2">&quot;chgenv_cm&quot;</span><span class="p">,</span> <span class="s2">&quot;get_glue_libraries&quot;</span><span class="p">]</span>
 </pre></div>
 
            </div>
