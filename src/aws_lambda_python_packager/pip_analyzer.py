@@ -84,7 +84,10 @@ class PipAnalyzer(DepAnalyzer):
 
     def _update_dependency_file(self, pkgs_to_add: Dict[str, PackageInfo]):
         self.backup_files(["requirements.txt"])
-        self.log.debug("Updating requirements.txt with %s", ", ".join(f"{k}=={v}" for k, v in pkgs_to_add.items()))
+        self.log.debug(
+            "Updating requirements.txt with %s",
+            ", ".join(f"{k}=={v}" for k, v in pkgs_to_add.items()),
+        )
         new_lines = []
         with open(Path(self._temp_proj_dir.name) / "requirements.txt", "r", encoding="utf8") as f:
             for pkg in self.process_requirements(f):

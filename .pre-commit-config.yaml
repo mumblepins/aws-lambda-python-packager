@@ -95,6 +95,8 @@ repos:
           - types-toml
           - types-colorama
           - types-setuptools
+          - click
+          - click_option_group
   - repo: local
     hooks:
       #      - id: mypy
@@ -121,11 +123,14 @@ repos:
         description: Run pytest in the local virtualenv
         entry: >
           pytest
-          -n 4
+          -n 8
           "tests/"
           --verbose
           --cov=aws_lambda_python_packager
           --pyargs "aws_lambda_python_packager"
+          --cov-report=html
+          --cov-report=term
+          --cov-report=xml
         language: system
         # ignore all files, run on hard-coded modules instead
         pass_filenames: false

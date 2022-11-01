@@ -2,6 +2,7 @@
 import logging
 import re
 import shutil
+import sys
 import tempfile
 from pathlib import Path
 from typing import Optional, Union
@@ -16,7 +17,13 @@ from packaging.version import InvalidVersion, Version
 AWS_WRANGLER_RELEASES = "https://api.github.com/repos/awslabs/aws-data-wrangler/releases"
 AWS_LAYER_VERSION_URL = "https://github.com/awslabs/aws-data-wrangler/releases/download/{version}/awswrangler-layer-{version}-py{python_version}{arch}.zip"
 LOG = logging.getLogger(__name__)
-fs = fsspec.filesystem("blockcache", target_protocol="http", cache_storage=user_cache_dir("lambda-packager"))
+CACHE_METHOD = "blockcache"
+
+if "pytest" in sys.modules:
+    CACHE_METHOD = "simplecache"
+fs = fsspec.filesystem(
+    CACHE_METHOD, target_protocol="http", cache_storage=user_cache_dir("lambda-packager")
+)
 
 
 def to_version(version):
@@ -31,7 +38,9 @@ def get_all_versions(python_version="3.9", arch="x86_64"):
     rj = r.json()
     rj = filter(lambda x: to_version(x["tag_name"]) is not None, rj)
 
-    tags = {v["tag_name"]: v for v in sorted(rj, key=lambda x: Version(x["tag_name"]), reverse=True)}
+    tags = {
+        v["tag_name"]: v for v in sorted(rj, key=lambda x: Version(x["tag_name"]), reverse=True)
+    }
 
     if arch == "x86_64":
         arch = ""
@@ -62,7 +71,9 @@ def fetch_package(
     for zfh in get_all_versions(python_version, arch):
         file_list = [a for a in zfh.namelist() if a.startswith(f"python/{package_name}")]
         wr_pkg_version = [
-            re.sub(rf"^.*{package_name}-(.*?)\.dist-info.*$", r"\1", a) for a in file_list if "dist-info" in a
+            re.sub(rf"^.*{package_name}-(.*?)\.dist-info.*$", r"\1", a)
+            for a in file_list
+            if "dist-info" in a
         ][0]
         if pkg_spec is None or pkg_spec.contains(wr_pkg_version):
             LOG.info("Found package %s-%s in %s", package_name, wr_pkg_version, zfh.filename)
@@ -86,4 +97,10 @@ if __name__ == "__main__":  # pragma: no cover
     parser.add_argument("--python-version", help="Python version to use", default="3.9")
     parser.add_argument("--arch", help="Architecture to use", default="x86_64")
     args = parser.parse_args()
-    fetch_package(args.package_name, Path(args.output_dir), args.package_version, args.python_version, args.arch)
+    fetch_package(
+        args.package_name,
+        Path(args.output_dir),
+        args.package_version,
+        args.python_version,
+        args.arch,
+    )

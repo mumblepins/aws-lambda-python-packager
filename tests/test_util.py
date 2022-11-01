@@ -10,4 +10,7 @@ def test_get_python_runtime():
     assert to_platform_format(get_python_runtime()) in PLATFORMS
     assert to_platform_format(get_python_runtime("arm64")) in PLATFORMS
     assert to_platform_format(get_python_runtime("aarch64", (3, 2))) in PLATFORMS
-    assert to_platform_format(get_python_runtime(target_version="python3.8")) == ("python3.8", "x86_64")
+    assert to_platform_format(get_python_runtime(target_version="python3.8")) == (
+        "python3.8",
+        "x86_64",
+    )

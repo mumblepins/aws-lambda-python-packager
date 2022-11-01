@@ -11,6 +11,7 @@ from __future__ import annotations
 import logging
 import os
 import platform
+import re
 import shutil
 import subprocess  # nosec B404
 from compileall import compile_dir
@@ -34,6 +35,7 @@ from .util import PLATFORMS, PathType
 
 LOG = logging.getLogger(__name__)
 MAX_LAMBDA_SIZE = 250 * 1024 * 1024  # 250MB
+OTHER_FILE_EXTENSIONS = (".pyx", ".pyi", ".pxi", ".pxd", ".c", ".h", ".cc")
 
 
 class LambdaPackager:
@@ -51,6 +53,7 @@ class LambdaPackager:
         ignore_packages: bool = False,
         split_layer: bool = False,
         additional_packages_to_ignore: dict | None = None,
+        ignore_unsupported_python: bool = False,
     ):  # pylint: disable=too-many-arguments
         """Initialize the Lambda Packager
 
@@ -66,7 +69,11 @@ class LambdaPackager:
         self._reqs = None
         self._pip = None
         self.output_dir = Path(output_dir)
-        if ("python" + python_version, architecture) not in PLATFORMS:
+        short_python_version = re.sub(r"^(\d(\.\d+)?)(\.\d+)?$", r"\1", python_version)
+        if (
+            "python" + short_python_version,
+            architecture,
+        ) not in PLATFORMS and not ignore_unsupported_python:
             raise Exception(f"{architecture} {python_version} not supported")  # pragma: no cover
         self.project_path = Path(project_path)
         self.python_version = python_version
@@ -76,10 +83,14 @@ class LambdaPackager:
         self.ignore_packages = ignore_packages
         self.split_layer = split_layer
         analyzer_type: Type[DepAnalyzer]
-        if (self.project_path / "pyproject.toml").exists() and not (self.project_path / "requirements.txt").exists():
+        if (self.project_path / "pyproject.toml").exists() and not (
+            self.project_path / "requirements.txt"
+        ).exists():
             LOG.info("pyproject.toml found and not requirements.txt, assuming poetry")
             analyzer_type = PoetryAnalyzer
-        elif (self.project_path / "requirements.txt").exists() and not (self.project_path / "pyproject.toml").exists():
+        elif (self.project_path / "requirements.txt").exists() and not (
+            self.project_path / "pyproject.toml"
+        ).exists():
             LOG.info("requirements.txt found, assuming pip")
             analyzer_type = PipAnalyzer
         else:
@@ -169,7 +180,7 @@ class LambdaPackager:
     def strip_other_files(self):
         LOG.warning("Stripping other files")
         for p in self.output_dir.glob("**/*"):
-            if p.is_file() and p.suffix in (".pyx", ".pyi", ".pxi", ".pxd", ".c", ".h", ".cc"):
+            if p.is_file() and p.suffix in OTHER_FILE_EXTENSIONS:
                 LOG.debug("Stripping file %s", p)
                 p.unlink()
 
@@ -179,7 +190,9 @@ class LambdaPackager:
             strip_command = get_strip_binary(self.architecture)
             for p in self.output_dir.glob("**/*.so*"):
                 LOG.debug('Stripping library "%s"', p)
-                subprocess.run([strip_command, str(p)])  # nosec: B603 pylint: disable=subprocess-run-check
+                subprocess.run(  # nosec: B603 pylint: disable=subprocess-run-check
+                    [strip_command, str(p)]
+                )
         except Exception:  # pylint: disable=broad-except
             LOG.error("Failed to strip libraries, perhaps we don't have the 'strip' command?")
 
@@ -219,7 +232,11 @@ class LambdaPackager:
         if use_wrangler_pyarrow:
             self.get_aws_wrangler_pyarrow()
             new_size = self.get_total_size()
-            LOG.info("Switched PyArrow size: %s (%0.1f%%)", sizeof_fmt(new_size), new_size / initial_size * 100)
+            LOG.info(
+                "Switched PyArrow size: %s (%0.1f%%)",
+                sizeof_fmt(new_size),
+                new_size / initial_size * 100,
+            )
 
         if strip_python and not compile_python:
             LOG.warning("Not stripping python, since compile_python is set to False")
@@ -232,23 +249,32 @@ class LambdaPackager:
                 strip_python = False
                 LOG.warning("Unable to compile python, not stripping python")
             new_size = self.get_total_size()
-            LOG.info("Compiled size: %s (%0.1f%%)", sizeof_fmt(new_size), new_size / initial_size * 100)
+            LOG.info(
+                "Compiled size: %s (%0.1f%%)", sizeof_fmt(new_size), new_size / initial_size * 100
+            )
         for strip_func in ("strip_python", "strip_tests", "strip_libraries", "strip_other_files"):
             if locals()[strip_func]:
                 getattr(self, strip_func)()
                 new_size = self.get_total_size()
                 LOG.info(
-                    "%s done, new size: %s (%0.1f%%)", strip_func, sizeof_fmt(new_size), new_size / initial_size * 100
+                    "%s done, new size: %s (%0.1f%%)",
+                    strip_func,
+                    sizeof_fmt(new_size),
+                    new_size / initial_size * 100,
                 )
         if self.split_layer:
             self._layer_splitter(layer_paths)
         size_out = self.get_total_size()
         if size_out > MAX_LAMBDA_SIZE:
             LOG.error(
-                "Package size %s exceeds maximum lambda size %s", sizeof_fmt(size_out), sizeof_fmt(MAX_LAMBDA_SIZE)
+                "Package size %s exceeds maximum lambda size %s",
+                sizeof_fmt(size_out),
+                sizeof_fmt(MAX_LAMBDA_SIZE),
             )
         else:
-            LOG.warning("Package size: %s (%0.1f%%)", sizeof_fmt(size_out), size_out / initial_size * 100)
+            LOG.warning(
+                "Package size: %s (%0.1f%%)", sizeof_fmt(size_out), size_out / initial_size * 100
+            )
         if zip_output:
             LOG.warning("Zipping output")
             self.zip_output(zip_output)

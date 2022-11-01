@@ -10,7 +10,7 @@ readme = "README.md"
 packages = [{ include = "aws_lambda_python_packager", from = "src" }]
 
 [tool.poetry.scripts]
-lambda-packager = "aws_lambda_python_packager.__main__:main_cli"
+lambda-packager = "aws_lambda_python_packager.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -19,9 +19,13 @@ python-certifi-win32 = { version = "*", markers = "platform_system == 'Windows'"
 fsspec = "*"
 appdirs = "*"
 aiohttp = "*"
-colorama = ">=0.4"
 toml = ">=0.10"
 packaging = "*"
+click = ">=8"
+click-option-group = "*"
+click-log = "*"
+wheel = "*"
+
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.13.0"
 pytest = "^7.1.1"
@@ -64,7 +68,7 @@ combine_as_imports = true
 force_grid_wrap = 3
 
 [tool.black]
-line-length = 120
+line-length = 100
 include = '\.pyi?$'
 target-version = ['py38', 'py39', 'py310']
 exclude = '''
@@ -132,10 +136,18 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = "packaging.*"
 ignore_missing_imports = true
+
 [[tool.mypy.overrides]]
 module = "pytest.*"
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = "click_log.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "wheel.cli.*"
+ignore_missing_imports = true
 
 [tool.dep_checker]
 allowed_unused = ["python_certifi_win32", 'aiohttp']

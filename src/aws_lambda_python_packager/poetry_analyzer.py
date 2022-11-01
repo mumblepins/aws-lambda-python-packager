@@ -86,7 +86,9 @@ class PoetryAnalyzer(DepAnalyzer):
             self.log.info("Locking dependencies")
             self.lock()
         try:
-            reqs, _ = self.run_poetry("export", "--without-hashes", "--with-credentials", "--only", "main")
+            reqs, _ = self.run_poetry(
+                "export", "--without-hashes", "--with-credentials", "--only", "main"
+            )
             # with self._change_context():
             #     reqs = export_requirements(Path(self._temp_proj_dir.name))
             #
@@ -102,7 +104,10 @@ class PoetryAnalyzer(DepAnalyzer):
 
     def _update_dependency_file(self, pkgs_to_add: Dict[str, PackageInfo]):
         self.backup_files(["pyproject.toml", "poetry.lock"])
-        self.log.debug("Updating pyproject.toml with %s", ", ".join(f"{k}=={v}" for k, v in pkgs_to_add.items()))
+        self.log.debug(
+            "Updating pyproject.toml with %s",
+            ", ".join(f"{k}=={v}" for k, v in pkgs_to_add.items()),
+        )
         self.run_poetry("add", "--lock", *[f"{k}=={v.version}" for k, v in pkgs_to_add.items()])
         self.copy_from_temp_dir(["poetry.lock", "pyproject.toml"])
 
@@ -117,14 +122,21 @@ class PoetryAnalyzer(DepAnalyzer):
             yield
 
     def run_poetry(self, *args, return_state=False, quiet=False, context=None):
-        return self.run_command(self._poetry, *args, return_state=return_state, quiet=quiet, context=context)
+        return self.run_command(
+            self._poetry, *args, return_state=return_state, quiet=quiet, context=context
+        )
 
     def install_root(self):
         initial_dist = {(a, a.lstat()) for a in (self.project_root / "dist").glob("*.tar.gz")}
         self.log.debug("Trying to build package with poetry")
 
         packaged = self.run_poetry(
-            "build", "--format", "sdist", quiet=True, return_state=True, context=self._change_project_root_context
+            "build",
+            "--format",
+            "sdist",
+            quiet=True,
+            return_state=True,
+            context=self._change_project_root_context,
         )
         if packaged:
             self.log.info("Package built with poetry, installing")

@@ -13,11 +13,11 @@ import requests
 
 LOG = logging.getLogger(__name__)
 
-_lambda_runtime_regex = re.compile(r"^.*?\|\s*`(python3\.\d+)`\s*\|.*?\|\s*([armx864 \\_,]+)\s*\|.*$")
-
-LAMBDA_RUNTIME_DOCS_URL = (
-    "https://raw.githubusercontent.com/awsdocs/aws-lambda-developer-guide/main/doc_source/lambda-runtimes.md"
+_lambda_runtime_regex = re.compile(
+    r"^.*?\|\s*`(python3\.\d+)`\s*\|.*?\|\s*([armx864 \\_,]+)\s*\|.*$"
 )
+
+LAMBDA_RUNTIME_DOCS_URL = "https://raw.githubusercontent.com/awsdocs/aws-lambda-developer-guide/main/doc_source/lambda-runtimes.md"
 
 PACKAGE_URL = "https://raw.githubusercontent.com/mumblepins/aws-get-lambda-python-pkg-versions/main/{region}-{python_version}-{architecture}.json"
 

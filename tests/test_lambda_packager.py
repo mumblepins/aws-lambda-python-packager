@@ -3,8 +3,9 @@ import os
 from pathlib import Path
 
 import pytest
+from click.testing import CliRunner
 
-from aws_lambda_python_packager.__main__ import main_args
+from aws_lambda_python_packager.__main__ import main
 from aws_lambda_python_packager.lambda_packager import LambdaPackager
 
 resources = Path(os.path.realpath(__file__)).parent / "resources"
@@ -71,7 +72,13 @@ def test_export_no_ignore_packages_no_update_pyproject(temp_path_filled):
 @pytest.mark.parametrize("arch,pyarch", architectures)
 def test_cli_regular(arch, pyarch, temp_path_filled):
     src, dst, _ = temp_path_filled
-    main_args([str(a) for a in ["-v", "--architecture", arch, src, dst]])
+    runner = CliRunner()
+    result = runner.invoke(
+        main, ["-v", "INFO", "build", "--architecture", arch, str(src), str(dst)]
+    )
+
+    assert result.exit_code == 0
+    # main_args([str(a) for a in ["-v", "--architecture", arch, src, dst]])
 
     # lp = LambdaPackager(src, dst, update_dependencies=False, ignore_packages=False, architecture="arm64")
     # lp.package()
@@ -83,7 +90,13 @@ def test_cli_regular(arch, pyarch, temp_path_filled):
 def test_optimize(arch, pyarch, temp_path_filled):
     # TODO: improve tests for optimization
     src, dst, _ = temp_path_filled
-    main_args([str(a) for a in ["-v", "-O", "--architecture", arch, src, dst]])
+
+    runner = CliRunner()
+    result = runner.invoke(
+        main, ["-v", "INFO", "build", "-O", "--architecture", arch, str(src), str(dst)]
+    )
+    # main_args([str(a) for a in ["-v", "-O", "--architecture", arch, src, dst]])
+    assert result.exit_code == 0
     pyarrow_file = list(dst.glob("**/pyarrow/**/libarrow.so.*"))[0]
     assert 31_000_000 < os.path.getsize(pyarrow_file) < 40_000_000
     # make sure we aren't using the aws wrangler version
@@ -96,7 +109,13 @@ def test_optimize(arch, pyarch, temp_path_filled):
 @pytest.mark.parametrize("arch,pyarch", architectures)
 def test_full_optimize(arch, pyarch, temp_path_filled):
     src, dst, _ = temp_path_filled
-    main_args([str(a) for a in ["-v", "-OO", "--architecture", arch, src, dst]])
+    runner = CliRunner()
+    result = runner.invoke(
+        main, ["-v", "INFO", "build", "-OOOOO", "--architecture", arch, str(src), str(dst)]
+    )
+    # main_args([str(a) for a in ["-v", "-O", "--architecture", arch, src, dst]])
+    assert result.exit_code == 0
+    # main_args([str(a) for a in ["-v", "-OO", "--architecture", arch, src, dst]])
     pyarrow_file = list(dst.glob("**/pyarrow/**/libarrow.so.*"))[0]
     assert os.path.getsize(pyarrow_file) < 32_000_000
     # make sure we are using the aws wrangler version
@@ -108,5 +127,9 @@ def test_full_optimize(arch, pyarch, temp_path_filled):
 def test_zip(temp_path_filled):
     src, dst, _ = temp_path_filled
     zip_file = src.parent / "test_package.zip"
-    main_args([str(a) for a in ["-v", "-z", zip_file, src, dst]])
+
+    runner = CliRunner()
+    result = runner.invoke(main, ["-v", "INFO", "build", "-z", str(zip_file), str(src), str(dst)])
+    # main_args([str(a) for a in ["-v", "-O", "--architecture", arch, src, dst]])
+    assert result.exit_code == 0
     assert zip_file.exists() and zip_file.stat().st_size > 1 * 1024 * 1024
