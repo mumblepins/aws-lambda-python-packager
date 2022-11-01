@@ -41,7 +41,7 @@ myst-parser = "^0.17.2"
 
 importlib-resources = { version = "^5.7.1", python = "<3.9" }
 bump2version = "^1.0.1"
-pytest-randomly = "^3.12.0"
+#pytest-randomly = "^3.12.0"
 
 
 [tool.poetry.extras]

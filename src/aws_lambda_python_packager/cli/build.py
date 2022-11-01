@@ -3,12 +3,14 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
+from pprint import pformat
 
 import click
 from click_option_group import optgroup
 
 from ..dep_analyzer import DepAnalyzer, PackageInfo
 from ..lambda_packager import OTHER_FILE_EXTENSIONS, LambdaPackager
+from ..util import get_glue_libraries
 
 LOG = logging.getLogger(__name__)
 
@@ -144,6 +146,12 @@ def optimize_callback(ctx, opt, val):
     type=click.File(),
 )
 @optgroup.option(
+    "--ignore-from-glue",
+    help="ignore dependencies already present in Glue Version",
+    type=click.Choice(["2", "3"]),
+    callback=lambda c, p, v: int(v) if v else None,
+)
+@optgroup.option(
     "--optimize-all",
     "-O",
     help="Turns on all size optimizations\n\n" + "\b\n" + "Levels:\n" + OPT_LEVEL_TEXT,
@@ -170,6 +178,7 @@ def build(
     ignore_additional=None,
     export_requirements=False,
     ignore_unsupported_python: bool = False,
+    ignore_from_glue: int | None = None,
     **_,
 ):  # pylint: disable=too-many-arguments,too-many-locals
     """Bundles a group of python dependencies"""
@@ -181,6 +190,11 @@ def build(
                 additional_packages_to_ignore[req.name] = req.version
     if project_path.is_file() and project_path.name in ("pyproject.toml", "requirements.txt"):
         project_path = project_path.parent
+    if ignore_from_glue:
+        glue_libs = get_glue_libraries()[ignore_from_glue]
+        additional_packages_to_ignore.update(glue_libs)
+    if additional_packages_to_ignore and LOG.getEffectiveLevel() <= logging.DEBUG:
+        LOG.debug(pformat(additional_packages_to_ignore))
 
     lp = LambdaPackager(
         project_path=project_path,

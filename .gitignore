@@ -328,3 +328,4 @@ src/requirements.txt
 /.idea/GitLink.xml
 tdist*
 /.idea/ghactions-toolbar.xml
+/.idea/git_toolbox_prj.xml

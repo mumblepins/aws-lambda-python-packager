@@ -18,6 +18,7 @@ _lambda_runtime_regex = re.compile(
 )
 
 LAMBDA_RUNTIME_DOCS_URL = "https://raw.githubusercontent.com/awsdocs/aws-lambda-developer-guide/main/doc_source/lambda-runtimes.md"
+GLUE_LIBRARIES_DOCS_URL = "https://raw.githubusercontent.com/awsdocs/aws-glue-developer-guide/master/doc_source/aws-glue-programming-python-libraries.md"
 
 PACKAGE_URL = "https://raw.githubusercontent.com/mumblepins/aws-get-lambda-python-pkg-versions/main/{region}-{python_version}-{architecture}.json"
 
@@ -46,6 +47,28 @@ def get_lambda_runtimes():
             for arch in archs:
                 runtimes.append((runtime, arch))
     return runtimes
+
+
+def get_glue_libraries():
+    """Gets libraries included in AWS Glue"""
+    r = requests.get(GLUE_LIBRARIES_DOCS_URL, timeout=10)
+    r.raise_for_status()
+    section = 0
+    glue_libraries = {}
+    for ln in r.text.splitlines():
+        if section == 0 or section % 1 == 0.5:
+            mch = re.match(r"AWS Glue version (\d).*out of the box", ln)
+            if mch:
+                section = int(mch.group(1))
+                glue_libraries[section] = {}
+            continue
+        if section in (2, 3):
+            if ln.strip() == "":
+                section += 0.5
+                continue
+            grp = re.search(r"\+\s+([^=]+)==([\\.\d]+)", ln)
+            glue_libraries[section][grp.group(1).replace("\\", "")] = grp.group(2).replace("\\", "")
+    return glue_libraries
 
 
 def check_architecture(architecture):
@@ -123,4 +146,4 @@ def chgenv_cm(**kwargs):
 
 PLATFORMS = get_lambda_runtimes()
 
-__all__ = ["PathType", "PLATFORMS", "chdir_cm", "chgenv_cm"]
+__all__ = ["PathType", "PLATFORMS", "chdir_cm", "chgenv_cm", "get_glue_libraries"]

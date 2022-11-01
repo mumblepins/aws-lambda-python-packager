@@ -112,12 +112,16 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
     # region properties
     @property
     def pkgs_to_ignore_dict(self):
-        if not self.ignore_packages:
+        if not self.ignore_packages and not self._additional_packages_to_ignore:
             return {}
         if self._pkgs_to_ignore_dict is None:
             self._pkgs_to_ignore_dict = {}
+            if self.ignore_packages:
+                lambda_pkgs_to_ignore = self._get_packages_to_ignore()
+            else:
+                lambda_pkgs_to_ignore = {}
             for pk, pv in {
-                **self._get_packages_to_ignore(),
+                **lambda_pkgs_to_ignore,
                 **self._additional_packages_to_ignore,
             }.items():
                 pk = re.sub(r"\[[^\]]+\]$", "", pk)
@@ -282,7 +286,7 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
                 return stdout, stderr
 
     def update_dependency_file(self):
-        if not self.ignore_packages or not self.update_dependencies:
+        if not self.update_dependencies or not self.pkgs_to_ignore_dict:
             return None
         self.log.info(
             "Checking to see if any dependencies need to be changed in the dependency file to match the AWS Lambda environment"
@@ -317,8 +321,7 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
             output = []
             for pkg_name, pkg_version, pkg_spec in self.requirements.values():
                 if (
-                    self.ignore_packages
-                    and self.pkgs_to_ignore_dict.get(strip_extras.sub("", pkg_name), None)
+                    self.pkgs_to_ignore_dict.get(strip_extras.sub("", pkg_name), None)
                     == pkg_version
                 ):
                     self.log.warning(
