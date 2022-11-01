@@ -68,6 +68,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
@@ -82,7 +83,13 @@
 <span class="n">AWS_WRANGLER_RELEASES</span> <span class="o">=</span> <span class="s2">&quot;https://api.github.com/repos/awslabs/aws-data-wrangler/releases&quot;</span>
 <span class="n">AWS_LAYER_VERSION_URL</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/awslabs/aws-data-wrangler/releases/download/</span><span class="si">{version}</span><span class="s2">/awswrangler-layer-</span><span class="si">{version}</span><span class="s2">-py</span><span class="si">{python_version}{arch}</span><span class="s2">.zip&quot;</span>
 <span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-<span class="n">fs</span> <span class="o">=</span> <span class="n">fsspec</span><span class="o">.</span><span class="n">filesystem</span><span class="p">(</span><span class="s2">&quot;blockcache&quot;</span><span class="p">,</span> <span class="n">target_protocol</span><span class="o">=</span><span class="s2">&quot;http&quot;</span><span class="p">,</span> <span class="n">cache_storage</span><span class="o">=</span><span class="n">user_cache_dir</span><span class="p">(</span><span class="s2">&quot;lambda-packager&quot;</span><span class="p">))</span>
+<span class="n">CACHE_METHOD</span> <span class="o">=</span> <span class="s2">&quot;blockcache&quot;</span>
+
+<span class="k">if</span> <span class="s2">&quot;pytest&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+    <span class="n">CACHE_METHOD</span> <span class="o">=</span> <span class="s2">&quot;simplecache&quot;</span>
+<span class="n">fs</span> <span class="o">=</span> <span class="n">fsspec</span><span class="o">.</span><span class="n">filesystem</span><span class="p">(</span>
+    <span class="n">CACHE_METHOD</span><span class="p">,</span> <span class="n">target_protocol</span><span class="o">=</span><span class="s2">&quot;http&quot;</span><span class="p">,</span> <span class="n">cache_storage</span><span class="o">=</span><span class="n">user_cache_dir</span><span class="p">(</span><span class="s2">&quot;lambda-packager&quot;</span><span class="p">)</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="to_version"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.aws_wrangler.to_version">[docs]</a><span class="k">def</span> <span class="nf">to_version</span><span class="p">(</span><span class="n">version</span><span class="p">):</span>
@@ -97,7 +104,9 @@
     <span class="n">rj</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
     <span class="n">rj</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">to_version</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;tag_name&quot;</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rj</span><span class="p">)</span>
 
-    <span class="n">tags</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">[</span><span class="s2">&quot;tag_name&quot;</span><span class="p">]:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">rj</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Version</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;tag_name&quot;</span><span class="p">]),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)}</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">v</span><span class="p">[</span><span class="s2">&quot;tag_name&quot;</span><span class="p">]:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">rj</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Version</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;tag_name&quot;</span><span class="p">]),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="p">}</span>
 
     <span class="k">if</span> <span class="n">arch</span> <span class="o">==</span> <span class="s2">&quot;x86_64&quot;</span><span class="p">:</span>
         <span class="n">arch</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -128,7 +137,9 @@
     <span class="k">for</span> <span class="n">zfh</span> <span class="ow">in</span> <span class="n">get_all_versions</span><span class="p">(</span><span class="n">python_version</span><span class="p">,</span> <span class="n">arch</span><span class="p">):</span>
         <span class="n">file_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">zfh</span><span class="o">.</span><span class="n">namelist</span><span class="p">()</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;python/</span><span class="si">{</span><span class="n">package_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)]</span>
         <span class="n">wr_pkg_version</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;^.*</span><span class="si">{</span><span class="n">package_name</span><span class="si">}</span><span class="s2">-(.*?)\.dist-info.*$&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">file_list</span> <span class="k">if</span> <span class="s2">&quot;dist-info&quot;</span> <span class="ow">in</span> <span class="n">a</span>
+            <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;^.*</span><span class="si">{</span><span class="n">package_name</span><span class="si">}</span><span class="s2">-(.*?)\.dist-info.*$&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">file_list</span>
+            <span class="k">if</span> <span class="s2">&quot;dist-info&quot;</span> <span class="ow">in</span> <span class="n">a</span>
         <span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">pkg_spec</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">pkg_spec</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">wr_pkg_version</span><span class="p">):</span>
             <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Found package </span><span class="si">%s</span><span class="s2">-</span><span class="si">%s</span><span class="s2"> in </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">package_name</span><span class="p">,</span> <span class="n">wr_pkg_version</span><span class="p">,</span> <span class="n">zfh</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
@@ -152,7 +163,13 @@
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--python-version&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Python version to use&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;3.9&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--arch&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Architecture to use&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;x86_64&quot;</span><span class="p">)</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
-    <span class="n">fetch_package</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">package_name</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">output_dir</span><span class="p">),</span> <span class="n">args</span><span class="o">.</span><span class="n">package_version</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">python_version</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">arch</span><span class="p">)</span>
+    <span class="n">fetch_package</span><span class="p">(</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">package_name</span><span class="p">,</span>
+        <span class="n">Path</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">output_dir</span><span class="p">),</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">package_version</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">python_version</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">arch</span><span class="p">,</span>
+    <span class="p">)</span>
 </pre></div>
 
            </div>

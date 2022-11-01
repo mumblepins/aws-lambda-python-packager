@@ -77,6 +77,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>  <span class="c1"># nosec B404</span>
 <span class="kn">from</span> <span class="nn">compileall</span> <span class="kn">import</span> <span class="n">compile_dir</span>
@@ -100,6 +101,7 @@
 
 <span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">MAX_LAMBDA_SIZE</span> <span class="o">=</span> <span class="mi">250</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>  <span class="c1"># 250MB</span>
+<span class="n">OTHER_FILE_EXTENSIONS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;.pyx&quot;</span><span class="p">,</span> <span class="s2">&quot;.pyi&quot;</span><span class="p">,</span> <span class="s2">&quot;.pxi&quot;</span><span class="p">,</span> <span class="s2">&quot;.pxd&quot;</span><span class="p">,</span> <span class="s2">&quot;.c&quot;</span><span class="p">,</span> <span class="s2">&quot;.h&quot;</span><span class="p">,</span> <span class="s2">&quot;.cc&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="LambdaPackager"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager">[docs]</a><span class="k">class</span> <span class="nc">LambdaPackager</span><span class="p">:</span>
@@ -117,6 +119,7 @@
         <span class="n">ignore_packages</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">split_layer</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">additional_packages_to_ignore</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ignore_unsupported_python</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="sd">&quot;&quot;&quot;Initialize the Lambda Packager</span>
 
@@ -132,7 +135,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_reqs</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pip</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;python&quot;</span> <span class="o">+</span> <span class="n">python_version</span><span class="p">,</span> <span class="n">architecture</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">PLATFORMS</span><span class="p">:</span>
+        <span class="n">short_python_version</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^(\d(\.\d+)?)(\.\d+)?$&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1&quot;</span><span class="p">,</span> <span class="n">python_version</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="s2">&quot;python&quot;</span> <span class="o">+</span> <span class="n">short_python_version</span><span class="p">,</span>
+            <span class="n">architecture</span><span class="p">,</span>
+        <span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">PLATFORMS</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ignore_unsupported_python</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">architecture</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">python_version</span><span class="si">}</span><span class="s2"> not supported&quot;</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">project_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">python_version</span> <span class="o">=</span> <span class="n">python_version</span>
@@ -142,10 +149,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ignore_packages</span> <span class="o">=</span> <span class="n">ignore_packages</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">split_layer</span> <span class="o">=</span> <span class="n">split_layer</span>
         <span class="n">analyzer_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">DepAnalyzer</span><span class="p">]</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="o">/</span> <span class="s2">&quot;pyproject.toml&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="o">/</span> <span class="s2">&quot;requirements.txt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="o">/</span> <span class="s2">&quot;pyproject.toml&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="o">/</span> <span class="s2">&quot;requirements.txt&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;pyproject.toml found and not requirements.txt, assuming poetry&quot;</span><span class="p">)</span>
             <span class="n">analyzer_type</span> <span class="o">=</span> <span class="n">PoetryAnalyzer</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="o">/</span> <span class="s2">&quot;requirements.txt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="o">/</span> <span class="s2">&quot;pyproject.toml&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="o">/</span> <span class="s2">&quot;requirements.txt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="o">/</span> <span class="s2">&quot;pyproject.toml&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;requirements.txt found, assuming pip&quot;</span><span class="p">)</span>
             <span class="n">analyzer_type</span> <span class="o">=</span> <span class="n">PipAnalyzer</span>
         <span class="k">else</span><span class="p">:</span>
@@ -235,7 +246,7 @@
 <div class="viewcode-block" id="LambdaPackager.strip_other_files"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.strip_other_files">[docs]</a>    <span class="k">def</span> <span class="nf">strip_other_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Stripping other files&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;**/*&quot;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;.pyx&quot;</span><span class="p">,</span> <span class="s2">&quot;.pyi&quot;</span><span class="p">,</span> <span class="s2">&quot;.pxi&quot;</span><span class="p">,</span> <span class="s2">&quot;.pxd&quot;</span><span class="p">,</span> <span class="s2">&quot;.c&quot;</span><span class="p">,</span> <span class="s2">&quot;.h&quot;</span><span class="p">,</span> <span class="s2">&quot;.cc&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">in</span> <span class="n">OTHER_FILE_EXTENSIONS</span><span class="p">:</span>
                 <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Stripping file </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
                 <span class="n">p</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span></div>
 
@@ -245,7 +256,9 @@
             <span class="n">strip_command</span> <span class="o">=</span> <span class="n">get_strip_binary</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">architecture</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;**/*.so*&quot;</span><span class="p">):</span>
                 <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Stripping library &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
-                <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">strip_command</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)])</span>  <span class="c1"># nosec: B603 pylint: disable=subprocess-run-check</span>
+                <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>  <span class="c1"># nosec: B603 pylint: disable=subprocess-run-check</span>
+                    <span class="p">[</span><span class="n">strip_command</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)]</span>
+                <span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-except</span>
             <span class="n">LOG</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Failed to strip libraries, perhaps we don&#39;t have the &#39;strip&#39; command?&quot;</span><span class="p">)</span></div>
 
@@ -285,7 +298,11 @@
         <span class="k">if</span> <span class="n">use_wrangler_pyarrow</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">get_aws_wrangler_pyarrow</span><span class="p">()</span>
             <span class="n">new_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_total_size</span><span class="p">()</span>
-            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Switched PyArrow size: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%0.1f%%</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">new_size</span><span class="p">),</span> <span class="n">new_size</span> <span class="o">/</span> <span class="n">initial_size</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;Switched PyArrow size: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%0.1f%%</span><span class="s2">)&quot;</span><span class="p">,</span>
+                <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">new_size</span><span class="p">),</span>
+                <span class="n">new_size</span> <span class="o">/</span> <span class="n">initial_size</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">strip_python</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">compile_python</span><span class="p">:</span>
             <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Not stripping python, since compile_python is set to False&quot;</span><span class="p">)</span>
@@ -298,23 +315,32 @@
                 <span class="n">strip_python</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Unable to compile python, not stripping python&quot;</span><span class="p">)</span>
             <span class="n">new_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_total_size</span><span class="p">()</span>
-            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Compiled size: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%0.1f%%</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">new_size</span><span class="p">),</span> <span class="n">new_size</span> <span class="o">/</span> <span class="n">initial_size</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;Compiled size: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%0.1f%%</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">new_size</span><span class="p">),</span> <span class="n">new_size</span> <span class="o">/</span> <span class="n">initial_size</span> <span class="o">*</span> <span class="mi">100</span>
+            <span class="p">)</span>
         <span class="k">for</span> <span class="n">strip_func</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;strip_python&quot;</span><span class="p">,</span> <span class="s2">&quot;strip_tests&quot;</span><span class="p">,</span> <span class="s2">&quot;strip_libraries&quot;</span><span class="p">,</span> <span class="s2">&quot;strip_other_files&quot;</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">locals</span><span class="p">()[</span><span class="n">strip_func</span><span class="p">]:</span>
                 <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strip_func</span><span class="p">)()</span>
                 <span class="n">new_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_total_size</span><span class="p">()</span>
                 <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                    <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> done, new size: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%0.1f%%</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">strip_func</span><span class="p">,</span> <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">new_size</span><span class="p">),</span> <span class="n">new_size</span> <span class="o">/</span> <span class="n">initial_size</span> <span class="o">*</span> <span class="mi">100</span>
+                    <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> done, new size: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%0.1f%%</span><span class="s2">)&quot;</span><span class="p">,</span>
+                    <span class="n">strip_func</span><span class="p">,</span>
+                    <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">new_size</span><span class="p">),</span>
+                    <span class="n">new_size</span> <span class="o">/</span> <span class="n">initial_size</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
                 <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_layer</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_layer_splitter</span><span class="p">(</span><span class="n">layer_paths</span><span class="p">)</span>
         <span class="n">size_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_total_size</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">size_out</span> <span class="o">&gt;</span> <span class="n">MAX_LAMBDA_SIZE</span><span class="p">:</span>
             <span class="n">LOG</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                <span class="s2">&quot;Package size </span><span class="si">%s</span><span class="s2"> exceeds maximum lambda size </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">size_out</span><span class="p">),</span> <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">MAX_LAMBDA_SIZE</span><span class="p">)</span>
+                <span class="s2">&quot;Package size </span><span class="si">%s</span><span class="s2"> exceeds maximum lambda size </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">size_out</span><span class="p">),</span>
+                <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">MAX_LAMBDA_SIZE</span><span class="p">),</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Package size: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%0.1f%%</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">size_out</span><span class="p">),</span> <span class="n">size_out</span> <span class="o">/</span> <span class="n">initial_size</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Package size: </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%0.1f%%</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">sizeof_fmt</span><span class="p">(</span><span class="n">size_out</span><span class="p">),</span> <span class="n">size_out</span> <span class="o">/</span> <span class="n">initial_size</span> <span class="o">*</span> <span class="mi">100</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">zip_output</span><span class="p">:</span>
             <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Zipping output&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">zip_output</span><span class="p">(</span><span class="n">zip_output</span><span class="p">)</span>

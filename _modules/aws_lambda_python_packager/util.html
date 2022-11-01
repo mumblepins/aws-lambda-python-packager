@@ -79,11 +79,11 @@
 
 <span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="n">_lambda_runtime_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^.*?\|\s*`(python3\.\d+)`\s*\|.*?\|\s*([armx864 </span><span class="se">\\</span><span class="s2">_,]+)\s*\|.*$&quot;</span><span class="p">)</span>
-
-<span class="n">LAMBDA_RUNTIME_DOCS_URL</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">&quot;https://raw.githubusercontent.com/awsdocs/aws-lambda-developer-guide/main/doc_source/lambda-runtimes.md&quot;</span>
+<span class="n">_lambda_runtime_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sa">r</span><span class="s2">&quot;^.*?\|\s*`(python3\.\d+)`\s*\|.*?\|\s*([armx864 </span><span class="se">\\</span><span class="s2">_,]+)\s*\|.*$&quot;</span>
 <span class="p">)</span>
+
+<span class="n">LAMBDA_RUNTIME_DOCS_URL</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/awsdocs/aws-lambda-developer-guide/main/doc_source/lambda-runtimes.md&quot;</span>
 
 <span class="n">PACKAGE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/mumblepins/aws-get-lambda-python-pkg-versions/main/</span><span class="si">{region}</span><span class="s2">-</span><span class="si">{python_version}</span><span class="s2">-</span><span class="si">{architecture}</span><span class="s2">.json&quot;</span>
 

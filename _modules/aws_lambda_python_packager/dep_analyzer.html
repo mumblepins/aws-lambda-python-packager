@@ -182,7 +182,10 @@
             <span class="k">return</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pkgs_to_ignore_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_pkgs_to_ignore_dict</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">for</span> <span class="n">pk</span><span class="p">,</span> <span class="n">pv</span> <span class="ow">in</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_packages_to_ignore</span><span class="p">(),</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_additional_packages_to_ignore</span><span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">pk</span><span class="p">,</span> <span class="n">pv</span> <span class="ow">in</span> <span class="p">{</span>
+                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_packages_to_ignore</span><span class="p">(),</span>
+                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_additional_packages_to_ignore</span><span class="p">,</span>
+            <span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">pk</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\[[^\]]+\]$&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_pkgs_to_ignore_dict</span><span class="p">[</span><span class="n">pk</span><span class="p">]</span> <span class="o">=</span> <span class="n">pv</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pkgs_to_ignore_dict</span>
@@ -264,7 +267,9 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
                 <span class="n">PACKAGE_URL</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">region</span><span class="p">,</span> <span class="n">architecture</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">architecture</span><span class="p">,</span> <span class="n">python_version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">python_version</span>
+                    <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">region</span><span class="p">,</span>
+                    <span class="n">architecture</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">architecture</span><span class="p">,</span>
+                    <span class="n">python_version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">python_version</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
             <span class="p">)</span>
@@ -284,7 +289,9 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_requirements</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="DepAnalyzer.process_requirements"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.process_requirements">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">process_requirements</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">requirements</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">PackageInfo</span><span class="p">,</span> <span class="n">ExtraLine</span><span class="p">]]:</span>
+    <span class="k">def</span> <span class="nf">process_requirements</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">requirements</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">PackageInfo</span><span class="p">,</span> <span class="n">ExtraLine</span><span class="p">]]:</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">requirements</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
                 <span class="k">continue</span>
@@ -352,9 +359,15 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="n">ExtraLine</span><span class="p">):</span>
                 <span class="k">continue</span>
             <span class="n">pkg_name</span><span class="p">,</span> <span class="n">pkg_version</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pkg</span>
-            <span class="k">if</span> <span class="n">pkg_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pkgs_to_ignore_dict</span> <span class="ow">and</span> <span class="n">pkg_version</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pkgs_to_ignore_dict</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">pkg_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pkgs_to_ignore_dict</span>
+                <span class="ow">and</span> <span class="n">pkg_version</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pkgs_to_ignore_dict</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]</span>
+            <span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is currently </span><span class="si">%s</span><span class="s2"> but should be </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">pkg_name</span><span class="p">,</span> <span class="n">pkg_version</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pkgs_to_ignore_dict</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]</span>
+                    <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is currently </span><span class="si">%s</span><span class="s2"> but should be </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">pkg_name</span><span class="p">,</span>
+                    <span class="n">pkg_version</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">pkgs_to_ignore_dict</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">],</span>
                 <span class="p">)</span>
                 <span class="n">pkgs_to_add</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pkgs_to_ignore_info</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pkgs_to_add</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -371,7 +384,8 @@
             <span class="k">for</span> <span class="n">pkg_name</span><span class="p">,</span> <span class="n">pkg_version</span><span class="p">,</span> <span class="n">pkg_spec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">requirements</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
                 <span class="k">if</span> <span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">ignore_packages</span>
-                    <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">pkgs_to_ignore_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">strip_extras</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">pkg_name</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">pkg_version</span>
+                    <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">pkgs_to_ignore_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">strip_extras</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">pkg_name</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="o">==</span> <span class="n">pkg_version</span>
                 <span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                         <span class="s2">&quot;Ignoring </span><span class="si">%s</span><span class="s2"> as it should be in the AWS Lambda Environment already&quot;</span><span class="p">,</span>
@@ -409,14 +423,18 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;src/__init__.py exists, installing as package in target&quot;</span><span class="p">)</span>
                 <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">src_path</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;src&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;src/__init__.py does not exist, installing files from src directly into target&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;src/__init__.py does not exist, installing files from src directly into target&quot;</span>
+                <span class="p">)</span>
                 <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">src_path</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="n">dirs_exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_root</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.py&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_root</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.py&quot;</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Copying </span><span class="si">%s</span><span class="s2"> to target&quot;</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
                 <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No src/__init__.py or *.py files found, no root program is being installed&quot;</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;No src/__init__.py or *.py files found, no root program is being installed&quot;</span>
+            <span class="p">)</span></div>
 
 <div class="viewcode-block" id="DepAnalyzer.get_layer_files"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.get_layer_files">[docs]</a>    <span class="k">def</span> <span class="nf">get_layer_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">target_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
