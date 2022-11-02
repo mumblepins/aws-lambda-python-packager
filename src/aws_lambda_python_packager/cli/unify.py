@@ -76,12 +76,12 @@ def combine_wheel_files(bundle_path: Path, dist_info_dir: Path):
 @click.option("--output-package-version", default="0.0.1")
 def unify(
     bundle_path: Path,
-    output_path: Path | None = None,
+    output_path: Path,
     output_package_name="unified_package",
     output_package_version="0.0.1",
 ):
     """Converts a bundled directory into a single wheel."""
-    click.echo(output_path)
+
     with tempfile.TemporaryDirectory() as td:
         pkg_td = Path(td) / "bundle"
         shutil.copytree(bundle_path, pkg_td)
@@ -106,5 +106,5 @@ def unify(
                 continue
             LOG.debug("Deleting %s", di_dir)
             shutil.rmtree(di_dir)
-
+        output_path.mkdir(exist_ok=True, parents=True)
         whl_pack(pkg_td, output_path, None)
