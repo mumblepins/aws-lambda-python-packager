@@ -8,6 +8,8 @@ It is an alternative to `sam build` and uses poetry to manage dependencies.
 """
 from __future__ import annotations
 
+import gzip
+import json
 import logging
 import os
 import platform
@@ -184,6 +186,25 @@ class LambdaPackager:
                 LOG.debug("Stripping file %s", p)
                 p.unlink()
 
+    def compress_boto(self):
+        LOG.warning("(Re)Compressing botocore and boto3 data files")
+        f: Path
+        for f in self.output_dir.glob("**/boto[3c]*/data/**/*.json*"):
+            if f.name.endswith(".json.gz"):
+                _open = gzip.open
+                new_name = f
+                delete = False
+            else:
+                _open = open
+                new_name = f.with_suffix(".json.gz")
+                delete = True
+            with _open(f, "rt", encoding="utf8") as fh:
+                data = json.load(fh)
+            with gzip.open(new_name, "wt", encoding="utf8", compresslevel=9) as fh:
+                json.dump(data, fh)
+            if delete:
+                f.unlink(missing_ok=True)
+
     def strip_libraries(self):
         try:
             LOG.warning("Stripping libraries")
@@ -216,6 +237,7 @@ class LambdaPackager:
         strip_libraries: bool = False,  # pylint: disable=unused-argument
         strip_python: bool = False,
         strip_other_files: bool = False,  # pylint: disable=unused-argument
+        compress_boto: bool = False,  # pylint: disable=unused-argument
     ):  # pylint: disable=too-many-arguments,too-many-branches
         if not no_clobber and os.path.exists(self.output_dir):
             LOG.warning("Output directory %s already exists, removing it", self.output_dir)
@@ -252,7 +274,13 @@ class LambdaPackager:
             LOG.info(
                 "Compiled size: %s (%0.1f%%)", sizeof_fmt(new_size), new_size / initial_size * 100
             )
-        for strip_func in ("strip_python", "strip_tests", "strip_libraries", "strip_other_files"):
+        for strip_func in (
+            "strip_python",
+            "strip_tests",
+            "strip_libraries",
+            "strip_other_files",
+            "compress_boto",
+        ):
             if locals()[strip_func]:
                 getattr(self, strip_func)()
                 new_size = self.get_total_size()

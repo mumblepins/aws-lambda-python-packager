@@ -15,8 +15,8 @@ from ..util import get_glue_libraries
 LOG = logging.getLogger(__name__)
 
 OPTIMIZATION_LEVELS = [
-    ("strip_tests", "strip_other", "strip_libraries"),
-    ("ignore_packages",),
+    ("strip_tests", "strip_other", "compress_boto"),
+    ("ignore_packages", "strip_libraries"),
     ("update_dependencies",),
     ("use_aws_pyarrow",),
     ("strip_python", "compile_python"),
@@ -140,6 +140,11 @@ def optimize_callback(ctx, opt, val):
     default=False,
 )
 @optgroup.option(
+    "--compress-boto/--no-compress-boto",
+    help="Compress boto3/botocore data files if present",
+    default=False,
+)
+@optgroup.option(
     "--ignore-additional",
     help="ignore additional dependencies using requirements file",
     multiple=True,
@@ -175,6 +180,7 @@ def build(
     strip_libraries=False,
     strip_python=False,
     strip_other=False,
+    compress_boto=False,
     ignore_additional=None,
     export_requirements=False,
     ignore_unsupported_python: bool = False,
@@ -215,6 +221,7 @@ def build(
         strip_libraries=strip_libraries,
         strip_python=strip_python,
         strip_other_files=strip_other,
+        compress_boto=compress_boto,
     )
     if export_requirements:
         print(export_requirements)
