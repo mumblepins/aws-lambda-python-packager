@@ -28,7 +28,7 @@ for n, ol in enumerate(OPTIMIZATION_LEVELS, 1):
 OPT_LEVEL_TEXT = "\n".join(_opt_levels)
 
 
-def compile_python_callback(ctx, opt, val):
+def compile_python_callback(ctx, opt, val):  # pylint: disable=unused-argument
     if "strip_python" not in ctx.params:
         return val
     if ctx.params["strip_python"] and not val:
@@ -36,7 +36,7 @@ def compile_python_callback(ctx, opt, val):
     return val
 
 
-def strip_python_callback(ctx, opt, val):
+def strip_python_callback(ctx, opt, val):  # pylint: disable=unused-argument
     if "compile_python" not in ctx.params:
         return val
     if val and not ctx.params["compile_python"]:
@@ -44,15 +44,15 @@ def strip_python_callback(ctx, opt, val):
     return val
 
 
-def optimize_callback(ctx, opt, val):
+def optimize_callback(ctx, opt, val):  # pylint: disable=unused-argument
     cmd = ctx.command
     params = {a.name: a for a in cmd.params if not getattr(a, "hidden", False)}
-    for n, opts in enumerate(OPTIMIZATION_LEVELS, 1):
-        if val < n:
-            break
-        for opt in opts:
-            params[opt].default = True
-    params["optimize_all"].default = val
+    for oln, opts in enumerate(OPTIMIZATION_LEVELS, 1):
+        for o in opts:
+            if val < oln:
+                params[o].default = False
+            else:
+                params[o].default = True
     return val
 
 
@@ -188,7 +188,7 @@ def build(
     **_,
 ):  # pylint: disable=too-many-arguments,too-many-locals
     """Bundles a group of python dependencies"""
-
+    LOG.info(pformat(click.get_current_context().params, width=150))
     additional_packages_to_ignore = {}
     for ia in ignore_additional:
         for req in DepAnalyzer.process_requirements(list(ia)):

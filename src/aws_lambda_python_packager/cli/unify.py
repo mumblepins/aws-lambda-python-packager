@@ -63,9 +63,7 @@ def combine_wheel_files(bundle_path: Path, dist_info_dir: Path):
 
 
 @click.command()
-@click.argument(
-    "bundle_path", type=click.Path(exists=True, file_okay=False, resolve_path=True, path_type=Path)
-)
+@click.argument("bundle_path", type=click.Path(exists=True, file_okay=False, resolve_path=True, path_type=Path))
 @click.argument(
     "output_path",
     type=click.Path(file_okay=False, resolve_path=True, path_type=Path),
@@ -100,9 +98,7 @@ def unify(
             )
         di_dir: Path
         for di_dir in pkg_td.glob("*.dist-info"):
-            if not di_dir.is_dir() or di_dir.name.startswith(
-                f"{output_package_name}-{output_package_version}"
-            ):
+            if not di_dir.is_dir() or di_dir.name.startswith(f"{output_package_name}-{output_package_version}"):
                 continue
             LOG.debug("Deleting %s", di_dir)
             shutil.rmtree(di_dir)

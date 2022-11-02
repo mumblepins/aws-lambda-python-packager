@@ -1,14 +1,16 @@
 ..
     coding=utf-8
 
-Welcome to Python Template's documentation!
-============================================
+Welcome to Aws Lambda Python Packager's documentation!
+======================================================
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
-   modules
+   CLI Interface <lambda-packager>
+   Python Modules <aws_lambda_python_packager>
+
+
 
 
 Readme
@@ -24,4 +26,3 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`

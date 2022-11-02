@@ -1,23 +1,13 @@
 exclude: ^(buildspec.yml|.pre-commit-config.yaml)$
 fail_fast: false
+default_install_hook_types: [ pre-commit, post-commit ]
 repos:
   - repo: https://github.com/python-poetry/poetry
     rev: 1.2.0
     hooks:
       - id: poetry-lock
         args: [ "--check" ]
-        stages: [ manual ]
-  #      - id: poetry-export
-  #        args:
-  #          - "-o"
-  #          - "src/requirements.txt"
-  #          - "-f"
-  #          - "requirements.txt"
-  #          - "--without-hashes"
-  #  - repo: https://github.com/mumblepins/pre-commit-poetry
-  #    rev: v0.0.3
-  #    hooks:
-  #      - id: pre_commit_poetry
+        files: "(pyproject.toml|poetry.lock)"
   - repo: https://github.com/pycqa/isort
     rev: 5.10.1
     hooks:
@@ -40,6 +30,7 @@ repos:
       - id: check-yaml
       - id: detect-private-key
       - id: end-of-file-fixer
+        exclude: "[CHANGELOG.md]"
       - id: fix-encoding-pragma
       - id: mixed-line-ending
         args:
@@ -55,6 +46,8 @@ repos:
     rev: 5.0.4
     hooks:
       - id: flake8
+        args:
+          - --config=.config/.flake8
         additional_dependencies:
           - flake8-bugbear>=19.3.0
           - flake8-builtins>=1.4.1
@@ -90,6 +83,7 @@ repos:
     hooks:
       - id: mypy
         args: [ '--config-file', 'pyproject.toml' ]
+        files: '^(src/.*|[^/]*)\.py$'
         additional_dependencies:
           - types-requests
           - types-toml
@@ -108,24 +102,27 @@ repos:
       #        args: [ "--config-file", "pyproject.toml","--no-incremental" ]
       - id: pylint
         name: pylint
-        entry: pylint
-        stages: [ manual ]
+        entry: >
+          poetry run
+          pylint
         language: system
         types: [ python ]
         args:
           [
             "-rn", # Only display messages
-            #            "-sn", # Don't display the score
+            "-sn", # Don't display the score
+            "--extension-pkg-whitelist=pydantic",
+            "--rcfile=.config/.pylintrc",
           ]
       - id: pytest-local
         name: pytest-local
         stages: [ manual ]
         description: Run pytest in the local virtualenv
         entry: >
+          poetry run 
           pytest
-          -n 8
           "tests/"
-          --verbose
+          -n auto
           --cov=aws_lambda_python_packager
           --pyargs "aws_lambda_python_packager"
           --cov-report=html
@@ -135,3 +132,14 @@ repos:
         # ignore all files, run on hard-coded modules instead
         pass_filenames: false
         always_run: true
+        types: [ python ]
+        verbose: true
+  - repo: local
+    hooks:
+      - id: gitchangelog
+        language: system
+        always_run: true
+        pass_filenames: false
+        name: Generate changelog
+        entry: poetry run bash -c "GITCHANGELOG_CONFIG_FILENAME='.config/.gitchangelog.rc' gitchangelog > CHANGELOG.md"
+        stages: [ post-commit ]

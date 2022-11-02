@@ -57,6 +57,7 @@ jobs:
       - name: run tests
         run: |
           poetry run pytest "tests/" \
+          -n auto \
           --verbose  \
           --cov=aws_lambda_python_packager \
           --pyargs "aws_lambda_python_packager" \

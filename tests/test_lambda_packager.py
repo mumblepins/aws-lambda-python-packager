@@ -16,6 +16,10 @@ architectures = [("x86_64", "x86_64"), ("arm64", "aarch64")]
 URL_LIB_VERSION = "1.26.9"
 BOTO3_VERSION = "1.20.32"
 
+LIBARROW_SO_STANDARD_SIZE = 50_547_832
+LIBARROW_SO_WR_SIZE = 22_414_232
+LIBARROW_SO_WIGGLE = 10_000_000
+
 
 def test_export_ignore_packages_update_reqs(temp_path_filled):
     src, dst, pkg_type = temp_path_filled
@@ -73,9 +77,7 @@ def test_export_no_ignore_packages_no_update_pyproject(temp_path_filled):
 def test_cli_regular(arch, pyarch, temp_path_filled):
     src, dst, _ = temp_path_filled
     runner = CliRunner()
-    result = runner.invoke(
-        main, ["-v", "INFO", "build", "--architecture", arch, str(src), str(dst)]
-    )
+    result = runner.invoke(main, ["-v", "INFO", "build", "--architecture", arch, str(src), str(dst)])
 
     assert result.exit_code == 0
     # main_args([str(a) for a in ["-v", "--architecture", arch, src, dst]])
@@ -92,14 +94,12 @@ def test_optimize(arch, pyarch, temp_path_filled):
     src, dst, _ = temp_path_filled
 
     runner = CliRunner()
-    result = runner.invoke(
-        main, ["-v", "INFO", "build", "-O", "--architecture", arch, str(src), str(dst)]
-    )
+    result = runner.invoke(main, ["-v", "INFO", "build", "-O", "--architecture", arch, str(src), str(dst)])
     # main_args([str(a) for a in ["-v", "-O", "--architecture", arch, src, dst]])
     assert result.exit_code == 0
-    pyarrow_file = list(dst.glob("**/pyarrow/**/libarrow.so.*"))[0]
-    assert 31_000_000 < os.path.getsize(pyarrow_file) < 40_000_000
     # make sure we aren't using the aws wrangler version
+    pyarrow_file = list(dst.glob("**/pyarrow/**/libarrow.so.*"))[0]
+    assert abs(os.path.getsize(pyarrow_file) - LIBARROW_SO_STANDARD_SIZE) < LIBARROW_SO_WIGGLE
     assert list(dst.glob("**/pyarrow/**/libarrow_flight.so.*"))[0].exists()
 
     numpy_file = list(dst.glob("numpy*dist-info/WHEEL"))[0]
@@ -110,14 +110,12 @@ def test_optimize(arch, pyarch, temp_path_filled):
 def test_full_optimize(arch, pyarch, temp_path_filled):
     src, dst, _ = temp_path_filled
     runner = CliRunner()
-    result = runner.invoke(
-        main, ["-v", "INFO", "build", "-OOOOO", "--architecture", arch, str(src), str(dst)]
-    )
+    result = runner.invoke(main, ["-v", "INFO", "build", "-OOOOO", "--architecture", arch, str(src), str(dst)])
     # main_args([str(a) for a in ["-v", "-O", "--architecture", arch, src, dst]])
     assert result.exit_code == 0
     # main_args([str(a) for a in ["-v", "-OO", "--architecture", arch, src, dst]])
     pyarrow_file = list(dst.glob("**/pyarrow/**/libarrow.so.*"))[0]
-    assert os.path.getsize(pyarrow_file) < 32_000_000
+    assert abs(os.path.getsize(pyarrow_file) - LIBARROW_SO_WR_SIZE) < LIBARROW_SO_WIGGLE
     # make sure we are using the aws wrangler version
     assert len(list(dst.glob("**/pyarrow/**/libarrow_flight.so.*"))) == 0
     numpy_file = list(dst.glob("numpy*dist-info/WHEEL"))[0]

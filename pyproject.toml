@@ -16,7 +16,7 @@ lambda-packager = "aws_lambda_python_packager.__main__:main"
 python = "^3.8"
 requests = "*"
 python-certifi-win32 = { version = "*", markers = "platform_system == 'Windows'" }
-fsspec = "*"
+fsspec = ">=2020.0, != 2022.10.0"
 appdirs = "*"
 aiohttp = "*"
 toml = ">=0.10"
@@ -27,21 +27,23 @@ click-log = "*"
 wheel = "*"
 
 [tool.poetry.group.dev.dependencies]
+# region pre-commit hooks and linting
 pylint = "^2.13.0"
 pytest = "^7.1.1"
-
-coverage = "^6.3.2"
-pre-commit = "^2.15.0"
+coverage = { version = "^6.3.2", extras = ['toml'] }
 Sphinx = "^4.4"
-sphinx-rtd-theme = "^1.0"
+sphinx-material = "^0.0.35"
 pytest-cov = "^3.0.0"
+gitchangelog = { version = "^3.0" }
 pylint-pytest = "^1.1.2"
-pytest-xdist = "^2.5.0"
-myst-parser = "^0.17.2"
-
+myst-parser = "^0.18.0"
+# endregion
 importlib-resources = { version = "^5.7.1", python = "<3.9" }
 bump2version = "^1.0.1"
-#pytest-randomly = "^3.12.0"
+pystache = "^0.6.0"
+sphinx-click = "^4.3.0"
+pytest-randomly = "^3.12.0"
+pytest-xdist = "^3.0.2"
 
 
 [tool.poetry.extras]
@@ -50,25 +52,31 @@ bump2version = "^1.0.1"
 requires = ["poetry-core>=1.1.0b2"]
 build-backend = "poetry.core.masonry.api"
 
+# region pytest
 [tool.pytest.ini_options]
 log_cli = true
 log_cli_level = "DEBUG"
 log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
 log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+#endregion
 
+# region ISort
 [tool.isort]
 profile = "black"
 skip_gitignore = true
 line_length = 88
-indent = "    "
+indent = '    '
 multi_line_output = 3
-skip = "env"
+skip = 'env'
 include_trailing_comma = true
 combine_as_imports = true
-force_grid_wrap = 3
+force_grid_wrap = 0
+known_first_party = ["template_python_library"]
+# endregion
 
+# region Black
 [tool.black]
-line-length = 100
+line-length = 120
 include = '\.pyi?$'
 target-version = ['py38', 'py39', 'py310']
 exclude = '''
@@ -89,9 +97,9 @@ exclude = '''
   | dist
 )/
 '''
+# endregion
 
-
-
+# region Mypy
 [tool.mypy]
 files = 'src/**/*.py'
 exclude = '''(?x)(
@@ -113,43 +121,50 @@ exclude = '''(?x)(
 )'''
 
 
-[[tool.mypy.overrides]]
-module = "poetry.*"
-ignore_missing_imports = true
+overrides = [
+    { module = 'awacs.*', ignore_missing_imports = true },
+    { module = 'inflection.*', ignore_missing_imports = true },
+    { module = 'troposphere.*', ignore_missing_imports = true },
+    { module = 'pystache.*', ignore_missing_imports = true },
+    { module = 'wheel.cli.*', ignore_missing_imports = true },
+    { module = 'fsspec.*', ignore_missing_imports = true },
+    { module = 'appdirs.*', ignore_missing_imports = true },
+    { module = 'packaging.*', ignore_missing_imports = true },
+    { module = 'click_log.*', ignore_missing_imports = true },
+]
+#endregion
 
-[[tool.mypy.overrides]]
-module = "poetry_plugin_export.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "cleo.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "appdirs.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "fsspec.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "packaging.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "pytest.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "click_log.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "wheel.cli.*"
-ignore_missing_imports = true
-
+# region DepChecker
 [tool.dep_checker]
 allowed_unused = ["python_certifi_win32", 'aiohttp']
 [tool.dep_checker.name_mapping]
+gitpython = "git"
+python-dateutil = "dateutil"
+python-dotenv = "dotenv"
 setuptools = "pkg_resources"
+#endregion
+
+#region Coverage
+[tool.coverage.run]
+branch = true
+concurrency = ["multiprocessing", "thread"]
+parallel = true
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
+precision = 1
+fail_under = 80
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "if .*? == .DEBUG.",
+    "if .*? == .INFO.",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:"
+]
+#endregion

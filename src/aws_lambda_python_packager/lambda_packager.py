@@ -21,12 +21,7 @@ from datetime import datetime
 from pathlib import Path
 from py_compile import PycInvalidationMode
 from tempfile import TemporaryDirectory
-from typing import (
-    List,
-    Optional,
-    Type,
-    Union,
-)
+from typing import List, Optional, Type, Union
 from zipfile import ZIP_DEFLATED, ZipFile
 
 from .aws_wrangler import fetch_package
@@ -85,14 +80,10 @@ class LambdaPackager:
         self.ignore_packages = ignore_packages
         self.split_layer = split_layer
         analyzer_type: Type[DepAnalyzer]
-        if (self.project_path / "pyproject.toml").exists() and not (
-            self.project_path / "requirements.txt"
-        ).exists():
+        if (self.project_path / "pyproject.toml").exists() and not (self.project_path / "requirements.txt").exists():
             LOG.info("pyproject.toml found and not requirements.txt, assuming poetry")
             analyzer_type = PoetryAnalyzer
-        elif (self.project_path / "requirements.txt").exists() and not (
-            self.project_path / "pyproject.toml"
-        ).exists():
+        elif (self.project_path / "requirements.txt").exists() and not (self.project_path / "pyproject.toml").exists():
             LOG.info("requirements.txt found, assuming pip")
             analyzer_type = PipAnalyzer
         else:
@@ -211,9 +202,7 @@ class LambdaPackager:
             strip_command = get_strip_binary(self.architecture)
             for p in self.output_dir.glob("**/*.so*"):
                 LOG.debug('Stripping library "%s"', p)
-                subprocess.run(  # nosec: B603 pylint: disable=subprocess-run-check
-                    [strip_command, str(p)]
-                )
+                subprocess.run([strip_command, str(p)])  # nosec: B603 pylint: disable=subprocess-run-check
         except Exception:  # pylint: disable=broad-except
             LOG.error("Failed to strip libraries, perhaps we don't have the 'strip' command?")
 
@@ -238,7 +227,7 @@ class LambdaPackager:
         strip_python: bool = False,
         strip_other_files: bool = False,  # pylint: disable=unused-argument
         compress_boto: bool = False,  # pylint: disable=unused-argument
-    ):  # pylint: disable=too-many-arguments,too-many-branches
+    ):  # pylint: disable=too-many-arguments,too-many-branches,too-many-locals
         if not no_clobber and os.path.exists(self.output_dir):
             LOG.warning("Output directory %s already exists, removing it", self.output_dir)
             shutil.rmtree(self.output_dir, ignore_errors=True)
@@ -271,9 +260,7 @@ class LambdaPackager:
                 strip_python = False
                 LOG.warning("Unable to compile python, not stripping python")
             new_size = self.get_total_size()
-            LOG.info(
-                "Compiled size: %s (%0.1f%%)", sizeof_fmt(new_size), new_size / initial_size * 100
-            )
+            LOG.info("Compiled size: %s (%0.1f%%)", sizeof_fmt(new_size), new_size / initial_size * 100)
         for strip_func in (
             "strip_python",
             "strip_tests",
@@ -300,9 +287,7 @@ class LambdaPackager:
                 sizeof_fmt(MAX_LAMBDA_SIZE),
             )
         else:
-            LOG.warning(
-                "Package size: %s (%0.1f%%)", sizeof_fmt(size_out), size_out / initial_size * 100
-            )
+            LOG.warning("Package size: %s (%0.1f%%)", sizeof_fmt(size_out), size_out / initial_size * 100)
         if zip_output:
             LOG.warning("Zipping output")
             self.zip_output(zip_output)

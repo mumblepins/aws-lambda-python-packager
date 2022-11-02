@@ -14,15 +14,7 @@ from contextlib import contextmanager
 from datetime import datetime
 from functools import partial
 from pathlib import Path
-from typing import (
-    Any,
-    Dict,
-    Iterable,
-    List,
-    Optional,
-    Tuple,
-    Union,
-)
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import requests
 
@@ -227,9 +219,7 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
         return self._get_requirements()
 
     @classmethod
-    def process_requirements(
-        cls, requirements: Iterable[str]
-    ) -> Iterable[Union[PackageInfo, ExtraLine]]:
+    def process_requirements(cls, requirements: Iterable[str]) -> Iterable[Union[PackageInfo, ExtraLine]]:
         for line in requirements:
             if line.startswith("#") or line.strip() == "":
                 continue
@@ -297,10 +287,7 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
             if isinstance(pkg, ExtraLine):
                 continue
             pkg_name, pkg_version, _ = pkg
-            if (
-                pkg_name in self.pkgs_to_ignore_dict
-                and pkg_version != self.pkgs_to_ignore_dict[pkg_name]
-            ):
+            if pkg_name in self.pkgs_to_ignore_dict and pkg_version != self.pkgs_to_ignore_dict[pkg_name]:
                 self.log.warning(
                     "%s is currently %s but should be %s",
                     pkg_name,
@@ -320,10 +307,7 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
         if self._exported_reqs is None:
             output = []
             for pkg_name, pkg_version, pkg_spec in self.requirements.values():
-                if (
-                    self.pkgs_to_ignore_dict.get(strip_extras.sub("", pkg_name), None)
-                    == pkg_version
-                ):
+                if self.pkgs_to_ignore_dict.get(strip_extras.sub("", pkg_name), None) == pkg_version:
                     self.log.warning(
                         "Ignoring %s as it should be in the AWS Lambda Environment already",
                         pkg_spec.strip().split(";")[0],
@@ -360,18 +344,14 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
                 self.log.warning("src/__init__.py exists, installing as package in target")
                 shutil.copytree(src_path, Path(self._target.name) / "src")
             else:
-                self.log.warning(
-                    "src/__init__.py does not exist, installing files from src directly into target"
-                )
+                self.log.warning("src/__init__.py does not exist, installing files from src directly into target")
                 shutil.copytree(src_path, Path(self._target.name), dirs_exist_ok=True)
         elif next(self.project_root.glob("*.py"), None):
             for f in self.project_root.glob("*.py"):
                 self.log.warning("Copying %s to target", f)
                 shutil.copy(f, self._target.name)
         else:
-            self.log.warning(
-                "No src/__init__.py or *.py files found, no root program is being installed"
-            )
+            self.log.warning("No src/__init__.py or *.py files found, no root program is being installed")
 
     def get_layer_files(self):
         target_path = Path(self._target.name)

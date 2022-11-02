@@ -57,9 +57,9 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.githubpages",
     "sphinx.ext.intersphinx",
-    "sphinx_rtd_theme",
     "sphinx.ext.viewcode",
     "myst_parser",
+    "sphinx_click",
 ]
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
@@ -84,7 +84,32 @@ exclude_patterns: List[Any] = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
+html_theme = "sphinx_material"
+
+# Material theme options (see theme.conf for more information)
+html_theme_options = {
+    # Set the name of the project to appear in the navigation.
+    "nav_title": "Lambda Python Packager",
+    # Set you GA account ID to enable tracking
+    # 'google_analytics_account': 'UA-XXXXX',
+    # Specify a base_url used to generate sitemap.xml. If not
+    # specified, then no sitemap will be built.
+    "base_url": "https://mumblepins.github.io/aws-lambda-python-packager",
+    # Set the color and the accent color
+    "color_primary": "#003865",
+    "color_accent": "#78BE21",
+    # Set the repo location to get a badge with stats
+    "repo_url": "https://github.com/mumblepins/aws-lambda-python-packager/",
+    "repo_name": "Template Python Library",
+    # Visible levels of the global TOC; -1 means unlimited
+    "globaltoc_depth": 2,
+    # If False, expand all TOC entries
+    "globaltoc_collapse": False,
+    # If True, show hidden TOC entries
+    "globaltoc_includehidden": False,
+    "logo_icon": "&#xe86f",
+}
+html_sidebars = {"**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]}
 
 autoclass_content = "both"
 # Add any paths that contain custom static files (such as style sheets) here,

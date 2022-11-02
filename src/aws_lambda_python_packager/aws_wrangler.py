@@ -2,8 +2,8 @@
 import logging
 import re
 import shutil
-import sys
 import tempfile
+from contextlib import contextmanager, suppress
 from pathlib import Path
 from typing import Optional, Union
 from zipfile import ZipFile
@@ -19,12 +19,6 @@ AWS_LAYER_VERSION_URL = "https://github.com/awslabs/aws-data-wrangler/releases/d
 LOG = logging.getLogger(__name__)
 CACHE_METHOD = "blockcache"
 
-if "pytest" in sys.modules:
-    CACHE_METHOD = "simplecache"
-fs = fsspec.filesystem(
-    CACHE_METHOD, target_protocol="http", cache_storage=user_cache_dir("lambda-packager")
-)
-
 
 def to_version(version):
     try:
@@ -38,9 +32,7 @@ def get_all_versions(python_version="3.9", arch="x86_64"):
     rj = r.json()
     rj = filter(lambda x: to_version(x["tag_name"]) is not None, rj)
 
-    tags = {
-        v["tag_name"]: v for v in sorted(rj, key=lambda x: Version(x["tag_name"]), reverse=True)
-    }
+    tags = {v["tag_name"]: v for v in sorted(rj, key=lambda x: Version(x["tag_name"]), reverse=True)}
 
     if arch == "x86_64":
         arch = ""
@@ -51,10 +43,33 @@ def get_all_versions(python_version="3.9", arch="x86_64"):
     for v in tags.values():
         for a in v["assets"]:
             if re.match(rf"awswrangler-layer-[\d.]*-py{python_version}{arch}.zip", a["name"]):
-                with fs.open(a["browser_download_url"], "rb") as f:
-                    with ZipFile(f) as z:
-                        z.filename = a["name"]
-                        yield z
+                download_url = a["browser_download_url"]
+                filename = a["name"]
+                yield download_url, filename
+
+
+@contextmanager
+def open_zip_file(url, file):
+    for cache_type in ("blockcache", "simplecache"):
+        f = z = None
+        try:
+            fs = fsspec.filesystem(
+                cache_type,
+                target_protocol="http",
+                cache_storage=str((Path(user_cache_dir("lambda-packager")) / cache_type).resolve()),
+            )
+            f = fs.open(url, "rb")
+            z = ZipFile(f)
+            z.filename = file
+            yield z
+        except KeyError:
+            continue
+        else:
+            break
+        finally:
+            with suppress(NameError, KeyError, AttributeError):
+                z.close()
+                f.close()
 
 
 def fetch_package(
@@ -68,21 +83,20 @@ def fetch_package(
         pkg_spec = SpecifierSet(package_version)
     else:
         pkg_spec = None
-    for zfh in get_all_versions(python_version, arch):
-        file_list = [a for a in zfh.namelist() if a.startswith(f"python/{package_name}")]
-        wr_pkg_version = [
-            re.sub(rf"^.*{package_name}-(.*?)\.dist-info.*$", r"\1", a)
-            for a in file_list
-            if "dist-info" in a
-        ][0]
-        if pkg_spec is None or pkg_spec.contains(wr_pkg_version):
-            LOG.info("Found package %s-%s in %s", package_name, wr_pkg_version, zfh.filename)
-            with tempfile.TemporaryDirectory() as tmpdir:
-                zfh.extractall(tmpdir, file_list)
-                Path(output_dir).mkdir(parents=True, exist_ok=True)
-                for p in (Path(tmpdir) / "python").glob("*"):
-                    shutil.copytree(p, Path(output_dir) / p.name, dirs_exist_ok=True)
-                return wr_pkg_version
+    for url, filename in get_all_versions(python_version, arch):
+        with open_zip_file(url, filename) as zfh:
+            file_list = [a for a in zfh.namelist() if a.startswith(f"python/{package_name}")]
+            wr_pkg_version = [
+                re.sub(rf"^.*{package_name}-(.*?)\.dist-info.*$", r"\1", a) for a in file_list if "dist-info" in a
+            ][0]
+            if pkg_spec is None or pkg_spec.contains(wr_pkg_version):
+                LOG.info("Found package %s-%s in %s", package_name, wr_pkg_version, zfh.filename)
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    zfh.extractall(tmpdir, file_list)
+                    Path(output_dir).mkdir(parents=True, exist_ok=True)
+                    for p in (Path(tmpdir) / "python").glob("*"):
+                        shutil.copytree(p, Path(output_dir) / p.name, dirs_exist_ok=True)
+                    return wr_pkg_version
     raise ValueError(f"Could not find package {package_name} with version {package_version}")
 
 

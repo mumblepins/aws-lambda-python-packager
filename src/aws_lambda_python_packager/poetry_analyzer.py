@@ -6,25 +6,12 @@ import re
 import shutil
 import tempfile
 from contextlib import contextmanager
-from typing import (
-    Dict,
-    Iterable,
-    Union,
-)
+from typing import Dict, Iterable, Union
 
 import toml
 
-from .dep_analyzer import (
-    CommandNotFoundError,
-    DepAnalyzer,
-    ExtraLine,
-    PackageInfo,
-)
-from .util import (
-    PathType,
-    chdir_cm,
-    chgenv_cm,
-)
+from .dep_analyzer import CommandNotFoundError, DepAnalyzer, ExtraLine, PackageInfo
+from .util import PathType, chdir_cm, chgenv_cm
 
 
 class PoetryAnalyzer(DepAnalyzer):
@@ -86,9 +73,7 @@ class PoetryAnalyzer(DepAnalyzer):
             self.log.info("Locking dependencies")
             self.lock()
         try:
-            reqs, _ = self.run_poetry(
-                "export", "--without-hashes", "--with-credentials", "--only", "main"
-            )
+            reqs, _ = self.run_poetry("export", "--without-hashes", "--with-credentials", "--only", "main")
             # with self._change_context():
             #     reqs = export_requirements(Path(self._temp_proj_dir.name))
             #
@@ -122,9 +107,7 @@ class PoetryAnalyzer(DepAnalyzer):
             yield
 
     def run_poetry(self, *args, return_state=False, quiet=False, context=None):
-        return self.run_command(
-            self._poetry, *args, return_state=return_state, quiet=quiet, context=context
-        )
+        return self.run_command(self._poetry, *args, return_state=return_state, quiet=quiet, context=context)
 
     def install_root(self):
         initial_dist = {(a, a.lstat()) for a in (self.project_root / "dist").glob("*.tar.gz")}

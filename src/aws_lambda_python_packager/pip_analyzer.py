@@ -4,17 +4,9 @@ from __future__ import annotations
 import tempfile
 from importlib.metadata import distributions
 from pathlib import Path
-from typing import (
-    Dict,
-    Iterable,
-    Union,
-)
+from typing import Dict, Iterable, Union
 
-from .dep_analyzer import (
-    DepAnalyzer,
-    ExtraLine,
-    PackageInfo,
-)
+from .dep_analyzer import DepAnalyzer, ExtraLine, PackageInfo
 from .util import PathType
 
 
