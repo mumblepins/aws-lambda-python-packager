@@ -1,6 +1,14 @@
 aws\_lambda\_python\_packager package
 =====================================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   aws_lambda_python_packager.cli
+
 Submodules
 ----------
 

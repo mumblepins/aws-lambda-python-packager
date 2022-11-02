@@ -1,271 +1,560 @@
-<!DOCTYPE html>
-<html class="writer-html5" lang="en" >
-<head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>aws_lambda_python_packager package &mdash; aws-lambda-python-packager v1.3.1 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="lang:clipboard.copy" content="Copy to clipboard">
+  <meta name="lang:clipboard.copied" content="Copied to clipboard">
+  <meta name="lang:search.language" content="en">
+  <meta name="lang:search.pipeline.stopwords" content="True">
+  <meta name="lang:search.pipeline.trimmer" content="True">
+  <meta name="lang:search.result.none" content="No matching documents">
+  <meta name="lang:search.result.one" content="1 matching document">
+  <meta name="lang:search.result.other" content="# matching documents">
+  <meta name="lang:search.tokenizer" content="[\s\-]+">
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-    <script src="_static/js/theme.js"></script>
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
+
+    <style>
+      body,
+      input {
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
+      }
+
+      code,
+      kbd,
+      pre {
+        font-family: "Roboto Mono", "Courier New", Courier, monospace
+      }
+    </style>
+  
+
+  <link rel="stylesheet" href="_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-fixes.css"/>
+  
+  <link rel="stylesheet" href="_static/fonts/material-icons.css"/>
+  
+  <meta name="theme-color" content="#3f51b5">
+  <script src="_static/javascripts/modernizr.js"></script>
+  
+  
+  
+    <title>aws_lambda_python_packager package &#8212; aws-lambda-python-packager v1.3.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/material.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="aws_lambda_python_packager" href="modules.html" /> 
-</head>
+    <link rel="next" title="aws_lambda_python_packager.cli package" href="aws_lambda_python_packager.cli.html" />
+    <link rel="prev" title="lambda-packager" href="lambda-packager.html" />
+  
+   
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> aws-lambda-python-packager
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">aws_lambda_python_packager</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">aws_lambda_python_packager package</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-aws_lambda_python_packager.aws_wrangler">aws_lambda_python_packager.aws_wrangler module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-aws_lambda_python_packager.dep_analyzer">aws_lambda_python_packager.dep_analyzer module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-aws_lambda_python_packager.lambda_packager">aws_lambda_python_packager.lambda_packager module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-aws_lambda_python_packager.pip_analyzer">aws_lambda_python_packager.pip_analyzer module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-aws_lambda_python_packager.poetry_analyzer">aws_lambda_python_packager.poetry_analyzer module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-aws_lambda_python_packager.util">aws_lambda_python_packager.util module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-aws_lambda_python_packager">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
+  </head>
+  <body dir=ltr
+        data-md-color-primary=#003865 data-md-color-accent=#78BE21>
+  
+  <svg class="md-svg">
+    <defs data-children-count="0">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+      
+    </defs>
+  </svg>
+  
+  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
+  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
+  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+  <a href="#aws_lambda_python_packager" tabindex="1" class="md-skip"> Skip to content </a>
+  <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex navheader">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="index.html" title="aws-lambda-python-packager v1.3.1 documentation"
+           class="md-header-nav__button md-logo">
+          
+            <i class="md-icon">&#xe86f</i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          <span class="md-header-nav__topic">Lambda Python Packager</span>
+          <span class="md-header-nav__topic"> aws_lambda_python_packager package </span>
         </div>
       </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">aws-lambda-python-packager</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
-          <li class="breadcrumb-item"><a href="modules.html">aws_lambda_python_packager</a></li>
-      <li class="breadcrumb-item active">aws_lambda_python_packager package</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="_sources/aws_lambda_python_packager.rst.txt" rel="nofollow"> View page source</a>
-      </li>
-  </ul>
-  <hr/>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+        
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" action="search.html" method="get" name="search">
+      <input type="text" class="md-search__input" name="q" placeholder="Search"
+             autocapitalize="off" autocomplete="off" spellcheck="false"
+             data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
+
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            <a href="https://github.com/mumblepins/aws-lambda-python-packager/" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    Template Python Library
+  </div>
+</a>
+          </div>
+        </div>
+      
+      
+  
+  <script src="_static/javascripts/version_dropdown.js"></script>
+  <script>
+    var json_loc = ""versions.json"",
+        target_loc = "../",
+        text = "Versions";
+    $( document ).ready( add_version_dropdown(json_loc, target_loc, text));
+  </script>
+  
+
+    </div>
+  </nav>
+</header>
+
+  
+  <div class="md-container">
+    
+    
+    
+  <nav class="md-tabs" data-md-component="tabs">
+    <div class="md-tabs__inner md-grid">
+      <ul class="md-tabs__list">
+          <li class="md-tabs__item"><a href="index.html" class="md-tabs__link">aws-lambda-python-packager v1.3.1 documentation</a></li>
+      </ul>
+    </div>
+  </nav>
+    <main class="md-main">
+      <div class="md-main__inner md-grid" data-md-component="container">
+        
+          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="index.html" title="aws-lambda-python-packager v1.3.1 documentation" class="md-nav__button md-logo">
+      
+        <i class="md-icon">&#xe86f</i>
+      
+    </a>
+    <a href="index.html"
+       title="aws-lambda-python-packager v1.3.1 documentation">Lambda Python Packager</a>
+  </label>
+    <div class="md-nav__source">
+      <a href="https://github.com/mumblepins/aws-lambda-python-packager/" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    Template Python Library
+  </div>
+</a>
+    </div>
+  
+  
+
+  
+  <ul class="md-nav__list">
+    <li class="md-nav__item">
+    
+    
+      <a href="lambda-packager.html" class="md-nav__link">CLI Interface</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="lambda-packager.html#lambda-packager-build" class="md-nav__link">build</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="lambda-packager.html#lambda-packager-unify" class="md-nav__link">unify</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    <label class="md-nav__link md-nav__link--active" for="__toc"> Python Modules </label>
+    
+      <a href="#" class="md-nav__link md-nav__link--active">Python Modules</a>
+      
+        
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">Contents</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#aws-lambda-python-packager--page-root" class="md-nav__link">aws_lambda_python_packager package</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#subpackages" class="md-nav__link">Subpackages</a>
+        </li>
+        <li class="md-nav__item"><a href="#submodules" class="md-nav__link">Submodules</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-aws_lambda_python_packager.aws_wrangler" class="md-nav__link">aws_lambda_python_packager.aws_wrangler module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-aws_lambda_python_packager.dep_analyzer" class="md-nav__link">aws_lambda_python_packager.dep_analyzer module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-aws_lambda_python_packager.lambda_packager" class="md-nav__link">aws_lambda_python_packager.lambda_packager module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-aws_lambda_python_packager.pip_analyzer" class="md-nav__link">aws_lambda_python_packager.pip_analyzer module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-aws_lambda_python_packager.poetry_analyzer" class="md-nav__link">aws_lambda_python_packager.poetry_analyzer module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-aws_lambda_python_packager.util" class="md-nav__link">aws_lambda_python_packager.util module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-aws_lambda_python_packager" class="md-nav__link">Module contents</a>
+        </li></ul>
+            </nav>
+        </li>
+    
+<li class="md-nav__item"><a class="md-nav__extra_link" href="_sources/aws_lambda_python_packager.rst.txt">Show Source</a> </li>
+
+  </ul>
+</nav>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="#subpackages" class="md-nav__link">Subpackages</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#submodules" class="md-nav__link">Submodules</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#module-aws_lambda_python_packager.aws_wrangler" class="md-nav__link">aws_lambda_python_packager.aws_wrangler module</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#module-aws_lambda_python_packager.dep_analyzer" class="md-nav__link">aws_lambda_python_packager.dep_analyzer module</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#module-aws_lambda_python_packager.lambda_packager" class="md-nav__link">aws_lambda_python_packager.lambda_packager module</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#module-aws_lambda_python_packager.pip_analyzer" class="md-nav__link">aws_lambda_python_packager.pip_analyzer module</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#module-aws_lambda_python_packager.poetry_analyzer" class="md-nav__link">aws_lambda_python_packager.poetry_analyzer module</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#module-aws_lambda_python_packager.util" class="md-nav__link">aws_lambda_python_packager.util module</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#module-aws_lambda_python_packager" class="md-nav__link">Module contents</a>
+      
+    
+    </li></ul>
+    
+    </li>
+  </ul>
+  
+
+</nav>
+              </div>
+            </div>
+          </div>
+          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">Contents</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#aws-lambda-python-packager--page-root" class="md-nav__link">aws_lambda_python_packager package</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#subpackages" class="md-nav__link">Subpackages</a>
+        </li>
+        <li class="md-nav__item"><a href="#submodules" class="md-nav__link">Submodules</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-aws_lambda_python_packager.aws_wrangler" class="md-nav__link">aws_lambda_python_packager.aws_wrangler module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-aws_lambda_python_packager.dep_analyzer" class="md-nav__link">aws_lambda_python_packager.dep_analyzer module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-aws_lambda_python_packager.lambda_packager" class="md-nav__link">aws_lambda_python_packager.lambda_packager module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-aws_lambda_python_packager.pip_analyzer" class="md-nav__link">aws_lambda_python_packager.pip_analyzer module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-aws_lambda_python_packager.poetry_analyzer" class="md-nav__link">aws_lambda_python_packager.poetry_analyzer module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-aws_lambda_python_packager.util" class="md-nav__link">aws_lambda_python_packager.util module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-aws_lambda_python_packager" class="md-nav__link">Module contents</a>
+        </li></ul>
+            </nav>
+        </li>
+    
+<li class="md-nav__item"><a class="md-nav__extra_link" href="_sources/aws_lambda_python_packager.rst.txt">Show Source</a> </li>
+
+<li id="searchbox" class="md-nav__item"></li>
+
+  </ul>
+</nav>
+              </div>
+            </div>
+          </div>
+        
+        <div class="md-content">
+          <article class="md-content__inner md-typeset" role="main">
+            
   <section id="aws-lambda-python-packager-package">
-<h1>aws_lambda_python_packager package<a class="headerlink" href="#aws-lambda-python-packager-package" title="Permalink to this headline"></a></h1>
+<h1 id="aws-lambda-python-packager--page-root">aws_lambda_python_packager package<a class="headerlink" href="#aws-lambda-python-packager--page-root" title="Permalink to this headline">¶</a></h1>
+<section id="subpackages">
+<h2 id="subpackages">Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="aws_lambda_python_packager.cli.html">aws_lambda_python_packager.cli package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aws_lambda_python_packager.cli.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws_lambda_python_packager.cli.html#module-aws_lambda_python_packager.cli.build">aws_lambda_python_packager.cli.build module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws_lambda_python_packager.cli.html#module-aws_lambda_python_packager.cli.unify">aws_lambda_python_packager.cli.unify module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aws_lambda_python_packager.cli.html#module-aws_lambda_python_packager.cli">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+<h2 id="submodules">Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </section>
 <section id="module-aws_lambda_python_packager.aws_wrangler">
-<span id="aws-lambda-python-packager-aws-wrangler-module"></span><h2>aws_lambda_python_packager.aws_wrangler module<a class="headerlink" href="#module-aws_lambda_python_packager.aws_wrangler" title="Permalink to this headline"></a></h2>
+<span id="aws-lambda-python-packager-aws-wrangler-module"></span><h2 id="module-aws_lambda_python_packager.aws_wrangler">aws_lambda_python_packager.aws_wrangler module<a class="headerlink" href="#module-aws_lambda_python_packager.aws_wrangler" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.aws_wrangler.fetch_package">
-<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.aws_wrangler.</span></span><span class="sig-name descname"><span class="pre">fetch_package</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">python_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'3.9'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x86_64'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/aws_wrangler.html#fetch_package"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.aws_wrangler.fetch_package" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.aws_wrangler.</span></span><span class="sig-name descname"><span class="pre">fetch_package</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><span class="pre">pathlib.Path</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">python_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'3.9'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x86_64'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/aws_wrangler.html#fetch_package"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.aws_wrangler.fetch_package" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.aws_wrangler.get_all_versions">
-<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.aws_wrangler.</span></span><span class="sig-name descname"><span class="pre">get_all_versions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">python_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'3.9'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x86_64'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/aws_wrangler.html#get_all_versions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.aws_wrangler.get_all_versions" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.aws_wrangler.</span></span><span class="sig-name descname"><span class="pre">get_all_versions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">python_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'3.9'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x86_64'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/aws_wrangler.html#get_all_versions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.aws_wrangler.get_all_versions" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
+<dl class="py function">
+<dt class="sig sig-object py" id="aws_lambda_python_packager.aws_wrangler.open_zip_file">
+<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.aws_wrangler.</span></span><span class="sig-name descname"><span class="pre">open_zip_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/aws_wrangler.html#open_zip_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.aws_wrangler.open_zip_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.aws_wrangler.to_version">
-<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.aws_wrangler.</span></span><span class="sig-name descname"><span class="pre">to_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/aws_wrangler.html#to_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.aws_wrangler.to_version" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.aws_wrangler.</span></span><span class="sig-name descname"><span class="pre">to_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/aws_wrangler.html#to_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.aws_wrangler.to_version" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 </section>
 <section id="module-aws_lambda_python_packager.dep_analyzer">
-<span id="aws-lambda-python-packager-dep-analyzer-module"></span><h2>aws_lambda_python_packager.dep_analyzer module<a class="headerlink" href="#module-aws_lambda_python_packager.dep_analyzer" title="Permalink to this headline"></a></h2>
+<span id="aws-lambda-python-packager-dep-analyzer-module"></span><h2 id="module-aws_lambda_python_packager.dep_analyzer">aws_lambda_python_packager.dep_analyzer module<a class="headerlink" href="#module-aws_lambda_python_packager.dep_analyzer" title="Permalink to this headline">¶</a></h2>
 <dl class="py exception">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.CommandNotFoundError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.dep_analyzer.</span></span><span class="sig-name descname"><span class="pre">CommandNotFoundError</span></span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#CommandNotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.CommandNotFoundError" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.dep_analyzer.</span></span><span class="sig-name descname"><span class="pre">CommandNotFoundError</span></span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#CommandNotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.CommandNotFoundError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 </dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.dep_analyzer.</span></span><span class="sig-name descname"><span class="pre">DepAnalyzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">python_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'3.9'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">architecture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'x86_64'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'us-east-1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_packages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_dependencies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_packages_to_ignore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.dep_analyzer.</span></span><span class="sig-name descname"><span class="pre">DepAnalyzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">python_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'3.9'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">architecture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'x86_64'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'us-east-1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_packages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_dependencies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_packages_to_ignore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.analyzer_name">
-<span class="sig-name descname"><span class="pre">analyzer_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.analyzer_name" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">analyzer_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.analyzer_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.backup_files">
-<span class="sig-name descname"><span class="pre">backup_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.11)"><span class="pre">Iterable</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.backup_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.backup_files" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">backup_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.11)"><span class="pre">Iterable</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.backup_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.backup_files" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.copy_from_target">
-<span class="sig-name descname"><span class="pre">copy_from_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dst</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.copy_from_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.copy_from_target" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">copy_from_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dst</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.copy_from_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.copy_from_target" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.copy_from_temp_dir">
-<span class="sig-name descname"><span class="pre">copy_from_temp_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.11)"><span class="pre">Iterable</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.copy_from_temp_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.copy_from_temp_dir" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">copy_from_temp_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.11)"><span class="pre">Iterable</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.copy_from_temp_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.copy_from_temp_dir" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.copy_to_temp_dir">
-<span class="sig-name descname"><span class="pre">copy_to_temp_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.11)"><span class="pre">Iterable</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.copy_to_temp_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.copy_to_temp_dir" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">copy_to_temp_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.11)"><span class="pre">Iterable</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.copy_to_temp_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.copy_to_temp_dir" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.direct_dependencies">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">direct_dependencies</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.direct_dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.direct_dependencies" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">direct_dependencies</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.direct_dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.direct_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.export_requirements">
-<span class="sig-name descname"><span class="pre">export_requirements</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.export_requirements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.export_requirements" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">export_requirements</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.export_requirements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.export_requirements" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.exported_requirements">
-<span class="sig-name descname"><span class="pre">exported_requirements</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.exported_requirements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.exported_requirements" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">exported_requirements</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.exported_requirements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.exported_requirements" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.extra_lines">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extra_lines</span></span><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.extra_lines" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extra_lines</span></span><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.extra_lines" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.get_layer_files">
-<span class="sig-name descname"><span class="pre">get_layer_files</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.get_layer_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.get_layer_files" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_layer_files</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.get_layer_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.get_layer_files" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.get_requirements">
-<span class="sig-name descname"><span class="pre">get_requirements</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.11)"><span class="pre">Iterable</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#aws_lambda_python_packager.dep_analyzer.PackageInfo" title="aws_lambda_python_packager.dep_analyzer.PackageInfo"><span class="pre">aws_lambda_python_packager.dep_analyzer.PackageInfo</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#aws_lambda_python_packager.dep_analyzer.ExtraLine" title="aws_lambda_python_packager.dep_analyzer.ExtraLine"><span class="pre">aws_lambda_python_packager.dep_analyzer.ExtraLine</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.get_requirements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.get_requirements" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_requirements</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.11)"><span class="pre">Iterable</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#aws_lambda_python_packager.dep_analyzer.PackageInfo" title="aws_lambda_python_packager.dep_analyzer.PackageInfo"><span class="pre">aws_lambda_python_packager.dep_analyzer.PackageInfo</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#aws_lambda_python_packager.dep_analyzer.ExtraLine" title="aws_lambda_python_packager.dep_analyzer.ExtraLine"><span class="pre">aws_lambda_python_packager.dep_analyzer.ExtraLine</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.get_requirements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.get_requirements" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.install_dependencies">
-<span class="sig-name descname"><span class="pre">install_dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quiet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.install_dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.install_dependencies" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">install_dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quiet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.install_dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.install_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.install_root">
-<span class="sig-name descname"><span class="pre">install_root</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.install_root"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.install_root" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">install_root</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.install_root"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.install_root" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.pkgs_to_ignore">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pkgs_to_ignore</span></span><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.pkgs_to_ignore" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pkgs_to_ignore</span></span><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.pkgs_to_ignore" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.pkgs_to_ignore_dict">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pkgs_to_ignore_dict</span></span><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.pkgs_to_ignore_dict" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pkgs_to_ignore_dict</span></span><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.pkgs_to_ignore_dict" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.pkgs_to_ignore_info">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pkgs_to_ignore_info</span></span><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.pkgs_to_ignore_info" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pkgs_to_ignore_info</span></span><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.pkgs_to_ignore_info" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.process_requirements">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">process_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requirements</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.11)"><span class="pre">Iterable</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.11)"><span class="pre">Iterable</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#aws_lambda_python_packager.dep_analyzer.PackageInfo" title="aws_lambda_python_packager.dep_analyzer.PackageInfo"><span class="pre">aws_lambda_python_packager.dep_analyzer.PackageInfo</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#aws_lambda_python_packager.dep_analyzer.ExtraLine" title="aws_lambda_python_packager.dep_analyzer.ExtraLine"><span class="pre">aws_lambda_python_packager.dep_analyzer.ExtraLine</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.process_requirements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.process_requirements" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">process_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requirements</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.11)"><span class="pre">Iterable</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.11)"><span class="pre">Iterable</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#aws_lambda_python_packager.dep_analyzer.PackageInfo" title="aws_lambda_python_packager.dep_analyzer.PackageInfo"><span class="pre">aws_lambda_python_packager.dep_analyzer.PackageInfo</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#aws_lambda_python_packager.dep_analyzer.ExtraLine" title="aws_lambda_python_packager.dep_analyzer.ExtraLine"><span class="pre">aws_lambda_python_packager.dep_analyzer.ExtraLine</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.process_requirements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.process_requirements" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py attribute">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.project_root">
-<span class="sig-name descname"><span class="pre">project_root</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><span class="pre">pathlib.Path</span></a></em><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.project_root" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">project_root</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><span class="pre">pathlib.Path</span></a></em><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.project_root" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.requirements">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">requirements</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#aws_lambda_python_packager.dep_analyzer.PackageInfo" title="aws_lambda_python_packager.dep_analyzer.PackageInfo"><span class="pre">aws_lambda_python_packager.dep_analyzer.PackageInfo</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.requirements" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">requirements</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#aws_lambda_python_packager.dep_analyzer.PackageInfo" title="aws_lambda_python_packager.dep_analyzer.PackageInfo"><span class="pre">aws_lambda_python_packager.dep_analyzer.PackageInfo</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.requirements" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.run_command">
-<span class="sig-name descname"><span class="pre">run_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.run_command"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.run_command" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">run_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.run_command"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.run_command" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.run_pip">
-<span class="sig-name descname"><span class="pre">run_pip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.run_pip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.run_pip" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">run_pip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.run_pip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.run_pip" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.DepAnalyzer.update_dependency_file">
-<span class="sig-name descname"><span class="pre">update_dependency_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.update_dependency_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.update_dependency_file" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">update_dependency_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#DepAnalyzer.update_dependency_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.update_dependency_file" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 </dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.ExtraLine">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.dep_analyzer.</span></span><span class="sig-name descname"><span class="pre">ExtraLine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#ExtraLine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.ExtraLine" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.dep_analyzer.</span></span><span class="sig-name descname"><span class="pre">ExtraLine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/dep_analyzer.html#ExtraLine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.ExtraLine" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a></p>
 </dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.PackageInfo">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.dep_analyzer.</span></span><span class="sig-name descname"><span class="pre">PackageInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version_spec</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.PackageInfo" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.dep_analyzer.</span></span><span class="sig-name descname"><span class="pre">PackageInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version_spec</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.PackageInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
 <p>Create new instance of PackageInfo(name, version, version_spec)</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.PackageInfo.name">
-<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.PackageInfo.name" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.PackageInfo.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
-
 <dl class="py attribute">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.PackageInfo.version">
-<span class="sig-name descname"><span class="pre">version</span></span><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.PackageInfo.version" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">version</span></span><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.PackageInfo.version" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 1</p>
 </dd></dl>
-
 <dl class="py attribute">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.dep_analyzer.PackageInfo.version_spec">
-<span class="sig-name descname"><span class="pre">version_spec</span></span><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.PackageInfo.version_spec" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">version_spec</span></span><a class="headerlink" href="#aws_lambda_python_packager.dep_analyzer.PackageInfo.version_spec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 2</p>
 </dd></dl>
-
 </dd></dl>
-
 </section>
 <section id="module-aws_lambda_python_packager.lambda_packager">
-<span id="aws-lambda-python-packager-lambda-packager-module"></span><h2>aws_lambda_python_packager.lambda_packager module<a class="headerlink" href="#module-aws_lambda_python_packager.lambda_packager" title="Permalink to this headline"></a></h2>
+<span id="aws-lambda-python-packager-lambda-packager-module"></span><h2 id="module-aws_lambda_python_packager.lambda_packager">aws_lambda_python_packager.lambda_packager module<a class="headerlink" href="#module-aws_lambda_python_packager.lambda_packager" title="Permalink to this headline">¶</a></h2>
 <p>AWS Lambda Packager</p>
 <p>This script is used to package the lambda function code into a zip file.
 It is an alternative to <cite>sam build</cite> and uses poetry to manage dependencies.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.lambda_packager.LambdaPackager">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.lambda_packager.</span></span><span class="sig-name descname"><span class="pre">LambdaPackager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">python_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'3.9'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">architecture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'x86_64'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'us-east-1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_dependencies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_packages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_packages_to_ignore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_unsupported_python</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.lambda_packager.</span></span><span class="sig-name descname"><span class="pre">LambdaPackager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">python_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'3.9'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">architecture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'x86_64'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'us-east-1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_dependencies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_packages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_packages_to_ignore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_unsupported_python</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Initialize the Lambda Packager</p>
 <dl class="field-list simple">
@@ -283,202 +572,199 @@ from the AWS lambda environment (ignored if ignore_packages is False)</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.lambda_packager.LambdaPackager.compile_python">
-<span class="sig-name descname"><span class="pre">compile_python</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.compile_python"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.compile_python" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">compile_python</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.compile_python"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.compile_python" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.lambda_packager.LambdaPackager.compress_boto">
-<span class="sig-name descname"><span class="pre">compress_boto</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.compress_boto"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.compress_boto" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">compress_boto</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.compress_boto"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.compress_boto" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.lambda_packager.LambdaPackager.get_aws_wrangler_pyarrow">
-<span class="sig-name descname"><span class="pre">get_aws_wrangler_pyarrow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.get_aws_wrangler_pyarrow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.get_aws_wrangler_pyarrow" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_aws_wrangler_pyarrow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.get_aws_wrangler_pyarrow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.get_aws_wrangler_pyarrow" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.lambda_packager.LambdaPackager.get_total_size">
-<span class="sig-name descname"><span class="pre">get_total_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.get_total_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.get_total_size" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_total_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.get_total_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.get_total_size" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py attribute">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.lambda_packager.LambdaPackager.layer_dir">
-<span class="sig-name descname"><span class="pre">layer_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.layer_dir" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">layer_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.layer_dir" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.lambda_packager.LambdaPackager.package">
-<span class="sig-name descname"><span class="pre">package</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">no_clobber</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zip_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compile_python</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_wrangler_pyarrow</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip_tests</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip_libraries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip_python</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip_other_files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compress_boto</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.package"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.package" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">package</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">no_clobber</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zip_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compile_python</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_wrangler_pyarrow</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip_tests</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip_libraries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip_python</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip_other_files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compress_boto</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.package"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.package" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.lambda_packager.LambdaPackager.set_utime">
-<span class="sig-name descname"><span class="pre">set_utime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">set_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.set_utime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.set_utime" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">set_utime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">set_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.set_utime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.set_utime" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.lambda_packager.LambdaPackager.strip_libraries">
-<span class="sig-name descname"><span class="pre">strip_libraries</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.strip_libraries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.strip_libraries" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">strip_libraries</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.strip_libraries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.strip_libraries" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.lambda_packager.LambdaPackager.strip_other_files">
-<span class="sig-name descname"><span class="pre">strip_other_files</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.strip_other_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.strip_other_files" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">strip_other_files</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.strip_other_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.strip_other_files" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.lambda_packager.LambdaPackager.strip_python">
-<span class="sig-name descname"><span class="pre">strip_python</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.strip_python"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.strip_python" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">strip_python</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.strip_python"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.strip_python" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.lambda_packager.LambdaPackager.strip_tests">
-<span class="sig-name descname"><span class="pre">strip_tests</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.strip_tests"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.strip_tests" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">strip_tests</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.strip_tests"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.strip_tests" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.lambda_packager.LambdaPackager.zip_output">
-<span class="sig-name descname"><span class="pre">zip_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zip_output</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.zip_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.zip_output" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">zip_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zip_output</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#LambdaPackager.zip_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.LambdaPackager.zip_output" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.lambda_packager.get_strip_binary">
-<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.lambda_packager.</span></span><span class="sig-name descname"><span class="pre">get_strip_binary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">architecture</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x86_64'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#get_strip_binary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.get_strip_binary" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.lambda_packager.</span></span><span class="sig-name descname"><span class="pre">get_strip_binary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">architecture</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x86_64'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#get_strip_binary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.get_strip_binary" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.lambda_packager.sizeof_fmt">
-<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.lambda_packager.</span></span><span class="sig-name descname"><span class="pre">sizeof_fmt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'B'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#sizeof_fmt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.sizeof_fmt" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.lambda_packager.</span></span><span class="sig-name descname"><span class="pre">sizeof_fmt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'B'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/lambda_packager.html#sizeof_fmt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.lambda_packager.sizeof_fmt" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 </section>
 <section id="module-aws_lambda_python_packager.pip_analyzer">
-<span id="aws-lambda-python-packager-pip-analyzer-module"></span><h2>aws_lambda_python_packager.pip_analyzer module<a class="headerlink" href="#module-aws_lambda_python_packager.pip_analyzer" title="Permalink to this headline"></a></h2>
+<span id="aws-lambda-python-packager-pip-analyzer-module"></span><h2 id="module-aws_lambda_python_packager.pip_analyzer">aws_lambda_python_packager.pip_analyzer module<a class="headerlink" href="#module-aws_lambda_python_packager.pip_analyzer" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.pip_analyzer.PipAnalyzer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.pip_analyzer.</span></span><span class="sig-name descname"><span class="pre">PipAnalyzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">python_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'3.9'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">architecture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'x86_64'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'us-east-1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_packages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_dependencies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_packages_to_ignore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/pip_analyzer.html#PipAnalyzer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.pip_analyzer.PipAnalyzer" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.pip_analyzer.</span></span><span class="sig-name descname"><span class="pre">PipAnalyzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">python_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'3.9'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">architecture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'x86_64'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'us-east-1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_packages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_dependencies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_packages_to_ignore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/pip_analyzer.html#PipAnalyzer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.pip_analyzer.PipAnalyzer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer" title="aws_lambda_python_packager.dep_analyzer.DepAnalyzer"><code class="xref py py-class docutils literal notranslate"><span class="pre">aws_lambda_python_packager.dep_analyzer.DepAnalyzer</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.pip_analyzer.PipAnalyzer.analyzer_name">
-<span class="sig-name descname"><span class="pre">analyzer_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'pip'</span></em><a class="headerlink" href="#aws_lambda_python_packager.pip_analyzer.PipAnalyzer.analyzer_name" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">analyzer_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'pip'</span></em><a class="headerlink" href="#aws_lambda_python_packager.pip_analyzer.PipAnalyzer.analyzer_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.pip_analyzer.PipAnalyzer.direct_dependencies">
-<span class="sig-name descname"><span class="pre">direct_dependencies</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/aws_lambda_python_packager/pip_analyzer.html#PipAnalyzer.direct_dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.pip_analyzer.PipAnalyzer.direct_dependencies" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">direct_dependencies</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/aws_lambda_python_packager/pip_analyzer.html#PipAnalyzer.direct_dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.pip_analyzer.PipAnalyzer.direct_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.pip_analyzer.PipAnalyzer.extra_lines">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extra_lines</span></span><a class="headerlink" href="#aws_lambda_python_packager.pip_analyzer.PipAnalyzer.extra_lines" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extra_lines</span></span><a class="headerlink" href="#aws_lambda_python_packager.pip_analyzer.PipAnalyzer.extra_lines" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.pip_analyzer.get_packages">
-<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.pip_analyzer.</span></span><span class="sig-name descname"><span class="pre">get_packages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/pip_analyzer.html#get_packages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.pip_analyzer.get_packages" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.pip_analyzer.</span></span><span class="sig-name descname"><span class="pre">get_packages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/pip_analyzer.html#get_packages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.pip_analyzer.get_packages" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 </section>
 <section id="module-aws_lambda_python_packager.poetry_analyzer">
-<span id="aws-lambda-python-packager-poetry-analyzer-module"></span><h2>aws_lambda_python_packager.poetry_analyzer module<a class="headerlink" href="#module-aws_lambda_python_packager.poetry_analyzer" title="Permalink to this headline"></a></h2>
+<span id="aws-lambda-python-packager-poetry-analyzer-module"></span><h2 id="module-aws_lambda_python_packager.poetry_analyzer">aws_lambda_python_packager.poetry_analyzer module<a class="headerlink" href="#module-aws_lambda_python_packager.poetry_analyzer" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.poetry_analyzer.</span></span><span class="sig-name descname"><span class="pre">PoetryAnalyzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">python_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'3.9'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">architecture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'x86_64'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'us-east-1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_packages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_dependencies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_packages_to_ignore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/poetry_analyzer.html#PoetryAnalyzer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.poetry_analyzer.</span></span><span class="sig-name descname"><span class="pre">PoetryAnalyzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">python_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'3.9'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">architecture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'x86_64'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'us-east-1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_packages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_dependencies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_packages_to_ignore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/poetry_analyzer.html#PoetryAnalyzer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#aws_lambda_python_packager.dep_analyzer.DepAnalyzer" title="aws_lambda_python_packager.dep_analyzer.DepAnalyzer"><code class="xref py py-class docutils literal notranslate"><span class="pre">aws_lambda_python_packager.dep_analyzer.DepAnalyzer</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.analyzer_name">
-<span class="sig-name descname"><span class="pre">analyzer_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'poetry'</span></em><a class="headerlink" href="#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.analyzer_name" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">analyzer_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'poetry'</span></em><a class="headerlink" href="#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.analyzer_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.direct_dependencies">
-<span class="sig-name descname"><span class="pre">direct_dependencies</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/aws_lambda_python_packager/poetry_analyzer.html#PoetryAnalyzer.direct_dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.direct_dependencies" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">direct_dependencies</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/aws_lambda_python_packager/poetry_analyzer.html#PoetryAnalyzer.direct_dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.direct_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.install_root">
-<span class="sig-name descname"><span class="pre">install_root</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/poetry_analyzer.html#PoetryAnalyzer.install_root"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.install_root" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">install_root</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/poetry_analyzer.html#PoetryAnalyzer.install_root"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.install_root" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.load_toml">
-<span class="sig-name descname"><span class="pre">load_toml</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a></span></span><a class="reference internal" href="_modules/aws_lambda_python_packager/poetry_analyzer.html#PoetryAnalyzer.load_toml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.load_toml" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">load_toml</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a></span></span><a class="reference internal" href="_modules/aws_lambda_python_packager/poetry_analyzer.html#PoetryAnalyzer.load_toml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.load_toml" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.lock">
-<span class="sig-name descname"><span class="pre">lock</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/poetry_analyzer.html#PoetryAnalyzer.lock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.lock" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">lock</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/poetry_analyzer.html#PoetryAnalyzer.lock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.lock" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.locked">
-<span class="sig-name descname"><span class="pre">locked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/poetry_analyzer.html#PoetryAnalyzer.locked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.locked" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">locked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/poetry_analyzer.html#PoetryAnalyzer.locked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.locked" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.run_poetry">
-<span class="sig-name descname"><span class="pre">run_poetry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/poetry_analyzer.html#PoetryAnalyzer.run_poetry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.run_poetry" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">run_poetry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/poetry_analyzer.html#PoetryAnalyzer.run_poetry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.run_poetry" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 </dd></dl>
-
 </section>
 <section id="module-aws_lambda_python_packager.util">
-<span id="aws-lambda-python-packager-util-module"></span><h2>aws_lambda_python_packager.util module<a class="headerlink" href="#module-aws_lambda_python_packager.util" title="Permalink to this headline"></a></h2>
+<span id="aws-lambda-python-packager-util-module"></span><h2 id="module-aws_lambda_python_packager.util">aws_lambda_python_packager.util module<a class="headerlink" href="#module-aws_lambda_python_packager.util" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.util.chdir_cm">
-<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.util.</span></span><span class="sig-name descname"><span class="pre">chdir_cm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/util.html#chdir_cm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.util.chdir_cm" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.util.</span></span><span class="sig-name descname"><span class="pre">chdir_cm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.11)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/util.html#chdir_cm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.util.chdir_cm" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.util.chgenv_cm">
-<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.util.</span></span><span class="sig-name descname"><span class="pre">chgenv_cm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/util.html#chgenv_cm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.util.chgenv_cm" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.util.</span></span><span class="sig-name descname"><span class="pre">chgenv_cm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/util.html#chgenv_cm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.util.chgenv_cm" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="aws_lambda_python_packager.util.get_glue_libraries">
-<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.util.</span></span><span class="sig-name descname"><span class="pre">get_glue_libraries</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/util.html#get_glue_libraries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.util.get_glue_libraries" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">aws_lambda_python_packager.util.</span></span><span class="sig-name descname"><span class="pre">get_glue_libraries</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aws_lambda_python_packager/util.html#get_glue_libraries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aws_lambda_python_packager.util.get_glue_libraries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets libraries included in AWS Glue</p>
 </dd></dl>
-
 </section>
 <section id="module-aws_lambda_python_packager">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aws_lambda_python_packager" title="Permalink to this headline"></a></h2>
+<span id="module-contents"></span><h2 id="module-aws_lambda_python_packager">Module contents<a class="headerlink" href="#module-aws_lambda_python_packager" title="Permalink to this headline">¶</a></h2>
 </section>
 </section>
 
 
-           </div>
-          </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="modules.html" class="btn btn-neutral float-left" title="aws_lambda_python_packager" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-    </div>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2022, Daniel Sullivan.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
+          </article>
         </div>
       </div>
-    </section>
+    </main>
   </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
-
-</body>
+  <footer class="md-footer">
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+          
+            <a href="lambda-packager.html" title="lambda-packager"
+               class="md-flex md-footer-nav__link md-footer-nav__link--prev"
+               rel="prev">
+              <div class="md-flex__cell md-flex__cell--shrink">
+                <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+              </div>
+              <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+                <span class="md-flex__ellipsis">
+                  <span
+                      class="md-footer-nav__direction"> Previous </span> lambda-packager </span>
+              </div>
+            </a>
+          
+          
+            <a href="aws_lambda_python_packager.cli.html" title="aws_lambda_python_packager.cli package"
+               class="md-flex md-footer-nav__link md-footer-nav__link--next"
+               rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
+                class="md-flex__ellipsis"> <span
+                class="md-footer-nav__direction"> Next </span> aws_lambda_python_packager.cli package </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink"><i
+                class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          
+        </a>
+        
+      </nav>
+    </div>
+    <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+        <div class="md-footer-copyright">
+          <div class="md-footer-copyright__highlight">
+              &#169; Copyright 2022, Daniel Sullivan.
+              
+          </div>
+            Created using
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+             and
+            <a href="https://github.com/bashtage/sphinx-material/">Material for
+              Sphinx</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="_static/javascripts/application.js"></script>
+  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  </body>
 </html>
