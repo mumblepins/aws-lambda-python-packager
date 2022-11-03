@@ -1,7 +1,7 @@
 # Changelog
 
 
-## (unreleased)
+## v1.3.2 (2022-11-03)
 
 ### Fix
 
@@ -10,6 +10,8 @@
   * [2022-11-02](0f1da6a2dc51a18fe27829125ac00ab38716b2ea) – Testing,config files.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
 
 ### Other
+
+  * [2022-11-03](afc67b9c47d7d3b1482272d9db93a094b9b9a9c1) – Ci: gitlab coverage.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
 
   * [2022-11-03](e6fee896568a04ed46efb0a46b681694cd4fcd71) – Ci: add gitlab ci.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
 
