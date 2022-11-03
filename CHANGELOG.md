@@ -11,6 +11,8 @@
 
 ### Other
 
+  * [2022-11-03](e6fee896568a04ed46efb0a46b681694cd4fcd71) – Ci: add gitlab ci.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
+
   * [2022-11-03](29cadbd6b02c58c50244efe1bce8ed737beec451) – Chore: pre-commit updates.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
 
 
