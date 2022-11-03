@@ -1,0 +1,41 @@
+
+build:
+  stage: build
+  variables:
+    POETRY_HTTP_BASIC_NEXUS_USERNAME: "${NEXUS_USERNAME}"
+    POETRY_HTTP_BASIC_NEXUS_PASSWORD: "${NEXUS_PASSWORD}"
+    POETRY_REPOSITORIES_NEXUS: "${NEXUS_URL}"
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+    POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/poetry"
+    PRE_COMMIT_HOME: "$CI_PROJECT_DIR/.cache/pre-commit"
+  cache:
+    paths:
+      - ".cache"
+    key: python-default-$CI_PROJECT_ROOT_NAMESPACE
+    untracked: true
+    when: always
+
+  before_script:
+    - ln -s "$(command -v python3)" /usr/local/bin/python || true
+    - python -VV
+    - echo -e "\e[0Ksection_start:`date +%s`:install_pip[collapsed=true]\r\e[0KInstall Pip Packages"
+    - pip install poetry pre-commit
+    - echo -e "\e[0Ksection_end:`date +%s`:install_pip\r\e[0K"
+    - echo -e "\e[0Ksection_start:`date +%s`:install_poetry[collapsed=true]\r\e[0KInstall Poetry Packages"
+    - poetry install --sync
+    - echo -e "\e[0Ksection_end:`date +%s`:install_poetry\r\e[0K"
+  script:
+    - echo -e "\e[0Ksection_start:`date +%s`:run_pre_commit[collapsed=true]\r\e[0KPre-Commit Linting and Testing"
+    - poetry run pre-commit run --all-files
+    - echo -e "\e[0Ksection_end:`date +%s`:run_pre_commit\r\e[0K"
+    - poetry build
+    -
+      if [[ "$CI_COMMIT_TAG" != "" ]]; then
+        poetry config repositories.nexus "${POETRY_REPOSITORIES_NEXUS}" ;
+        poetry publish -r nexus --skip-existing ;
+      else
+        echo "Not tagged release; not uploading" ;
+      fi
+  artifacts:
+    paths:
+      - dist
