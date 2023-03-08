@@ -1,6 +1,15 @@
 # Changelog
 
 
+## v1.3.3 (2023-03-08)
+
+### Changes
+
+  * [2023-03-08](4d0158fd682b5268fac2ee431dd1b8c227c3aeb1) – Formatting, precommits, various fixes.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
+
+  badge fix, boto compression fix
+
+
 ## v1.3.2 (2022-11-03)
 
 ### Fix
