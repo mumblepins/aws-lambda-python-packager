@@ -88,8 +88,9 @@ jobs:
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-${{ matrix.python-version }}
-      - run: pip install --upgrade poetry
-
+          restore-keys: |
+            ${{ runner.os }}-
+      - run: pip install --upgrade --pre poetry
       - uses: actions/cache@v3
         id: cache-poetry
         with:

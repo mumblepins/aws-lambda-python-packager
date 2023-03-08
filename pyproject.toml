@@ -34,17 +34,17 @@ coverage = { extras = ["toml"], version = "*" }
 Sphinx = "*"
 sphinx-immaterial = "*"
 pytest-cov = "*"
-gitchangelog = { version = "^3.0" }
-pylint-pytest = "^1.1.2"
-pytest-xdist = "^2.5.0"
+gitchangelog = { version = ">=3.0" }
+pylint-pytest = "*"
+pytest-xdist = "*"
 myst-parser = "*"
-bump2version = "^1.0.1"
+bump2version = "*"
 pystache = "*"
 toml = "*"
 # endregion
-importlib-resources = { version = "^5.7.1", python = "<3.9" }
-sphinx-click = "^4.3.0"
-pytest-randomly = "^3.12.0"
+importlib-resources = { version = ">=5.7.1", python = "<3.9" }
+sphinx-click = ">=4.3.0"
+pytest-randomly = ">=3.12.0"
 
 [tool.poetry.extras]
 

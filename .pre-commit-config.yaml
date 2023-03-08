@@ -21,6 +21,7 @@ repos:
         stages:
           - commit
         additional_dependencies:
+          - prettier
           - prettier-plugin-toml
           - "@prettier/plugin-xml"
           - prettier-plugin-sh
