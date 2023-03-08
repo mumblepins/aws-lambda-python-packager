@@ -32,14 +32,21 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: actions/cache@v3
-        id: cache-pip
+      - uses: actions/cache/restore@v3
+        id: cache-pip-restore
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-${{ matrix.python-version }}
+          restore-keys: |
+            ${{ runner.os }}-
       - run: pip install --upgrade poetry
-      - uses: actions/cache@v3
-        id: cache-poetry
+      - uses: actions/cache/save@v3
+        id: cache-pip-save
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-${{ matrix.python-version }}
+      - uses: actions/cache/restore@v3
+        id: cache-poetry-restore
         with:
           path: ~/.cache/pypoetry/virtualenvs
           key: ${{ runner.os }}-${{ matrix.python-version }}-poetry-${{ hashFiles('poetry.lock') }}
@@ -50,14 +57,18 @@ jobs:
         run: |
           poetry install --sync
           sudo apt-get install -y binutils-aarch64-linux-gnu
-
+      - uses: actions/cache/save@v3
+        id: cache-poetry-save
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-${{ matrix.python-version }}-poetry-${{ hashFiles('poetry.lock') }}
       - name: run pre-commit
         uses: pre-commit/action@v2.0.3
       #        run: poetry run pre-commit run --all-files
       - name: run tests
         run: |
           poetry run pytest "tests/" \
-          -n auto \
+          -n 2 \
           --verbose  \
           --cov=aws_lambda_python_packager \
           --pyargs "aws_lambda_python_packager" \
