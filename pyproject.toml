@@ -36,7 +36,7 @@ sphinx-immaterial = "*"
 pytest-cov = "*"
 gitchangelog = { version = "^3.0" }
 pylint-pytest = "^1.1.2"
-pytest-xdist = "^2.5.0"
+pytest-xdist = ">=2.5,<4.0"
 myst-parser = "*"
 bump2version = "^1.0.1"
 pystache = "*"
