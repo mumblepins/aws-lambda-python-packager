@@ -1,6 +1,6 @@
 name: "Docs Check"
 
-on: [ push, pull_request ]
+on: [push, pull_request]
 
 jobs:
   pre_job:
@@ -11,23 +11,22 @@ jobs:
       - id: skip_check
         uses: fkirc/skip-duplicate-actions@v4.0.0
         with:
-          concurrent_skipping: 'same_content_newer'
+          concurrent_skipping: "same_content_newer"
           do_not_skip: '["pull_request", "workflow_dispatch", "schedule", "create", "release"]'
   docs:
     needs: pre_job
     if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
     runs-on: ubuntu-latest
     steps:
-
       - uses: actions/checkout@v3
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: '3.10'
+          python-version: "3.10"
       - name: Install Poetry
         uses: abatilo/actions-poetry@v2.0.0
         with:
-          poetry-version: '1.2.0b1'
+          poetry-version: "1.2.0b1"
       - uses: actions/cache@v3
         with:
           path: ~/.cache/pypoetry/virtualenvs

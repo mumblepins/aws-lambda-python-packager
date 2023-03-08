@@ -35,6 +35,14 @@ MAX_LAMBDA_SIZE = 250 * 1024 * 1024  # 250MB
 OTHER_FILE_EXTENSIONS = (".pyx", ".pyi", ".pxi", ".pxd", ".c", ".h", ".cc")
 
 
+class UnsupportedVersionException(Exception):
+    pass
+
+
+class ProjectTypeException(Exception):
+    pass
+
+
 class LambdaPackager:
     # pylint: disable=too-many-instance-attributes
     layer_dir: PathType | None
@@ -71,7 +79,9 @@ class LambdaPackager:
             "python" + short_python_version,
             architecture,
         ) not in PLATFORMS and not ignore_unsupported_python:
-            raise Exception(f"{architecture} {python_version} not supported")  # pragma: no cover
+            raise UnsupportedVersionException(
+                f"{architecture} {python_version} not supported"
+            )  # pragma: no cover
         self.project_path = Path(project_path)
         self.python_version = python_version
         self.architecture = architecture
@@ -80,14 +90,18 @@ class LambdaPackager:
         self.ignore_packages = ignore_packages
         self.split_layer = split_layer
         analyzer_type: Type[DepAnalyzer]
-        if (self.project_path / "pyproject.toml").exists() and not (self.project_path / "requirements.txt").exists():
+        if (self.project_path / "pyproject.toml").exists() and not (
+            self.project_path / "requirements.txt"
+        ).exists():
             LOG.info("pyproject.toml found and not requirements.txt, assuming poetry")
             analyzer_type = PoetryAnalyzer
-        elif (self.project_path / "requirements.txt").exists() and not (self.project_path / "pyproject.toml").exists():
+        elif (self.project_path / "requirements.txt").exists() and not (
+            self.project_path / "pyproject.toml"
+        ).exists():
             LOG.info("requirements.txt found, assuming pip")
             analyzer_type = PipAnalyzer
         else:
-            raise Exception("Ambiguous project type, quitting")
+            raise ProjectTypeException("Ambiguous project type, quitting")
 
         self.analyzer = analyzer_type(
             self.project_path,
@@ -189,12 +203,18 @@ class LambdaPackager:
                 _open = open
                 new_name = f.with_suffix(".json.gz")
                 delete = True
-            with _open(f, "rt", encoding="utf8") as fh:
-                data = json.load(fh)
-            with gzip.open(new_name, "wt", encoding="utf8", compresslevel=9) as fh:
-                json.dump(data, fh)
-            if delete:
-                f.unlink(missing_ok=True)
+            try:
+                with _open(f, "rt") as fh, gzip.GzipFile(
+                    new_name, "wb", compresslevel=9, mtime=0
+                ) as zfh:
+                    # load and dump to decrease unnecessary whitespace,set mtime to 0 to make builds repeatable
+                    json_data = json.load(fh)
+                    zfh.write(json.dumps(json_data, separators=(",", ":")).encode("utf8"))
+            except json.decoder.JSONDecodeError:
+                delete = False
+            finally:
+                if delete:
+                    f.unlink(missing_ok=True)
 
     def strip_libraries(self):
         try:
@@ -202,7 +222,9 @@ class LambdaPackager:
             strip_command = get_strip_binary(self.architecture)
             for p in self.output_dir.glob("**/*.so*"):
                 LOG.debug('Stripping library "%s"', p)
-                subprocess.run([strip_command, str(p)])  # nosec: B603 pylint: disable=subprocess-run-check
+                subprocess.run(  # nosec: B603 pylint: disable=subprocess-run-check
+                    [strip_command, str(p)]
+                )
         except Exception:  # pylint: disable=broad-except
             LOG.error("Failed to strip libraries, perhaps we don't have the 'strip' command?")
 
@@ -260,7 +282,9 @@ class LambdaPackager:
                 strip_python = False
                 LOG.warning("Unable to compile python, not stripping python")
             new_size = self.get_total_size()
-            LOG.info("Compiled size: %s (%0.1f%%)", sizeof_fmt(new_size), new_size / initial_size * 100)
+            LOG.info(
+                "Compiled size: %s (%0.1f%%)", sizeof_fmt(new_size), new_size / initial_size * 100
+            )
         for strip_func in (
             "strip_python",
             "strip_tests",
@@ -287,7 +311,9 @@ class LambdaPackager:
                 sizeof_fmt(MAX_LAMBDA_SIZE),
             )
         else:
-            LOG.warning("Package size: %s (%0.1f%%)", sizeof_fmt(size_out), size_out / initial_size * 100)
+            LOG.warning(
+                "Package size: %s (%0.1f%%)", sizeof_fmt(size_out), size_out / initial_size * 100
+            )
         if zip_output:
             LOG.warning("Zipping output")
             self.zip_output(zip_output)

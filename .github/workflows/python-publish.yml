@@ -1,6 +1,6 @@
 name: Python Publish
 
-on: [ push, pull_request ]
+on: [push, pull_request]
 
 jobs:
   pre_job:
@@ -11,7 +11,7 @@ jobs:
       - id: skip_check
         uses: fkirc/skip-duplicate-actions@v4.0.0
         with:
-          concurrent_skipping: 'same_content_newer'
+          concurrent_skipping: "same_content_newer"
           do_not_skip: '["pull_request", "workflow_dispatch", "schedule", "create", "release"]'
 
   test:
@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python-version: [ '3.9' ,'3.10','3.8' ]
+        python-version: ["3.9", "3.10", "3.8"]
     env:
       OS: ${{ matrix.os }}
       PYTHON: ${{ matrix.python-version }}
@@ -74,7 +74,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python-version: [ '3.10' ]
+        python-version: ["3.10"]
     runs-on: ubuntu-latest
 
     steps:

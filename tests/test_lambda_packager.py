@@ -77,7 +77,9 @@ def test_export_no_ignore_packages_no_update_pyproject(temp_path_filled):
 def test_cli_regular(arch, pyarch, temp_path_filled):
     src, dst, _ = temp_path_filled
     runner = CliRunner()
-    result = runner.invoke(main, ["-v", "INFO", "build", "--architecture", arch, str(src), str(dst)])
+    result = runner.invoke(
+        main, ["-v", "INFO", "build", "--architecture", arch, str(src), str(dst)]
+    )
 
     assert result.exit_code == 0
     # main_args([str(a) for a in ["-v", "--architecture", arch, src, dst]])
@@ -94,7 +96,9 @@ def test_optimize(arch, pyarch, temp_path_filled):
     src, dst, _ = temp_path_filled
 
     runner = CliRunner()
-    result = runner.invoke(main, ["-v", "INFO", "build", "-O", "--architecture", arch, str(src), str(dst)])
+    result = runner.invoke(
+        main, ["-v", "INFO", "build", "-O", "--architecture", arch, str(src), str(dst)]
+    )
     # main_args([str(a) for a in ["-v", "-O", "--architecture", arch, src, dst]])
     assert result.exit_code == 0
     # make sure we aren't using the aws wrangler version
@@ -110,7 +114,9 @@ def test_optimize(arch, pyarch, temp_path_filled):
 def test_full_optimize(arch, pyarch, temp_path_filled):
     src, dst, _ = temp_path_filled
     runner = CliRunner()
-    result = runner.invoke(main, ["-v", "INFO", "build", "-OOOOO", "--architecture", arch, str(src), str(dst)])
+    result = runner.invoke(
+        main, ["-v", "INFO", "build", "-OOOOO", "--architecture", arch, str(src), str(dst)]
+    )
     # main_args([str(a) for a in ["-v", "-O", "--architecture", arch, src, dst]])
     assert result.exit_code == 0
     # main_args([str(a) for a in ["-v", "-OO", "--architecture", arch, src, dst]])

@@ -5,19 +5,19 @@ charset = utf-8
 end_of_line = lf
 indent_size = 4
 indent_style = space
-insert_final_newline = false
-max_line_length = 160
+insert_final_newline = true
+max_line_length = 100
 tab_width = 4
 ij_continuation_indent_size = 8
 ij_formatter_off_tag = @formatter:off
 ij_formatter_on_tag = @formatter:on
 ij_formatter_tags_enabled = true
 ij_smart_tabs = false
-ij_visual_guides = 80,120
+ij_visual_guides = 80, 100
 ij_wrap_on_typing = false
+trim_trailing_whitespace = True
 
 [{*.py,*.pyw}]
-ij_visual_guides = none
 ij_python_align_collections_and_comprehensions = true
 ij_python_align_multiline_imports = true
 ij_python_align_multiline_parameters = true
@@ -88,14 +88,13 @@ ij_python_use_continuation_indent_for_arguments = false
 ij_python_use_continuation_indent_for_collection_and_comprehensions = false
 ij_python_use_continuation_indent_for_parameters = true
 ij_python_wrap_long_lines = false
+ij_visual_guides = 80, 100
 
 [{*.toml,Cargo.lock,Cargo.toml.orig,Gopkg.lock,Pipfile,poetry.lock}]
-ij_visual_guides = none
 ij_toml_keep_indents_on_empty_lines = false
 
 [{*.yaml,*.yml}]
 indent_size = 2
-ij_visual_guides = none
 ij_yaml_align_values_properties = do_not_align
 ij_yaml_autoinsert_sequence_marker = true
 ij_yaml_block_mapping_on_new_line = false
@@ -106,3 +105,11 @@ ij_yaml_sequence_on_new_line = false
 ij_yaml_space_before_colon = false
 ij_yaml_spaces_within_braces = true
 ij_yaml_spaces_within_brackets = true
+ij_visual_guides = 80, 100
+
+[Makefile]
+indent_style = tab
+
+[{*.js,*json}]
+indent_size = 2
+ij_visual_guides = 80, 100

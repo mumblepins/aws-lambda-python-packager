@@ -5,7 +5,6 @@ description = "Test Package"
 authors = ["Daniel Sullivan <mumblepins@users.noreply.github.com>"]
 packages = [{ include = 'test_package' }]
 
-
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"
 awswrangler = "*"
@@ -13,7 +12,7 @@ boto3 = "1.20.32"
 test-pypi-package-9hfklcw8fq = { version = "^0.1.2", source = "gitlab_test" }
 
 [build-system]
-requires = ["poetry-core>=1.1.0a7", ]
+requires = ["poetry-core>=1.1.0a7"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.aws-deployment.source.gitlab_test]

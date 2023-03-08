@@ -32,7 +32,9 @@ def get_all_versions(python_version="3.9", arch="x86_64"):
     rj = r.json()
     rj = filter(lambda x: to_version(x["tag_name"]) is not None, rj)
 
-    tags = {v["tag_name"]: v for v in sorted(rj, key=lambda x: Version(x["tag_name"]), reverse=True)}
+    tags = {
+        v["tag_name"]: v for v in sorted(rj, key=lambda x: Version(x["tag_name"]), reverse=True)
+    }
 
     if arch == "x86_64":
         arch = ""
@@ -87,7 +89,9 @@ def fetch_package(
         with open_zip_file(url, filename) as zfh:
             file_list = [a for a in zfh.namelist() if a.startswith(f"python/{package_name}")]
             wr_pkg_version = [
-                re.sub(rf"^.*{package_name}-(.*?)\.dist-info.*$", r"\1", a) for a in file_list if "dist-info" in a
+                re.sub(rf"^.*{package_name}-(.*?)\.dist-info.*$", r"\1", a)
+                for a in file_list
+                if "dist-info" in a
             ][0]
             if pkg_spec is None or pkg_spec.contains(wr_pkg_version):
                 LOG.info("Found package %s-%s in %s", package_name, wr_pkg_version, zfh.filename)

@@ -21,35 +21,35 @@ appdirs = "*"
 aiohttp = "*"
 toml = ">=0.10"
 packaging = "*"
-click = ">=8"
+click = ">=7"
 click-option-group = "*"
 click-log = "*"
 wheel = "*"
 
 [tool.poetry.group.dev.dependencies]
 # region pre-commit hooks and linting
-pylint = "^2.13.0"
-pytest = "^7.1.1"
-coverage = { version = "^6.3.2", extras = ['toml'] }
-Sphinx = "^4.4"
-sphinx-material = "^0.0.35"
-pytest-cov = "^3.0.0"
+pylint = "*"
+pytest = "*"
+coverage = { extras = ["toml"], version = "*" }
+Sphinx = "*"
+sphinx-immaterial = "*"
+pytest-cov = "*"
 gitchangelog = { version = "^3.0" }
 pylint-pytest = "^1.1.2"
-myst-parser = "^0.18.0"
+pytest-xdist = "^2.5.0"
+myst-parser = "*"
+bump2version = "^1.0.1"
+pystache = "*"
+toml = "*"
 # endregion
 importlib-resources = { version = "^5.7.1", python = "<3.9" }
-bump2version = "^1.0.1"
-pystache = "^0.6.0"
 sphinx-click = "^4.3.0"
 pytest-randomly = "^3.12.0"
-pytest-xdist = "^3.0.2"
-
 
 [tool.poetry.extras]
 
 [build-system]
-requires = ["poetry-core>=1.1.0b2"]
+requires = ["poetry-core>=1.2.0"]
 build-backend = "poetry.core.masonry.api"
 
 # region pytest
@@ -58,8 +58,8 @@ log_cli = true
 log_cli_level = "DEBUG"
 log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
 log_cli_date_format = "%Y-%m-%d %H:%M:%S"
-#endregion
 
+# endregion
 # region ISort
 [tool.isort]
 profile = "black"
@@ -72,11 +72,11 @@ include_trailing_comma = true
 combine_as_imports = true
 force_grid_wrap = 0
 known_first_party = ["template_python_library"]
-# endregion
 
+# endregion
 # region Black
 [tool.black]
-line-length = 120
+line-length = 100
 include = '\.pyi?$'
 target-version = ['py38', 'py39', 'py310']
 exclude = '''
@@ -98,7 +98,6 @@ exclude = '''
 )/
 '''
 # endregion
-
 # region Mypy
 [tool.mypy]
 files = 'src/**/*.py'
@@ -119,8 +118,6 @@ exclude = '''(?x)(
   | dist
   | package_
 )'''
-
-
 overrides = [
     { module = 'awacs.*', ignore_missing_imports = true },
     { module = 'inflection.*', ignore_missing_imports = true },
@@ -132,18 +129,19 @@ overrides = [
     { module = 'packaging.*', ignore_missing_imports = true },
     { module = 'click_log.*', ignore_missing_imports = true },
 ]
-#endregion
 
+# endregion
 # region DepChecker
 [tool.dep_checker]
 allowed_unused = ["python_certifi_win32", 'aiohttp']
+
 [tool.dep_checker.name_mapping]
 gitpython = "git"
 python-dateutil = "dateutil"
 python-dotenv = "dotenv"
 setuptools = "pkg_resources"
-#endregion
 
+# endregion
 #region Coverage
 [tool.coverage.run]
 branch = true
@@ -167,4 +165,33 @@ exclude_lines = [
     "if 0:",
     "if __name__ == .__main__.:"
 ]
-#endregion
+
+# endregion
+# region Bandit
+[tool.bandit]
+skips = []
+
+# endregion
+# region Tox
+[tool.tox]
+# language=ini
+legacy_tox_ini = """
+
+[tox]
+env_list =
+    py310
+minversion = 4.3.5
+
+[testenv]
+description = run the tests with pytest
+package = wheel
+wheel_build_env = .pkg
+deps =
+    pytest>=6
+commands =
+    pytest {tty:--color=yes} {posargs}
+"""
+
+# endregion
+[tool.nitpick]
+style = ["https://raw.githubusercontent.com/mumblepins/style-repo/main/nitpick-python.toml"]
