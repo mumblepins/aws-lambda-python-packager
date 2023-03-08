@@ -1,119 +1,128 @@
 
-<!DOCTYPE html>
 
-<html>
+<!doctype html>
+<html lang="en" class="no-js">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <meta name="lang:clipboard.copy" content="Copy to clipboard">
-  <meta name="lang:clipboard.copied" content="Copied to clipboard">
-  <meta name="lang:search.language" content="en">
-  <meta name="lang:search.pipeline.stopwords" content="True">
-  <meta name="lang:search.pipeline.trimmer" content="True">
-  <meta name="lang:search.result.none" content="No matching documents">
-  <meta name="lang:search.result.one" content="1 matching document">
-  <meta name="lang:search.result.other" content="# matching documents">
-  <meta name="lang:search.tokenizer" content="[\s\-]+">
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="">
+    
+    
+      
+        <title>None - aws-lambda-python-packager v1.3.3 documentation</title>
+      
+    
+    
+      
+        
+        
+          
+          
+          <meta name="theme-color" content="#2094f3">
+        
+      
+      
 
-  
-    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
-    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
+    
+    
+    
+      
+        
+        
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+        <link rel="stylesheet" type="text/css" href="_static/sphinx_immaterial_theme.fa3fbbd75cfdd7cef.min.css" />
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
 
-    <style>
-      body,
-      input {
-        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
-      }
-
-      code,
-      kbd,
-      pre {
-        font-family: "Roboto Mono", "Courier New", Courier, monospace
-      }
-    </style>
-  
-
-  <link rel="stylesheet" href="_static/stylesheets/application.css"/>
-  <link rel="stylesheet" href="_static/stylesheets/application-palette.css"/>
-  <link rel="stylesheet" href="_static/stylesheets/application-fixes.css"/>
-  
-  <link rel="stylesheet" href="_static/fonts/material-icons.css"/>
-  
-  <meta name="theme-color" content="#3f51b5">
-  <script src="_static/javascripts/modernizr.js"></script>
-  
-  
-  
-    <title>Index &#8212; aws-lambda-python-packager v1.3.2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/material.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
-    <link rel="index" title="Index" href="#" />
-    <link rel="search" title="Search" href="search.html" />
-  
-   
-
+    
+    
+    
   </head>
-  <body dir=ltr
-        data-md-color-primary=#003865 data-md-color-accent=#78BE21>
   
-  <svg class="md-svg">
-    <defs data-children-count="0">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
-      
-    </defs>
-  </svg>
   
-  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
-  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
-  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
-  <a href="#genindex" tabindex="1" class="md-skip"> Skip to content </a>
-  <header class="md-header" data-md-component="header">
-  <nav class="md-header-nav md-grid">
-    <div class="md-flex navheader">
-      <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="index.html" title="aws-lambda-python-packager v1.3.2 documentation"
-           class="md-header-nav__button md-logo">
-          
-            <i class="md-icon">&#xe86f</i>
-          
-        </a>
-      </div>
-      <div class="md-flex__cell md-flex__cell--shrink">
-        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
-      </div>
-      <div class="md-flex__cell md-flex__cell--stretch">
-        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
-          <span class="md-header-nav__topic">Lambda Python Packager</span>
-          <span class="md-header-nav__topic"> Index </span>
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="blue" data-md-color-accent="green">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="aws-lambda-python-packager v1.3.3 documentation" class="md-header__button md-logo" aria-label="aws-lambda-python-packager v1.3.3 documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            aws-lambda-python-packager v1.3.3 documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              None
+            
+          </span>
         </div>
       </div>
-      <div class="md-flex__cell md-flex__cell--shrink">
-        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
-        
-<div class="md-search" data-md-component="search" role="dialog">
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
-    <form class="md-search__form" action="search.html" method="get" name="search">
-      <input type="text" class="md-search__input" name="q" placeholder="Search"
-             autocapitalize="off" autocomplete="off" spellcheck="false"
-             data-md-component="query" data-md-state="active">
-      <label class="md-icon md-search__icon" for="__search"></label>
-      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
-        &#xE5CD;
-      </button>
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
     </form>
     <div class="md-search__output">
       <div class="md-search__scrollwrap" data-md-scrollfix>
-        <div class="md-search-result" data-md-component="result">
+        <div class="md-search-result" data-md-component="search-result">
           <div class="md-search-result__meta">
-            Type to start searching
+            Initializing search
           </div>
           <ol class="md-search-result__list"></ol>
         </div>
@@ -121,1032 +130,180 @@
     </div>
   </div>
 </div>
-
-      </div>
-      
-        <div class="md-flex__cell md-flex__cell--shrink">
-          <div class="md-header-nav__source">
-            <a href="https://github.com/mumblepins/aws-lambda-python-packager/" title="Go to repository" class="md-source" data-md-source="github">
-
-    <div class="md-source__icon">
-      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
-        <use xlink:href="#__github" width="24" height="24"></use>
-      </svg>
-    </div>
-  
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/mumblepins/aws-lambda-python-packager/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
   <div class="md-source__repository">
     Template Python Library
   </div>
 </a>
-          </div>
-        </div>
-      
-      
-  
-  <script src="_static/javascripts/version_dropdown.js"></script>
-  <script>
-    var json_loc = ""versions.json"",
-        target_loc = "../",
-        text = "Versions";
-    $( document ).ready( add_version_dropdown(json_loc, target_loc, text));
-  </script>
-  
-
-    </div>
+      </div>
+    
   </nav>
+  
 </header>
-
-  
-  <div class="md-container">
     
-    
-    
-  <nav class="md-tabs" data-md-component="tabs">
-    <div class="md-tabs__inner md-grid">
-      <ul class="md-tabs__list">
-          <li class="md-tabs__item"><a href="index.html" class="md-tabs__link">aws-lambda-python-packager v1.3.2 documentation</a></li>
-      </ul>
-    </div>
-  </nav>
-    <main class="md-main">
-      <div class="md-main__inner md-grid" data-md-component="container">
+    <div class="md-container" data-md-component="container">
+      
+      
+      
+      
         
-          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
-            <div class="md-sidebar__scrollwrap">
-              <div class="md-sidebar__inner">
-                <nav class="md-nav md-nav--primary" data-md-level="0">
-  <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href="index.html" title="aws-lambda-python-packager v1.3.2 documentation" class="md-nav__button md-logo">
+          
+        
       
-        <i class="md-icon">&#xe86f</i>
-      
-    </a>
-    <a href="index.html"
-       title="aws-lambda-python-packager v1.3.2 documentation">Lambda Python Packager</a>
-  </label>
-    <div class="md-nav__source">
-      <a href="https://github.com/mumblepins/aws-lambda-python-packager/" title="Go to repository" class="md-source" data-md-source="github">
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
 
-    <div class="md-source__icon">
-      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
-        <use xlink:href="#__github" width="24" height="24"></use>
-      </svg>
-    </div>
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="aws-lambda-python-packager v1.3.3 documentation" class="md-nav__button md-logo" aria-label="aws-lambda-python-packager v1.3.3 documentation" data-md-component="logo">
+      
   
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+    </a>
+    aws-lambda-python-packager v1.3.3 documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/mumblepins/aws-lambda-python-packager/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
   <div class="md-source__repository">
     Template Python Library
   </div>
 </a>
     </div>
   
-  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
 
   
-  <ul class="md-nav__list">
+  
+  
+  
     <li class="md-nav__item">
-    
-    
-      <a href="lambda-packager.html" class="md-nav__link">CLI Interface</a>
-      <ul class="md-nav__list"> 
-    <li class="md-nav__item">
-    
-    
-      <a href="lambda-packager.html#lambda-packager-build" class="md-nav__link">build</a>
-      
-    
+      <a href="lambda-packager.html" class="md-nav__link">
+        <span class="md-ellipsis">CLI Interface</span>
+      </a>
     </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="lambda-packager.html#lambda-packager-unify" class="md-nav__link">unify</a>
-      
-    
-    </li></ul>
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="aws_lambda_python_packager.html" class="md-nav__link">Python Modules</a>
-      <ul class="md-nav__list"> 
-    <li class="md-nav__item">
-    
-    
-      <a href="aws_lambda_python_packager.html#subpackages" class="md-nav__link">Subpackages</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="aws_lambda_python_packager.html#submodules" class="md-nav__link">Submodules</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager.aws_wrangler" class="md-nav__link">aws_lambda_python_packager.aws_wrangler module</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager.dep_analyzer" class="md-nav__link">aws_lambda_python_packager.dep_analyzer module</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager.lambda_packager" class="md-nav__link">aws_lambda_python_packager.lambda_packager module</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager.pip_analyzer" class="md-nav__link">aws_lambda_python_packager.pip_analyzer module</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager.poetry_analyzer" class="md-nav__link">aws_lambda_python_packager.poetry_analyzer module</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager.util" class="md-nav__link">aws_lambda_python_packager.util module</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager" class="md-nav__link">Module contents</a>
-      
-    
-    </li></ul>
-    
-    </li>
-  </ul>
   
 
-</nav>
-              </div>
-            </div>
-          </div>
-          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
-            <div class="md-sidebar__scrollwrap">
-              <div class="md-sidebar__inner">
-                
-<nav class="md-nav md-nav--secondary">
-  <ul class="md-nav__list" data-md-scrollfix="">
     
+      
+      
+      
 
-<li id="searchbox" class="md-nav__item"></li>
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aws_lambda_python_packager.html" class="md-nav__link">
+        <span class="md-ellipsis">Python Modules</span>
+      </a>
+    </li>
+  
 
+    
   </ul>
 </nav>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        
-        <div class="md-content">
-          <article class="md-content__inner md-typeset" role="main">
             
-
-<h1 id="index">Index</h1>
-
-<div class="genindex-jumpbox">
- <a href="#Symbols"><strong>Symbols</strong></a>
- | <a href="#A"><strong>A</strong></a>
- | <a href="#B"><strong>B</strong></a>
- | <a href="#C"><strong>C</strong></a>
- | <a href="#D"><strong>D</strong></a>
- | <a href="#E"><strong>E</strong></a>
- | <a href="#F"><strong>F</strong></a>
- | <a href="#G"><strong>G</strong></a>
- | <a href="#I"><strong>I</strong></a>
- | <a href="#L"><strong>L</strong></a>
- | <a href="#M"><strong>M</strong></a>
- | <a href="#N"><strong>N</strong></a>
- | <a href="#O"><strong>O</strong></a>
- | <a href="#P"><strong>P</strong></a>
- | <a href="#R"><strong>R</strong></a>
- | <a href="#S"><strong>S</strong></a>
- | <a href="#T"><strong>T</strong></a>
- | <a href="#U"><strong>U</strong></a>
- | <a href="#V"><strong>V</strong></a>
- | <a href="#Z"><strong>Z</strong></a>
- 
-</div>
-<h2 id="Symbols">Symbols</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    --architecture
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-a">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --compile-python
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-compile-python">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --compress-boto
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-compress-boto">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --export-requirements
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-export-requirements">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --ignore-additional
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-ignore-additional">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --ignore-from-glue
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-ignore-from-glue">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --ignore-packages
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-ignore-packages">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --ignore-unsupported-python
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-ignore-unsupported-python">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --no-compile-python
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-compile-python">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --no-compress-boto
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-compress-boto">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --no-ignore-packages
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-ignore-packages">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --no-strip-libraries
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-strip-libraries">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --no-strip-other
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-strip-other">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --no-strip-python
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-strip-python">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --no-strip-tests
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-strip-tests">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --no-update-dependencies
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-update-dependencies">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --no-use-aws-pyarrow
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-use-aws-pyarrow">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --optimize-all
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-O">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --output-package-name
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-unify-output-package-name">lambda-packager-unify command line option</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    --output-package-version
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-unify-output-package-version">lambda-packager-unify command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --python-version
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-pyv">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --region
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-region">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --strip-libraries
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-strip-libraries">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --strip-other
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-strip-other">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --strip-python
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-strip-python">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --strip-tests
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-strip-tests">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --update-dependencies
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-update-dependencies">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --use-aws-pyarrow
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-use-aws-pyarrow">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --verbosity
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-v">lambda-packager command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --version
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-V">lambda-packager command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --zip-output
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-z">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    -a
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-a">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    -O
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-O">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    -pyv
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-pyv">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li>
-    -V
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-V">lambda-packager command line option</a>
-</li>
-      </ul></li>
-      <li>
-    -v
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-v">lambda-packager command line option</a>
-</li>
-      </ul></li>
-      <li>
-    -z
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-z">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="A">A</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.analyzer_name">analyzer_name (aws_lambda_python_packager.dep_analyzer.DepAnalyzer attribute)</a>
-
-      <ul>
-        <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.pip_analyzer.PipAnalyzer.analyzer_name">(aws_lambda_python_packager.pip_analyzer.PipAnalyzer attribute)</a>
-</li>
-        <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.analyzer_name">(aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer attribute)</a>
-</li>
-      </ul></li>
-      <li>
-    aws_lambda_python_packager
-
-      <ul>
-        <li><a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager">module</a>
-</li>
-      </ul></li>
-      <li>
-    aws_lambda_python_packager.aws_wrangler
-
-      <ul>
-        <li><a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager.aws_wrangler">module</a>
-</li>
-      </ul></li>
-      <li>
-    aws_lambda_python_packager.cli
-
-      <ul>
-        <li><a href="aws_lambda_python_packager.cli.html#module-aws_lambda_python_packager.cli">module</a>
-</li>
-      </ul></li>
-      <li>
-    aws_lambda_python_packager.cli.build
-
-      <ul>
-        <li><a href="aws_lambda_python_packager.cli.html#module-aws_lambda_python_packager.cli.build">module</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    aws_lambda_python_packager.cli.unify
-
-      <ul>
-        <li><a href="aws_lambda_python_packager.cli.html#module-aws_lambda_python_packager.cli.unify">module</a>
-</li>
-      </ul></li>
-      <li>
-    aws_lambda_python_packager.dep_analyzer
-
-      <ul>
-        <li><a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager.dep_analyzer">module</a>
-</li>
-      </ul></li>
-      <li>
-    aws_lambda_python_packager.lambda_packager
-
-      <ul>
-        <li><a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager.lambda_packager">module</a>
-</li>
-      </ul></li>
-      <li>
-    aws_lambda_python_packager.pip_analyzer
-
-      <ul>
-        <li><a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager.pip_analyzer">module</a>
-</li>
-      </ul></li>
-      <li>
-    aws_lambda_python_packager.poetry_analyzer
-
-      <ul>
-        <li><a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager.poetry_analyzer">module</a>
-</li>
-      </ul></li>
-      <li>
-    aws_lambda_python_packager.util
-
-      <ul>
-        <li><a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager.util">module</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="B">B</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.backup_files">backup_files() (aws_lambda_python_packager.dep_analyzer.DepAnalyzer method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    BUNDLE_PATH
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-unify-arg-BUNDLE_PATH">lambda-packager-unify command line option</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="C">C</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.util.chdir_cm">chdir_cm() (in module aws_lambda_python_packager.util)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.util.chgenv_cm">chgenv_cm() (in module aws_lambda_python_packager.util)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.cli.html#aws_lambda_python_packager.cli.unify.combine_wheel_files">combine_wheel_files() (in module aws_lambda_python_packager.cli.unify)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.CommandNotFoundError">CommandNotFoundError</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.compile_python">compile_python() (aws_lambda_python_packager.lambda_packager.LambdaPackager method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.cli.html#aws_lambda_python_packager.cli.build.compile_python_callback">compile_python_callback() (in module aws_lambda_python_packager.cli.build)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.compress_boto">compress_boto() (aws_lambda_python_packager.lambda_packager.LambdaPackager method)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.copy_from_target">copy_from_target() (aws_lambda_python_packager.dep_analyzer.DepAnalyzer method)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.copy_from_temp_dir">copy_from_temp_dir() (aws_lambda_python_packager.dep_analyzer.DepAnalyzer method)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.copy_to_temp_dir">copy_to_temp_dir() (aws_lambda_python_packager.dep_analyzer.DepAnalyzer method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="D">D</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer">DepAnalyzer (class in aws_lambda_python_packager.dep_analyzer)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.direct_dependencies">direct_dependencies() (aws_lambda_python_packager.dep_analyzer.DepAnalyzer method)</a>
-
-      <ul>
-        <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.pip_analyzer.PipAnalyzer.direct_dependencies">(aws_lambda_python_packager.pip_analyzer.PipAnalyzer method)</a>
-</li>
-        <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.direct_dependencies">(aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="E">E</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.export_requirements">export_requirements() (aws_lambda_python_packager.dep_analyzer.DepAnalyzer method)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.exported_requirements">exported_requirements() (aws_lambda_python_packager.dep_analyzer.DepAnalyzer method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.extra_lines">extra_lines (aws_lambda_python_packager.dep_analyzer.DepAnalyzer property)</a>
-
-      <ul>
-        <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.pip_analyzer.PipAnalyzer.extra_lines">(aws_lambda_python_packager.pip_analyzer.PipAnalyzer property)</a>
-</li>
-      </ul></li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.ExtraLine">ExtraLine (class in aws_lambda_python_packager.dep_analyzer)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="F">F</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.aws_wrangler.fetch_package">fetch_package() (in module aws_lambda_python_packager.aws_wrangler)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="G">G</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.aws_wrangler.get_all_versions">get_all_versions() (in module aws_lambda_python_packager.aws_wrangler)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.get_aws_wrangler_pyarrow">get_aws_wrangler_pyarrow() (aws_lambda_python_packager.lambda_packager.LambdaPackager method)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.util.get_glue_libraries">get_glue_libraries() (in module aws_lambda_python_packager.util)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.get_layer_files">get_layer_files() (aws_lambda_python_packager.dep_analyzer.DepAnalyzer method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.pip_analyzer.get_packages">get_packages() (in module aws_lambda_python_packager.pip_analyzer)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.get_requirements">get_requirements() (aws_lambda_python_packager.dep_analyzer.DepAnalyzer method)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.get_strip_binary">get_strip_binary() (in module aws_lambda_python_packager.lambda_packager)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.get_total_size">get_total_size() (aws_lambda_python_packager.lambda_packager.LambdaPackager method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="I">I</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.install_dependencies">install_dependencies() (aws_lambda_python_packager.dep_analyzer.DepAnalyzer method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.install_root">install_root() (aws_lambda_python_packager.dep_analyzer.DepAnalyzer method)</a>
-
-      <ul>
-        <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.install_root">(aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="L">L</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    lambda-packager command line option
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-v">--verbosity</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-V">--version</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-v">-v</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-V">-V</a>
-</li>
-      </ul></li>
-      <li>
-    lambda-packager-build command line option
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-a">--architecture</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-compile-python">--compile-python</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-compress-boto">--compress-boto</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-export-requirements">--export-requirements</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-ignore-additional">--ignore-additional</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-ignore-from-glue">--ignore-from-glue</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-ignore-packages">--ignore-packages</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-ignore-unsupported-python">--ignore-unsupported-python</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-compile-python">--no-compile-python</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-compress-boto">--no-compress-boto</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-ignore-packages">--no-ignore-packages</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-strip-libraries">--no-strip-libraries</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-strip-other">--no-strip-other</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-strip-python">--no-strip-python</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-strip-tests">--no-strip-tests</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-update-dependencies">--no-update-dependencies</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-use-aws-pyarrow">--no-use-aws-pyarrow</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-O">--optimize-all</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-pyv">--python-version</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-region">--region</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-strip-libraries">--strip-libraries</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-strip-other">--strip-other</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-strip-python">--strip-python</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-strip-tests">--strip-tests</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-update-dependencies">--update-dependencies</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-use-aws-pyarrow">--use-aws-pyarrow</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-z">--zip-output</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-a">-a</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-O">-O</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-pyv">-pyv</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-z">-z</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-arg-OUTPUT_PATH">OUTPUT_PATH</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-arg-PROJECT_PATH">PROJECT_PATH</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    lambda-packager-unify command line option
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-unify-output-package-name">--output-package-name</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-unify-output-package-version">--output-package-version</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-unify-arg-BUNDLE_PATH">BUNDLE_PATH</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-unify-arg-OUTPUT_PATH">OUTPUT_PATH</a>
-</li>
-      </ul></li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager">LambdaPackager (class in aws_lambda_python_packager.lambda_packager)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.layer_dir">layer_dir (aws_lambda_python_packager.lambda_packager.LambdaPackager attribute)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.load_toml">load_toml() (aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer method)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.lock">lock() (aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer method)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.locked">locked() (aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="M">M</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.cli.html#aws_lambda_python_packager.cli.unify.many_linux_sub">many_linux_sub() (in module aws_lambda_python_packager.cli.unify)</a>
-</li>
-      <li>
-    module
-
-      <ul>
-        <li><a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager">aws_lambda_python_packager</a>
-</li>
-        <li><a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager.aws_wrangler">aws_lambda_python_packager.aws_wrangler</a>
-</li>
-        <li><a href="aws_lambda_python_packager.cli.html#module-aws_lambda_python_packager.cli">aws_lambda_python_packager.cli</a>
-</li>
-        <li><a href="aws_lambda_python_packager.cli.html#module-aws_lambda_python_packager.cli.build">aws_lambda_python_packager.cli.build</a>
-</li>
-        <li><a href="aws_lambda_python_packager.cli.html#module-aws_lambda_python_packager.cli.unify">aws_lambda_python_packager.cli.unify</a>
-</li>
-        <li><a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager.dep_analyzer">aws_lambda_python_packager.dep_analyzer</a>
-</li>
-        <li><a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager.lambda_packager">aws_lambda_python_packager.lambda_packager</a>
-</li>
-        <li><a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager.pip_analyzer">aws_lambda_python_packager.pip_analyzer</a>
-</li>
-        <li><a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager.poetry_analyzer">aws_lambda_python_packager.poetry_analyzer</a>
-</li>
-        <li><a href="aws_lambda_python_packager.html#module-aws_lambda_python_packager.util">aws_lambda_python_packager.util</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="N">N</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.PackageInfo.name">name (aws_lambda_python_packager.dep_analyzer.PackageInfo attribute)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="O">O</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.aws_wrangler.open_zip_file">open_zip_file() (in module aws_lambda_python_packager.aws_wrangler)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.cli.html#aws_lambda_python_packager.cli.build.optimize_callback">optimize_callback() (in module aws_lambda_python_packager.cli.build)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    OUTPUT_PATH
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-arg-OUTPUT_PATH">lambda-packager-build command line option</a>
-</li>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-unify-arg-OUTPUT_PATH">lambda-packager-unify command line option</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="P">P</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.package">package() (aws_lambda_python_packager.lambda_packager.LambdaPackager method)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.PackageInfo">PackageInfo (class in aws_lambda_python_packager.dep_analyzer)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.cli.html#aws_lambda_python_packager.cli.unify.pad_many_linux">pad_many_linux() (in module aws_lambda_python_packager.cli.unify)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.pip_analyzer.PipAnalyzer">PipAnalyzer (class in aws_lambda_python_packager.pip_analyzer)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.pkgs_to_ignore">pkgs_to_ignore (aws_lambda_python_packager.dep_analyzer.DepAnalyzer property)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.pkgs_to_ignore_dict">pkgs_to_ignore_dict (aws_lambda_python_packager.dep_analyzer.DepAnalyzer property)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.pkgs_to_ignore_info">pkgs_to_ignore_info (aws_lambda_python_packager.dep_analyzer.DepAnalyzer property)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer">PoetryAnalyzer (class in aws_lambda_python_packager.poetry_analyzer)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.process_requirements">process_requirements() (aws_lambda_python_packager.dep_analyzer.DepAnalyzer class method)</a>
-</li>
-      <li>
-    PROJECT_PATH
-
-      <ul>
-        <li><a href="lambda-packager.html#cmdoption-lambda-packager-build-arg-PROJECT_PATH">lambda-packager-build command line option</a>
-</li>
-      </ul></li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.project_root">project_root (aws_lambda_python_packager.dep_analyzer.DepAnalyzer attribute)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="R">R</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.requirements">requirements (aws_lambda_python_packager.dep_analyzer.DepAnalyzer property)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.run_command">run_command() (aws_lambda_python_packager.dep_analyzer.DepAnalyzer method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.run_pip">run_pip() (aws_lambda_python_packager.dep_analyzer.DepAnalyzer method)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.run_poetry">run_poetry() (aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="S">S</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.set_utime">set_utime() (aws_lambda_python_packager.lambda_packager.LambdaPackager method)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.sizeof_fmt">sizeof_fmt() (in module aws_lambda_python_packager.lambda_packager)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.strip_libraries">strip_libraries() (aws_lambda_python_packager.lambda_packager.LambdaPackager method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.strip_other_files">strip_other_files() (aws_lambda_python_packager.lambda_packager.LambdaPackager method)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.strip_python">strip_python() (aws_lambda_python_packager.lambda_packager.LambdaPackager method)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.cli.html#aws_lambda_python_packager.cli.build.strip_python_callback">strip_python_callback() (in module aws_lambda_python_packager.cli.build)</a>
-</li>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.strip_tests">strip_tests() (aws_lambda_python_packager.lambda_packager.LambdaPackager method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="T">T</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.aws_wrangler.to_version">to_version() (in module aws_lambda_python_packager.aws_wrangler)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="U">U</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.DepAnalyzer.update_dependency_file">update_dependency_file() (aws_lambda_python_packager.dep_analyzer.DepAnalyzer method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="V">V</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.PackageInfo.version">version (aws_lambda_python_packager.dep_analyzer.PackageInfo attribute)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.dep_analyzer.PackageInfo.version_spec">version_spec (aws_lambda_python_packager.dep_analyzer.PackageInfo attribute)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="Z">Z</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.zip_output">zip_output() (aws_lambda_python_packager.lambda_packager.LambdaPackager method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-
-
-          </article>
-        </div>
-      </div>
-    </main>
-  </div>
-  <footer class="md-footer">
-    <div class="md-footer-nav">
-      <nav class="md-footer-nav__inner md-grid">
-          
-          
-        </a>
-        
-      </nav>
-    </div>
-    <div class="md-footer-meta md-typeset">
-      <div class="md-footer-meta__inner md-grid">
-        <div class="md-footer-copyright">
-          <div class="md-footer-copyright__highlight">
-              &#169; Copyright 2022, Daniel Sullivan.
+            
               
-          </div>
-            Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
-             and
-            <a href="https://github.com/bashtage/sphinx-material/">Material for
-              Sphinx</a>
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset" role="main">
+                  
+
+
+None
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
         </div>
-      </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  
+  
+  <div class="md-footer-meta md-typeset">
+    
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-footer-copyright__highlight">
+        &#169; Copyright 2023, Daniel Sullivan.
+        
     </div>
-  </footer>
-  <script src="_static/javascripts/application.js"></script>
-  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  
+    Created using
+    <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
+    6.1.3.
+     and
+    <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
+  
+</div>
+      
+    </div>
+    
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": ".", "features": [], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+      
+        <script src="_static/sphinx_immaterial_theme.cea6a0c1d5b0618cf.min.js"></script>
+    
   </body>
 </html>
