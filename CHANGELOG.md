@@ -5,6 +5,8 @@
 
 ### Fix
 
+  * [2023-03-08](d3ba18bf50f589590d51375d3d38599278097469) – Remove secure test.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
+
   * [2023-03-08](e68766f3430a10c8c638a0607f55ff77556fc8a9) – Github workflows.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
 
   * [2023-03-08](a8fcfbd6b7472a1b2ee8d391a96f3c6073d4f8d4) – Github workflows.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
