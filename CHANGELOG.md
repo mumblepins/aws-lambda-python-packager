@@ -1,9 +1,11 @@
 # Changelog
 
 
-## (unreleased)
+## v1.3.4 (2023-03-09)
 
 ### Fix
+
+  * [2023-03-08](7674177e9157c7e4779f4895a20e7dac1fa66ef6) – Docs.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
 
   * [2023-03-08](d3ba18bf50f589590d51375d3d38599278097469) – Remove secure test.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
 
