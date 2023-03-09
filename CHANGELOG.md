@@ -1,9 +1,11 @@
 # Changelog
 
 
-## (unreleased)
+## v1.3.5 (2023-03-09)
 
 ### Fix
+
+  * [2023-03-09](ad69670d11e4348f1e93e02f43cdd2e7845f829b) – Pyarrow things?  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
 
   * [2023-03-09](0c367b3bf6b6e6321361b962c71af861d626ebfc) – Disable pytest parallel.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
 
