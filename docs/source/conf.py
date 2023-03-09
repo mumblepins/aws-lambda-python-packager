@@ -103,7 +103,7 @@ html_theme_options = {
     },
     # Set the repo location to get a badge with stats
     "repo_url": "https://github.com/mumblepins/aws-lambda-python-packager/",
-    "repo_name": "Template Python Library",
+    "repo_name": "AWS Lambda Python Packager",
     "repo_type": "github",
     "icon": {
         "repo": "fontawesome/brands/github",
