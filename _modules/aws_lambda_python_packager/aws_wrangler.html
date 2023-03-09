@@ -13,7 +13,7 @@
     
     
       
-        <title>aws_lambda_python_packager.aws_wrangler - aws-lambda-python-packager v1.3.3 documentation</title>
+        <title>aws_lambda_python_packager.aws_wrangler - aws-lambda-python-packager v1.3.4 documentation</title>
       
     
     
@@ -71,7 +71,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="aws-lambda-python-packager v1.3.3 documentation" class="md-header__button md-logo" aria-label="aws-lambda-python-packager v1.3.3 documentation" data-md-component="logo">
+    <a href="../../index.html" title="aws-lambda-python-packager v1.3.4 documentation" class="md-header__button md-logo" aria-label="aws-lambda-python-packager v1.3.4 documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -83,7 +83,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            aws-lambda-python-packager v1.3.3 documentation
+            aws-lambda-python-packager v1.3.4 documentation
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -170,12 +170,12 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="aws-lambda-python-packager v1.3.3 documentation" class="md-nav__button md-logo" aria-label="aws-lambda-python-packager v1.3.3 documentation" data-md-component="logo">
+    <a href="../../index.html" title="aws-lambda-python-packager v1.3.4 documentation" class="md-nav__button md-logo" aria-label="aws-lambda-python-packager v1.3.4 documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
     </a>
-    aws-lambda-python-packager v1.3.3 documentation
+    aws-lambda-python-packager v1.3.4 documentation
   </label>
   
     <div class="md-nav__source">
@@ -273,7 +273,7 @@
 <span class="n">AWS_WRANGLER_RELEASES</span> <span class="o">=</span> <span class="s2">&quot;https://api.github.com/repos/awslabs/aws-data-wrangler/releases&quot;</span>
 <span class="n">AWS_LAYER_VERSION_URL</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/awslabs/aws-data-wrangler/releases/download/</span><span class="si">{version}</span><span class="s2">/awswrangler-layer-</span><span class="si">{version}</span><span class="s2">-py</span><span class="si">{python_version}{arch}</span><span class="s2">.zip&quot;</span>
 <span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-<span class="n">CACHE_METHOD</span> <span class="o">=</span> <span class="s2">&quot;blockcache&quot;</span>
+<span class="n">CACHE_METHODS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;blockcache&quot;</span><span class="p">,</span> <span class="s2">&quot;simplecache&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="to_version"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.aws_wrangler.to_version">[docs]</a><span class="k">def</span> <span class="nf">to_version</span><span class="p">(</span><span class="n">version</span><span class="p">):</span>
@@ -308,7 +308,8 @@
 
 <div class="viewcode-block" id="open_zip_file"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.aws_wrangler.open_zip_file">[docs]</a><span class="nd">@contextmanager</span>
 <span class="k">def</span> <span class="nf">open_zip_file</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">cache_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;blockcache&quot;</span><span class="p">,</span> <span class="s2">&quot;simplecache&quot;</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">cache_type</span> <span class="ow">in</span> <span class="n">CACHE_METHODS</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">cache_type</span><span class="p">)</span>
         <span class="n">f</span> <span class="o">=</span> <span class="n">z</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">fs</span> <span class="o">=</span> <span class="n">fsspec</span><span class="o">.</span><span class="n">filesystem</span><span class="p">(</span>
