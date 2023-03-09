@@ -68,8 +68,9 @@ jobs:
       - name: run tests
         run: |
           poetry run pytest "tests/" \
-          -n 1 \
-          --dist no \
+          -n 4 \
+          --dist worksteal \
+          --reruns 3 \
           --verbose  \
           --cov=aws_lambda_python_packager \
           --pyargs "aws_lambda_python_packager" \

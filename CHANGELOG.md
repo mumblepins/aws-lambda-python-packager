@@ -1,6 +1,13 @@
 # Changelog
 
 
+## (unreleased)
+
+### Fix
+
+  * [2023-03-09](0c367b3bf6b6e6321361b962c71af861d626ebfc) – Disable pytest parallel.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
+
+
 ## v1.3.4 (2023-03-09)
 
 ### Fix

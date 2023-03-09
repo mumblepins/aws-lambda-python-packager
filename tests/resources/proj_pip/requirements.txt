@@ -3,4 +3,5 @@
 awswrangler
 
 boto3==1.20.32
+pyarrow==7.0.0
 test-package-202206161624001

@@ -9,6 +9,7 @@ packages = [{ include = 'test_package' }]
 python = ">=3.8,<3.11"
 awswrangler = "*"
 boto3 = "1.20.32"
+pyarrow = "7.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.1.0a7"]

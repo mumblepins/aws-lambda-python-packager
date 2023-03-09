@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 from click.testing import CliRunner
 
+from aws_lambda_python_packager import aws_wrangler
 from aws_lambda_python_packager.__main__ import main
 from aws_lambda_python_packager.lambda_packager import LambdaPackager
 
@@ -111,15 +112,14 @@ def test_optimize(arch, pyarch, temp_path_filled):
 
 
 @pytest.mark.parametrize("arch,pyarch", architectures)
-def test_full_optimize(arch, pyarch, temp_path_filled):
+def test_full_optimize(arch, pyarch, temp_path_filled, monkeypatch):
+    monkeypatch.setattr(aws_wrangler, "CACHE_METHODS", ("simplecache",))
     src, dst, _ = temp_path_filled
     runner = CliRunner()
     result = runner.invoke(
         main, ["-v", "INFO", "build", "-OOOOO", "--architecture", arch, str(src), str(dst)]
     )
-    # main_args([str(a) for a in ["-v", "-O", "--architecture", arch, src, dst]])
     assert result.exit_code == 0
-    # main_args([str(a) for a in ["-v", "-OO", "--architecture", arch, src, dst]])
     pyarrow_file = list(dst.glob("**/pyarrow/**/libarrow.so.*"))[0]
     assert abs(os.path.getsize(pyarrow_file) - LIBARROW_SO_WR_SIZE) < LIBARROW_SO_WIGGLE
     # make sure we are using the aws wrangler version

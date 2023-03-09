@@ -336,9 +336,7 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
         return ret
 
     def run_pip(self, *args, return_state=False, quiet=False, context=None):
-        self.run_command(
-            "python", "-m", "pip", *args, return_state=return_state, quiet=quiet, context=context
-        )
+        self.run_command("pip", *args, return_state=return_state, quiet=quiet, context=context)
 
     def install_dependencies(self, quiet=True):
         pip_command = [

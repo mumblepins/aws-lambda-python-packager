@@ -1273,6 +1273,22 @@ importlib-metadata = {version = ">=3.6.0", markers = "python_version < \"3.10\""
 pytest = "*"
 
 [[package]]
+name = "pytest-rerunfailures"
+version = "11.1.2"
+description = "pytest plugin to re-run tests to eliminate flaky failures"
+category = "dev"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "pytest-rerunfailures-11.1.2.tar.gz", hash = "sha256:55611661e873f1cafa384c82f08d07883954f4b76435f4b8a5b470c1954573de"},
+    {file = "pytest_rerunfailures-11.1.2-py3-none-any.whl", hash = "sha256:d21fe2e46d9774f8ad95f1aa799544ae95cac3a223477af94aa985adfae92b7e"},
+]
+
+[package.dependencies]
+packaging = ">=17.1"
+pytest = ">=5.3"
+
+[[package]]
 name = "pytest-xdist"
 version = "3.2.0"
 description = "pytest xdist plugin for distributed testing, most importantly across multiple CPUs"
@@ -1884,4 +1900,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "5aab78fa14f82844c1522ca674bb99526b51d34852f509493181213f5a1a1fb0"
+content-hash = "a7b0478a3f254d1d5032cfe463a33b2284ac53b9de3672c1cccb81b36cd9280a"

@@ -17,7 +17,7 @@ from packaging.version import InvalidVersion, Version
 AWS_WRANGLER_RELEASES = "https://api.github.com/repos/awslabs/aws-data-wrangler/releases"
 AWS_LAYER_VERSION_URL = "https://github.com/awslabs/aws-data-wrangler/releases/download/{version}/awswrangler-layer-{version}-py{python_version}{arch}.zip"
 LOG = logging.getLogger(__name__)
-CACHE_METHOD = "blockcache"
+CACHE_METHODS = ("blockcache", "simplecache")
 
 
 def to_version(version):
@@ -52,7 +52,8 @@ def get_all_versions(python_version="3.9", arch="x86_64"):
 
 @contextmanager
 def open_zip_file(url, file):
-    for cache_type in ("blockcache", "simplecache"):
+    for cache_type in CACHE_METHODS:
+        print(cache_type)
         f = z = None
         try:
             fs = fsspec.filesystem(
