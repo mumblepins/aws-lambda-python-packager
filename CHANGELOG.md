@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.3.7 (2023-03-16)
+
+### Other
+
+  * [2023-03-16](c54a6fe388ac95c32728adfda38b55992d7f58d3) – Ci: add SAST.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
+
+
 ## v1.3.6 (2023-03-16)
 
 ### Other
