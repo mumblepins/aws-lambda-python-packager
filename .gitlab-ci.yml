@@ -1,42 +1,56 @@
-build:
-  stage: build
-  variables:
-    POETRY_HTTP_BASIC_NEXUS_USERNAME: "${NEXUS_USERNAME}"
-    POETRY_HTTP_BASIC_NEXUS_PASSWORD: "${NEXUS_PASSWORD}"
-    POETRY_REPOSITORIES_NEXUS: "${NEXUS_URL}"
-    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-    POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/poetry"
-    PRE_COMMIT_HOME: "$CI_PROJECT_DIR/.cache/pre-commit"
-  cache:
-    paths:
-      - ".cache"
-    key: python-default-$CI_PROJECT_ROOT_NAMESPACE
-    untracked: true
-    when: always
+image: python:3.9
 
-  before_script:
-    - ln -s "$(command -v python3)" /usr/local/bin/python || true
-    - python -VV
-    - echo -e "\e[0Ksection_start:`date +%s`:install_pip[collapsed=true]\r\e[0KInstall Pip Packages"
-    - pip install poetry pre-commit
-    - echo -e "\e[0Ksection_end:`date +%s`:install_pip\r\e[0K"
-    - echo -e "\e[0Ksection_start:`date +%s`:install_poetry[collapsed=true]\r\e[0KInstall Poetry Packages"
-    - poetry install --sync
-    - echo -e "\e[0Ksection_end:`date +%s`:install_poetry\r\e[0K"
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/poetry"
+  PRE_COMMIT_HOME: "$CI_PROJECT_DIR/.cache/pre-commit"
+
+cache:
+  paths:
+    - .cache/pip
+    - .cache/poetry
+    - .cache/pre-commit
+
+before_script:
+  - python -VV
+  - pip install poetry pre-commit
+  - poetry install --sync
+
+pre_commit:
   script:
-    - echo -e "\e[0Ksection_start:`date +%s`:run_pre_commit[collapsed=true]\r\e[0KPre-Commit Linting and Testing"
-    - poetry run pre-commit run --all-files --hook-stage manual
-    - echo -e "\e[0Ksection_end:`date +%s`:run_pre_commit\r\e[0K"
-    - poetry build
-    - if [[ "$CI_COMMIT_TAG" != "" ]]; then
-      poetry config repositories.nexus "${POETRY_REPOSITORIES_NEXUS}";
-      poetry publish -r nexus --skip-existing;
-      else
-      echo "Not tagged release; not uploading";
-      fi
-
+    - poetry run pre-commit run --all-files
   coverage: '/Total coverage: \d+\.\d+%/'
   artifacts:
     paths:
-      - dist
       - htmlcov
+
+test:
+  script:
+    - poetry run pytest "tests/" \
+      -n 4 \
+      --dist worksteal \
+      --reruns 3 \
+      --verbose  \
+      --cov=aws_lambda_python_packager \
+      --pyargs "aws_lambda_python_packager" \
+      --cov-report=html --cov-report=term --cov-report=xml
+
+build:
+  needs:
+    - pre_commit
+    - test
+  script:
+    - poetry build
+  artifacts:
+    paths:
+      - dist
+
+publish:
+  needs:
+    - build
+  script:
+    - rm -rf dist
+    - poetry build
+    - twine upload dist/*.whl
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/
