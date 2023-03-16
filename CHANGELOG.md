@@ -1,9 +1,11 @@
 # Changelog
 
 
-## (unreleased)
+## v1.3.6 (2023-03-16)
 
 ### Other
+
+  * [2023-03-16](8b0f866f67e723928e5b50ca76f51977da3d841e) – Ci: pipeline gitlab.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
 
   * [2023-03-16](7179ce604ce06e1b3606538f09bf4780685fe7e4) – Ci: pipeline gitlab.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
 
