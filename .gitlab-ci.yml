@@ -23,12 +23,13 @@ pre_commit:
 
 test:
   extends: .base
-  only:
-    changes:
-      - pyproject.toml
-      - poetry.lock
-      - src/**/*
-      - tests/**/*
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      changes:
+        - pyproject.toml
+        - poetry.lock
+        - src/**/*
+        - tests/**/*
   script:
     - poetry run pytest "tests/"
       -n 4
@@ -57,10 +58,11 @@ test:
 build:
   extends: .base
   stage: deploy
-  needs:
-    - pre_commit
   script:
     - poetry build
+  rules:
+    - if: $CI_COMMIT_BRANCH
+
   artifacts:
     paths:
       - dist
@@ -68,8 +70,6 @@ build:
 publish:
   extends: .base
   stage: deploy
-  needs:
-    - build
   script:
     - rm -rf dist
     - poetry build
