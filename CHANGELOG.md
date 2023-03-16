@@ -5,6 +5,8 @@
 
 ### Other
 
+  * [2023-03-16](15e87193ee62854ac4c8e3150096ea5902c8ba20) – Ci: pipeline gitlab.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
+
   * [2023-03-09](321ca7c832884a268d5fbe67d13f2771e600af52) – Docs: repo name fix.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
 
 

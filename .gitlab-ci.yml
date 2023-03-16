@@ -26,13 +26,13 @@ pre_commit:
 
 test:
   script:
-    - poetry run pytest "tests/" \
-      -n 4 \
-      --dist worksteal \
-      --reruns 3 \
-      --verbose  \
-      --cov=aws_lambda_python_packager \
-      --pyargs "aws_lambda_python_packager" \
+    - poetry run pytest "tests/"
+      -n 4
+      --dist worksteal
+      --reruns 3
+      --verbose
+      --cov=aws_lambda_python_packager
+      --pyargs "aws_lambda_python_packager"
       --cov-report=html --cov-report=term --cov-report=xml
 
 build:
