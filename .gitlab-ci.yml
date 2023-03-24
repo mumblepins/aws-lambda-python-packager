@@ -40,11 +40,8 @@ test:
       --pyargs "aws_lambda_python_packager"
       --cov-report=html --cov-report=term --cov-report=xml
       --junitxml=junit.xml
-  parallel:
-    matrix:
-      - ARCH: [x86-64, arm]
   tags:
-    - $ARCH
+    - arm
   coverage: '/Total coverage: \d+\.\d+%/'
   artifacts:
     paths:

@@ -33,7 +33,6 @@ class ExtraLine(list):
 
 
 class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
-
     project_root: Path
 
     analyzer_name: str
@@ -344,7 +343,11 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
             self._target.name,
             "--no-deps",
         ]
-        pip_command.extend(self.export_requirements())
+        reqs = self.export_requirements()
+        if not reqs:
+            self.log.warning("No dependencies to install with pip, skipping")
+            return
+        pip_command.extend(reqs)
         self.log.warning("Installing dependencies using pip")
         self._install_pip(*pip_command, quiet=quiet)
         self.log.warning("Installing dependencies done")
