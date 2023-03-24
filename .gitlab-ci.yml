@@ -1,4 +1,4 @@
-image: python:3.9
+image: 938619397650.dkr.ecr.us-east-2.amazonaws.com/cicd/poetry:3.9
 
 .base:
   variables:
@@ -13,7 +13,7 @@ image: python:3.9
 
   before_script:
     - python -VV
-    - pip install poetry pre-commit
+    - poetry -V
     - poetry install --sync
 
 pre_commit:

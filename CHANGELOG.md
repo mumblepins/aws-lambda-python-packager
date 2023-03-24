@@ -3,6 +3,10 @@
 
 ## (unreleased)
 
+### Fix
+
+  * [2023-03-24](b805dc82c419b3f8e48dad11858d419d3692e1be) – Empty dependencies shouldn't fail.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
+
 ### Other
 
   * [2023-03-16](ba0dfe1662a24c364b15b6ba7852d6c7ccedc300) – Ci: add SAST.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
