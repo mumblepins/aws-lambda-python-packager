@@ -1,9 +1,11 @@
 # Changelog
 
 
-## (unreleased)
+## v1.3.8 (2023-03-24)
 
 ### Fix
+
+  * [2023-03-24](8afbbf022090106ae2db06e3eeec46dc7274ea72) – Precommit.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
 
   * [2023-03-24](b805dc82c419b3f8e48dad11858d419d3692e1be) – Empty dependencies shouldn't fail.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
 
