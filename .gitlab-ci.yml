@@ -10,7 +10,8 @@ image: 938619397650.dkr.ecr.us-east-2.amazonaws.com/cicd/poetry:3.9
       - .cache/pip
       - .cache/poetry
       - .cache/pre-commit
-
+  tags:
+    - arm64
   before_script:
     - python -VV
     - poetry -V

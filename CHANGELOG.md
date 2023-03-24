@@ -9,6 +9,8 @@
 
 ### Other
 
+  * [2023-03-24](a041d8e4ae632f52bf5611ee2760bd399f8b481c) – Ci: change base image.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
+
   * [2023-03-16](ba0dfe1662a24c364b15b6ba7852d6c7ccedc300) – Ci: add SAST.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
 
 
