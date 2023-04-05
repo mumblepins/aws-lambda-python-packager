@@ -1,15 +1,27 @@
-image: 938619397650.dkr.ecr.us-east-2.amazonaws.com/cicd/poetry:3.9
+image: $DOCKER_REPO/cicd/poetry:3.9
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  GIT_DEPTH: "1"
+  GIT_SUBMODULE_DEPTH: "1"
+
+.precommit-cache: &precommit-cache
+  key: precommit
+  paths:
+    - .cache/pre-commit
+  unprotect: true
 
 .base:
   variables:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
     POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/poetry"
     PRE_COMMIT_HOME: "$CI_PROJECT_DIR/.cache/pre-commit"
-  cache:
+  cache: &poetry_cache
+    key: poetry
     paths:
       - .cache/pip
       - .cache/poetry
-      - .cache/pre-commit
+    unprotect: true
+    policy: pull
   tags:
     - arm64
   before_script:
@@ -17,13 +29,26 @@ image: 938619397650.dkr.ecr.us-east-2.amazonaws.com/cicd/poetry:3.9
     - poetry -V
     - poetry install --sync
 
+setup-deps:
+  extends: .base
+  stage: .pre
+  cache:
+    policy: pull-push
+  script:
+    - echo "deps done"
+
 pre_commit:
   extends: .base
+  stage: test
+  cache:
+    - *precommit-cache
+    - *poetry_cache
   script:
     - poetry run pre-commit run --all-files
 
 test:
   extends: .base
+  stage: test
   rules:
     - if: $CI_COMMIT_BRANCH
       changes:
@@ -42,7 +67,7 @@ test:
       --cov-report=html --cov-report=term --cov-report=xml
       --junitxml=junit.xml
   tags:
-    - arm
+    - arm64
   coverage: '/Total coverage: \d+\.\d+%/'
   artifacts:
     paths:
@@ -60,7 +85,6 @@ build:
     - poetry build
   rules:
     - if: $CI_COMMIT_BRANCH
-
   artifacts:
     paths:
       - dist
