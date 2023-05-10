@@ -135,11 +135,13 @@ class LambdaPackager:
             )
             return
         vers_str = "==" + self.analyzer.requirements["pyarrow"].version
+        files_moved = []
+        temp_dir = self.output_dir / "old_pyarrow.bak"
         for p in self.output_dir.glob("pyarrow*"):
-            if p.is_dir():
-                shutil.rmtree(p, ignore_errors=True)
-            else:
-                p.unlink()
+            old_p = p.resolve()
+            new_p = (temp_dir / p.relative_to(self.output_dir)).resolve()
+            shutil.move(old_p, new_p)
+            files_moved.append((old_p, new_p))
         try:
             fetch_package(
                 "pyarrow",
@@ -150,6 +152,10 @@ class LambdaPackager:
             )
         except ValueError:
             LOG.warning("pyarrow version %s not found", vers_str)
+            for old_p, new_p in files_moved:
+                shutil.move(new_p, old_p)
+        finally:
+            shutil.rmtree(temp_dir, ignore_errors=True)
 
     def strip_tests(self):
         LOG.warning("Stripping tests")
