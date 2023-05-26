@@ -1,6 +1,23 @@
 # Changelog
 
 
+## v1.4.0 (2023-05-26)
+
+### Fix
+
+  * [2023-05-26](5062c58b6c89c5809754198b0509e58bf3ec40a0) – Pyarrow version finding location.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
+
+  various code cleanup
+
+  * [2023-05-10](2951163def8da89b0d566a49c6b00ba091b122c3) – Pyarrow behavior on nonexistent wrangler version.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
+
+### Other
+
+  * [2023-05-26](e01b0c537c15f356f194e2a445030d89fb4541f2) – Chore: .gitignore.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
+
+  * [2023-04-05](ea11e5e2b16650b14e54c6f3c897bfdc394ee48b) – Ci: various changes.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
+
+
 ## v1.3.8 (2023-03-24)
 
 ### Fix
