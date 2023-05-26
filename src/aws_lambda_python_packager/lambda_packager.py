@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 AWS Lambda Packager
 
@@ -21,10 +20,9 @@ from datetime import datetime
 from pathlib import Path
 from py_compile import PycInvalidationMode
 from tempfile import TemporaryDirectory
-from typing import List, Optional, Type, Union
 from zipfile import ZIP_DEFLATED, ZipFile
 
-from .aws_wrangler import fetch_package
+from .arrow_fetcher import fetch_arrow_package
 from .dep_analyzer import DepAnalyzer
 from .pip_analyzer import PipAnalyzer
 from .poetry_analyzer import PoetryAnalyzer
@@ -89,7 +87,7 @@ class LambdaPackager:
         self.update_dependencies = update_dependencies
         self.ignore_packages = ignore_packages
         self.split_layer = split_layer
-        analyzer_type: Type[DepAnalyzer]
+        analyzer_type: type[DepAnalyzer]
         if (self.project_path / "pyproject.toml").exists() and not (
             self.project_path / "requirements.txt"
         ).exists():
@@ -134,7 +132,7 @@ class LambdaPackager:
                 "No pyarrow requirement found in requirements.txt, not bothering to get the aws_wrangler version"
             )
             return
-        vers_str = "==" + self.analyzer.requirements["pyarrow"].version
+        vers_str = self.analyzer.requirements["pyarrow"].version
         files_moved = []
         temp_dir = self.output_dir / "old_pyarrow.bak"
         for p in self.output_dir.glob("pyarrow*"):
@@ -143,8 +141,7 @@ class LambdaPackager:
             shutil.move(old_p, new_p)
             files_moved.append((old_p, new_p))
         try:
-            fetch_package(
-                "pyarrow",
+            fetch_arrow_package(
                 self.output_dir,
                 vers_str,
                 python_version=self.python_version.lstrip("python"),
@@ -223,6 +220,7 @@ class LambdaPackager:
                     f.unlink(missing_ok=True)
 
     def strip_libraries(self):
+        # noinspection PyBroadException
         try:
             LOG.warning("Stripping libraries")
             strip_command = get_strip_binary(self.architecture)
@@ -247,7 +245,7 @@ class LambdaPackager:
     def package(  # noqa: C901
         self,
         no_clobber: bool = False,
-        zip_output: Union[bool, str] = False,
+        zip_output: bool | str = False,
         compile_python: bool = False,
         use_wrangler_pyarrow: bool = False,
         strip_tests: bool = False,  # pylint: disable=unused-argument
@@ -327,7 +325,7 @@ class LambdaPackager:
             return self.output_dir / "main", self.output_dir / "layer"
         return self.output_dir, None
 
-    def _layer_splitter(self, layer_paths: List[Path]):
+    def _layer_splitter(self, layer_paths: list[Path]):
         with TemporaryDirectory() as layer_td, TemporaryDirectory() as main_td:
             for lp in layer_paths:
                 lp = self.output_dir / lp
@@ -341,7 +339,7 @@ class LambdaPackager:
             shutil.move(layer_td, layer_dir)
             shutil.move(main_td, main_dir)
 
-    def set_utime(self, set_time: Optional[int] = None):
+    def set_utime(self, set_time: int | None = None):
         if set_time is None:
             set_time = int(datetime(2020, 1, 1, 1, 1).timestamp()) * int(1e9)
         for dirpath, _, filenames in os.walk(self.output_dir):  # noqa: B007

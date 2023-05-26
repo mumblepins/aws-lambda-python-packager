@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 import os
 from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
 
-from aws_lambda_python_packager import aws_wrangler
+from aws_lambda_python_packager import arrow_fetcher
 from aws_lambda_python_packager.__main__ import main
 from aws_lambda_python_packager.lambda_packager import LambdaPackager
 
@@ -14,11 +13,12 @@ resources = Path(os.path.realpath(__file__)).parent / "resources"
 pkg_type_map = {"poetry": "test_package", "pip": "test_app.py"}
 architectures = [("x86_64", "x86_64"), ("arm64", "aarch64")]
 
-URL_LIB_VERSION = "1.26.9"
-BOTO3_VERSION = "1.20.32"
+URL_LIB_VERSION = "1.26.11"
+BOTO3_VERSION = "1.26.90"
 
-LIBARROW_SO_STANDARD_SIZE = 50_547_832
-LIBARROW_SO_WR_SIZE = 22_414_232
+# average of arm and amd sizes
+LIBARROW_SO_STANDARD_SIZE = (56_618_568 + 61_154_136) / 2
+LIBARROW_SO_REDUCED_SIZE = (21_221_768 + 22_727_312) / 2
 LIBARROW_SO_WIGGLE = 10_000_000
 
 
@@ -70,7 +70,7 @@ def test_export_no_ignore_packages_no_update_pyproject(temp_path_filled):
     assert (dst / "botocore").exists()
 
     d_deps = lp.analyzer.direct_dependencies()
-    assert d_deps["boto3"] == "1.20.32"
+    assert d_deps["boto3"] == BOTO3_VERSION
     assert "urllib3" not in d_deps
 
 
@@ -113,7 +113,7 @@ def test_optimize(arch, pyarch, temp_path_filled):
 
 @pytest.mark.parametrize("arch,pyarch", architectures)
 def test_full_optimize(arch, pyarch, temp_path_filled, monkeypatch):
-    monkeypatch.setattr(aws_wrangler, "CACHE_METHODS", ("simplecache",))
+    monkeypatch.setattr(arrow_fetcher, "CACHE_METHODS", ("simplecache",))
     src, dst, _ = temp_path_filled
     runner = CliRunner()
     result = runner.invoke(
@@ -121,7 +121,7 @@ def test_full_optimize(arch, pyarch, temp_path_filled, monkeypatch):
     )
     assert result.exit_code == 0
     pyarrow_file = list(dst.glob("**/pyarrow/**/libarrow.so.*"))[0]
-    assert abs(os.path.getsize(pyarrow_file) - LIBARROW_SO_WR_SIZE) < LIBARROW_SO_WIGGLE
+    assert abs(os.path.getsize(pyarrow_file) - LIBARROW_SO_REDUCED_SIZE) < LIBARROW_SO_WIGGLE
     # make sure we are using the aws wrangler version
     assert len(list(dst.glob("**/pyarrow/**/libarrow_flight.so.*"))) == 0
     numpy_file = list(dst.glob("numpy*dist-info/WHEEL"))[0]

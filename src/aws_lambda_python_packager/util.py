@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 import logging
@@ -146,4 +145,11 @@ def chgenv_cm(**kwargs):
 
 PLATFORMS = get_lambda_runtimes()
 
-__all__ = ["PathType", "PLATFORMS", "chdir_cm", "chgenv_cm", "get_glue_libraries"]
+__all__ = [
+    "PathType",
+    "PLATFORMS",
+    "chdir_cm",
+    "chgenv_cm",
+    "get_glue_libraries",
+    "get_python_runtime",
+]

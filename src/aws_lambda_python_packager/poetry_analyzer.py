@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 import os
@@ -6,7 +5,7 @@ import re
 import shutil
 import tempfile
 from contextlib import contextmanager
-from typing import Dict, Iterable, Union
+from typing import Iterable
 
 import toml
 
@@ -67,7 +66,7 @@ class PoetryAnalyzer(DepAnalyzer):
     def lock(self):
         return self.run_poetry("lock", "--no-update", quiet=True)
 
-    def _get_requirements(self) -> Iterable[Union[PackageInfo, ExtraLine]]:
+    def _get_requirements(self) -> Iterable[PackageInfo | ExtraLine]:
         output_file = None
         if not self.locked():
             self.log.info("Locking dependencies")
@@ -89,7 +88,7 @@ class PoetryAnalyzer(DepAnalyzer):
             if output_file:
                 os.remove(output_file.name)
 
-    def _update_dependency_file(self, pkgs_to_add: Dict[str, PackageInfo]):
+    def _update_dependency_file(self, pkgs_to_add: dict[str, PackageInfo]):
         self.backup_files(["pyproject.toml", "poetry.lock"])
         self.log.debug(
             "Updating pyproject.toml with %s",
@@ -137,13 +136,13 @@ class PoetryAnalyzer(DepAnalyzer):
             self.log.warning("Package not built with poetry, falling back to .py files")
             super().install_root()
 
-    def load_toml(self) -> Dict:
+    def load_toml(self) -> dict:
         pyproject = self.project_root / "pyproject.toml"
         with pyproject.open() as f:
             data = toml.load(f)
             return data
 
-    def _get_credentials(self) -> Dict[str, str]:
+    def _get_credentials(self) -> dict[str, str]:
         t = self.load_toml()
         out = {}
         if (
@@ -163,6 +162,6 @@ class PoetryAnalyzer(DepAnalyzer):
                         out[f"POETRY_HTTP_BASIC_{src_name}_{k}"] = v
         return out
 
-    def direct_dependencies(self) -> Dict[str, str]:
+    def direct_dependencies(self) -> dict[str, str]:
         data = self.load_toml()
         return data["tool"]["poetry"]["dependencies"]

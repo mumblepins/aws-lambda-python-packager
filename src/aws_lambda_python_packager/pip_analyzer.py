@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 import tempfile
 from importlib.metadata import distributions
 from pathlib import Path
-from typing import Dict, Iterable, Union
+from typing import Iterable
 
 from .dep_analyzer import DepAnalyzer, ExtraLine, PackageInfo
 from .util import PathType
@@ -47,7 +46,7 @@ class PipAnalyzer(DepAnalyzer):
         #     raise
         self.copy_to_temp_dir(("requirements.txt",))
 
-    def _get_requirements(self) -> Iterable[Union[PackageInfo, ExtraLine]]:
+    def _get_requirements(self) -> Iterable[PackageInfo | ExtraLine]:
         with tempfile.TemporaryDirectory() as tmpdir:
             self._install_pip(
                 "--only-binary=:all:",
@@ -64,7 +63,6 @@ class PipAnalyzer(DepAnalyzer):
 
     @property
     def extra_lines(self):
-
         self._extra_lines = []
         req_file = self.project_root / "requirements.txt"
         with req_file.open() as f:
@@ -74,14 +72,14 @@ class PipAnalyzer(DepAnalyzer):
                 self._extra_lines.append(line)
         return self._extra_lines
 
-    def _update_dependency_file(self, pkgs_to_add: Dict[str, PackageInfo]):
+    def _update_dependency_file(self, pkgs_to_add: dict[str, PackageInfo]):
         self.backup_files(["requirements.txt"])
         self.log.debug(
             "Updating requirements.txt with %s",
             ", ".join(f"{k}=={v}" for k, v in pkgs_to_add.items()),
         )
         new_lines = []
-        with open(Path(self._temp_proj_dir.name) / "requirements.txt", "r", encoding="utf8") as f:
+        with open(Path(self._temp_proj_dir.name) / "requirements.txt", encoding="utf8") as f:
             for pkg in self.process_requirements(f):
                 if isinstance(pkg, ExtraLine):
                     new_lines.append(" ".join(pkg))
@@ -95,7 +93,7 @@ class PipAnalyzer(DepAnalyzer):
             f.write("\n")
         self.copy_from_temp_dir(["requirements.txt"])
 
-    def direct_dependencies(self) -> Dict[str, str]:
+    def direct_dependencies(self) -> dict[str, str]:
         with (self.project_root / "requirements.txt").open() as f:
             ret = {}
             for pkg in self.process_requirements(f):

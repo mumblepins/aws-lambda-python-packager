@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 import logging
@@ -88,7 +87,7 @@ def unify(
         dist_info_dir = pkg_td / f"{output_package_name}-{output_package_version}.dist-info"
         dist_info_dir.mkdir(parents=True, exist_ok=True)
         combine_wheel_files(pkg_td, dist_info_dir)
-        with open(dist_info_dir / "METADATA", "wt", encoding="utf8") as mfh:
+        with open(dist_info_dir / "METADATA", "w", encoding="utf8") as mfh:
             mfh.write(
                 "\n".join(
                     [

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 import logging
@@ -14,7 +13,7 @@ from contextlib import contextmanager
 from datetime import datetime
 from functools import partial
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Iterable
 
 import requests
 
@@ -52,9 +51,9 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
             self._additional_packages_to_ignore = {}
         else:
             self._additional_packages_to_ignore = additional_packages_to_ignore
-        self._extra_lines: Optional[List[ExtraLine]] = None
+        self._extra_lines: list[ExtraLine] | None = None
         self._exported_reqs = None
-        self._reqs: Optional[Dict[Any, PackageInfo]] = None
+        self._reqs: dict[Any, PackageInfo] | None = None
         self._pkgs_to_ignore_dict = None
         if project_root is None:
             self.project_root = Path.cwd()
@@ -91,15 +90,15 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
 
     # region abstract methods
     @abstractmethod
-    def _get_requirements(self) -> Iterable[Union[PackageInfo, ExtraLine]]:
+    def _get_requirements(self) -> Iterable[PackageInfo | ExtraLine]:
         pass
 
     @abstractmethod
-    def _update_dependency_file(self, pkgs_to_add: Dict[str, PackageInfo]):
+    def _update_dependency_file(self, pkgs_to_add: dict[str, PackageInfo]):
         pass
 
     @abstractmethod
-    def direct_dependencies(self) -> Dict[str, str]:
+    def direct_dependencies(self) -> dict[str, str]:
         pass
 
     # endregion
@@ -132,7 +131,7 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
         return {k: PackageInfo(k, v, f"{k}=={v}") for k, v in self.pkgs_to_ignore_dict.items()}
 
     @property
-    def requirements(self) -> Dict[str, PackageInfo]:
+    def requirements(self) -> dict[str, PackageInfo]:
         if self._reqs is None:
             self.log.warning("Exporting requirements")
             reqs = self.update_dependency_file()
@@ -217,14 +216,12 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
     # endregion
 
     # region public methods
-    def get_requirements(self) -> Iterable[Union[PackageInfo, ExtraLine]]:
+    def get_requirements(self) -> Iterable[PackageInfo | ExtraLine]:
         self.log.info("Getting requirements info using %s", self.analyzer_name)
         return self._get_requirements()
 
     @classmethod
-    def process_requirements(
-        cls, requirements: Iterable[str]
-    ) -> Iterable[Union[PackageInfo, ExtraLine]]:
+    def process_requirements(cls, requirements: Iterable[str]) -> Iterable[PackageInfo | ExtraLine]:
         for line in requirements:
             if line.startswith("#") or line.strip() == "":
                 continue
@@ -239,7 +236,7 @@ class DepAnalyzer(ABC):  # pylint: disable=too-many-instance-attributes
 
     def run_command(
         self, *args, return_state=False, quiet=False, prefix=None, context=None
-    ) -> Union[bool, Tuple[str, str]]:
+    ) -> bool | tuple[str, str]:
         if prefix is None:
             prefix = Path(args[0]).name
         self.log.debug("Running command: %s", args)

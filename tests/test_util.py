@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from aws_lambda_python_packager.util import PLATFORMS, get_python_runtime
 
 

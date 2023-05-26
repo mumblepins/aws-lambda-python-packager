@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 import logging
@@ -225,6 +224,6 @@ def build(
     )
     if export_requirements:
         print(export_requirements)
-        with open(export_requirements, "wt", encoding="utf8") as f:
+        with open(export_requirements, "w", encoding="utf8") as f:
             for pkg in lp.analyzer.export_requirements():
                 f.write(pkg + "\n")
