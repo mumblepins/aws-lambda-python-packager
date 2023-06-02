@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.4.1 (2023-06-02)
+
+### Fix
+
+  * [2023-06-02](6824794349546f1d34d2c560c16e9ec379ee0b49) – Change default enforcement of lambda runtime versions.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
+
+
 ## v1.4.0 (2023-05-26)
 
 ### Fix
