@@ -56,7 +56,7 @@ class LambdaPackager:
         ignore_packages: bool = False,
         split_layer: bool = False,
         additional_packages_to_ignore: dict | None = None,
-        ignore_unsupported_python: bool = False,
+        ignore_unsupported_python: bool = True,
     ):  # pylint: disable=too-many-arguments
         """Initialize the Lambda Packager
 
