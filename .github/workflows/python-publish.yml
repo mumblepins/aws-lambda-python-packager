@@ -76,7 +76,7 @@ jobs:
           --cov=aws_lambda_python_packager \
           --pyargs "aws_lambda_python_packager" \
           --cov-report=html --cov-report=term --cov-report=xml
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
         with:
           files: ./coverage.xml
           env_vars: OS,PYTHON
