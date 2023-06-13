@@ -1,6 +1,13 @@
 # Changelog
 
 
+## v1.4.2 (2023-06-13)
+
+### Fix
+
+  * [2023-06-13](06f58ebfb5b095bbdd50667f634677db0ea3c1a8) – Changed caching on fsspec.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
+
+
 ## v1.4.1 (2023-06-02)
 
 ### Fix
