@@ -4,7 +4,6 @@ from pathlib import Path
 import pytest
 from click.testing import CliRunner
 
-from aws_lambda_python_packager import arrow_fetcher
 from aws_lambda_python_packager.__main__ import main
 from aws_lambda_python_packager.lambda_packager import LambdaPackager
 
@@ -112,8 +111,7 @@ def test_optimize(arch, pyarch, temp_path_filled):
 
 
 @pytest.mark.parametrize("arch,pyarch", architectures)
-def test_full_optimize(arch, pyarch, temp_path_filled, monkeypatch):
-    monkeypatch.setattr(arrow_fetcher, "CACHE_METHODS", ("simplecache",))
+def test_full_optimize(arch, pyarch, temp_path_filled):
     src, dst, _ = temp_path_filled
     runner = CliRunner()
     result = runner.invoke(

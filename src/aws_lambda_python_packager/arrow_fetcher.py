@@ -2,6 +2,7 @@ import logging
 import shutil
 import tarfile
 import tempfile
+from collections.abc import Generator
 from contextlib import contextmanager, suppress
 from pathlib import Path
 from typing import Optional, Union
@@ -12,7 +13,6 @@ from appdirs import user_cache_dir
 
 PYARROW_BUILDER_RELEASES = "https://api.github.com/repos/mumblepins/pyarrow-builder/releases/tags/{arrow_version}-py{python_version}"
 LOG = logging.getLogger(__name__)
-CACHE_METHODS = ("blockcache", "simplecache")
 
 
 def get_arrow_version(arrow_version: str, python_version: str, arch: str) -> Optional[str]:
@@ -36,27 +36,38 @@ def get_arrow_version(arrow_version: str, python_version: str, arch: str) -> Opt
 
 
 @contextmanager
-def open_zip_file(url):
-    for cache_type in CACHE_METHODS:
-        print(cache_type)
+def open_zip_file(url: object) -> Generator[tarfile.TarFile, None, None]:
+    for filesystem_type in (
+        {
+            "args": ("simplecache",),
+            "kwargs": {
+                "target_protocol": "http",
+                "cache_storage": str(
+                    (Path(user_cache_dir("lambda-packager")) / "simplecache").resolve()
+                ),
+            },
+        },
+        {
+            "args": ("http",),
+            "kwargs": {},
+        },
+    ):
         f = z = None
         try:
-            fs = fsspec.filesystem(
-                cache_type,
-                target_protocol="http",
-                cache_storage=str((Path(user_cache_dir("lambda-packager")) / cache_type).resolve()),
-            )
+            fs = fsspec.filesystem(*filesystem_type["args"], **filesystem_type["kwargs"])
             f = fs.open(url, "rb")
             z = tarfile.open(fileobj=f)
             yield z
-        except KeyError:
+        except (KeyError, AttributeError):
             continue
         else:
             break
         finally:
             with suppress(NameError, KeyError, AttributeError):
-                z.close()
-                f.close()
+                if z is not None:
+                    z.close()
+                if f is not None:
+                    f.close()
 
 
 def fetch_arrow_package(
