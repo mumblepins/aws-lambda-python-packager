@@ -1,6 +1,19 @@
 # Changelog
 
 
+## v1.4.3 (2023-06-13)
+
+### Fix
+
+  * [2023-06-13](fec3b2a3dd68adb1bbd6c7b2c8a4e88fa22e2ace) – Py3.8 typing.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
+
+  * [2023-06-13](968c0589f48690cf5a8e4920102dd8a39ebc052f) – Apt-get update.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
+
+### Other
+
+  * [2023-06-13](90147fbfd3e499458b38569a718d97c0125a4406) – Ci: bump codecov version.  <small>([Daniel Sullivan](mailto:mumblepins@users.noreply.github.com))</small>
+
+
 ## v1.4.2 (2023-06-13)
 
 ### Fix
