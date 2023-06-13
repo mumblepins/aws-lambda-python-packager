@@ -13,7 +13,7 @@
     
     
       
-        <title>aws_lambda_python_packager.lambda_packager - aws-lambda-python-packager v1.3.5 documentation</title>
+        <title>aws_lambda_python_packager.lambda_packager - aws-lambda-python-packager v1.4.2 documentation</title>
       
     
     
@@ -36,7 +36,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.fa3fbbd75cfdd7cef.min.css" />
+        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.9dcb20399d0097661.min.css" />
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -71,7 +71,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="aws-lambda-python-packager v1.3.5 documentation" class="md-header__button md-logo" aria-label="aws-lambda-python-packager v1.3.5 documentation" data-md-component="logo">
+    <a href="../../index.html" title="aws-lambda-python-packager v1.4.2 documentation" class="md-header__button md-logo" aria-label="aws-lambda-python-packager v1.4.2 documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -83,7 +83,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            aws-lambda-python-packager v1.3.5 documentation
+            aws-lambda-python-packager v1.4.2 documentation
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -170,12 +170,12 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="aws-lambda-python-packager v1.3.5 documentation" class="md-nav__button md-logo" aria-label="aws-lambda-python-packager v1.3.5 documentation" data-md-component="logo">
+    <a href="../../index.html" title="aws-lambda-python-packager v1.4.2 documentation" class="md-nav__button md-logo" aria-label="aws-lambda-python-packager v1.4.2 documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
     </a>
-    aws-lambda-python-packager v1.3.5 documentation
+    aws-lambda-python-packager v1.4.2 documentation
   </label>
   
     <div class="md-nav__source">
@@ -254,8 +254,7 @@
 
 
 <h1>Source code for aws_lambda_python_packager.lambda_packager</h1><div class="highlight"><pre>
-<span></span><code><span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><code><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">AWS Lambda Packager</span>
 
 <span class="sd">This script is used to package the lambda function code into a zip file.</span>
@@ -277,10 +276,9 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">py_compile</span> <span class="kn">import</span> <span class="n">PycInvalidationMode</span>
 <span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">from</span> <span class="nn">zipfile</span> <span class="kn">import</span> <span class="n">ZIP_DEFLATED</span><span class="p">,</span> <span class="n">ZipFile</span>
 
-<span class="kn">from</span> <span class="nn">.aws_wrangler</span> <span class="kn">import</span> <span class="n">fetch_package</span>
+<span class="kn">from</span> <span class="nn">.arrow_fetcher</span> <span class="kn">import</span> <span class="n">fetch_arrow_package</span>
 <span class="kn">from</span> <span class="nn">.dep_analyzer</span> <span class="kn">import</span> <span class="n">DepAnalyzer</span>
 <span class="kn">from</span> <span class="nn">.pip_analyzer</span> <span class="kn">import</span> <span class="n">PipAnalyzer</span>
 <span class="kn">from</span> <span class="nn">.poetry_analyzer</span> <span class="kn">import</span> <span class="n">PoetryAnalyzer</span>
@@ -314,7 +312,7 @@
         <span class="n">ignore_packages</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">split_layer</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">additional_packages_to_ignore</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">ignore_unsupported_python</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">ignore_unsupported_python</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>  <span class="c1"># pylint: disable=too-many-arguments</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the Lambda Packager</span>
 
@@ -345,7 +343,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">update_dependencies</span> <span class="o">=</span> <span class="n">update_dependencies</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ignore_packages</span> <span class="o">=</span> <span class="n">ignore_packages</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">split_layer</span> <span class="o">=</span> <span class="n">split_layer</span>
-        <span class="n">analyzer_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">DepAnalyzer</span><span class="p">]</span>
+        <span class="n">analyzer_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">DepAnalyzer</span><span class="p">]</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="o">/</span> <span class="s2">&quot;pyproject.toml&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="o">/</span> <span class="s2">&quot;requirements.txt&quot;</span>
         <span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
@@ -390,22 +388,27 @@
                 <span class="s2">&quot;No pyarrow requirement found in requirements.txt, not bothering to get the aws_wrangler version&quot;</span>
             <span class="p">)</span>
             <span class="k">return</span>
-        <span class="n">vers_str</span> <span class="o">=</span> <span class="s2">&quot;==&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzer</span><span class="o">.</span><span class="n">requirements</span><span class="p">[</span><span class="s2">&quot;pyarrow&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">version</span>
+        <span class="n">vers_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyzer</span><span class="o">.</span><span class="n">requirements</span><span class="p">[</span><span class="s2">&quot;pyarrow&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">version</span>
+        <span class="n">files_moved</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">temp_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="s2">&quot;old_pyarrow.bak&quot;</span>
         <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;pyarrow*&quot;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
-                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">p</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+            <span class="n">old_p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+            <span class="n">new_p</span> <span class="o">=</span> <span class="p">(</span><span class="n">temp_dir</span> <span class="o">/</span> <span class="n">p</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">))</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">old_p</span><span class="p">,</span> <span class="n">new_p</span><span class="p">)</span>
+            <span class="n">files_moved</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">old_p</span><span class="p">,</span> <span class="n">new_p</span><span class="p">))</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">fetch_package</span><span class="p">(</span>
-                <span class="s2">&quot;pyarrow&quot;</span><span class="p">,</span>
+            <span class="n">fetch_arrow_package</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span>
                 <span class="n">vers_str</span><span class="p">,</span>
                 <span class="n">python_version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">python_version</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;python&quot;</span><span class="p">),</span>
                 <span class="n">arch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">architecture</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;pyarrow version </span><span class="si">%s</span><span class="s2"> not found&quot;</span><span class="p">,</span> <span class="n">vers_str</span><span class="p">)</span></div>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;pyarrow version </span><span class="si">%s</span><span class="s2"> not found&quot;</span><span class="p">,</span> <span class="n">vers_str</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">old_p</span><span class="p">,</span> <span class="n">new_p</span> <span class="ow">in</span> <span class="n">files_moved</span><span class="p">:</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">new_p</span><span class="p">,</span> <span class="n">old_p</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="LambdaPackager.strip_tests"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.strip_tests">[docs]</a>    <span class="k">def</span> <span class="nf">strip_tests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Stripping tests&quot;</span><span class="p">)</span>
@@ -473,6 +476,7 @@
                     <span class="n">f</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="LambdaPackager.strip_libraries"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.strip_libraries">[docs]</a>    <span class="k">def</span> <span class="nf">strip_libraries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># noinspection PyBroadException</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Stripping libraries&quot;</span><span class="p">)</span>
             <span class="n">strip_command</span> <span class="o">=</span> <span class="n">get_strip_binary</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">architecture</span><span class="p">)</span>
@@ -497,7 +501,7 @@
 <div class="viewcode-block" id="LambdaPackager.package"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.package">[docs]</a>    <span class="k">def</span> <span class="nf">package</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">no_clobber</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">zip_output</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">zip_output</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">compile_python</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">use_wrangler_pyarrow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">strip_tests</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># pylint: disable=unused-argument</span>
@@ -577,7 +581,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="s2">&quot;main&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="s2">&quot;layer&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="kc">None</span></div>
 
-    <span class="k">def</span> <span class="nf">_layer_splitter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="nf">_layer_splitter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]):</span>
         <span class="k">with</span> <span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">layer_td</span><span class="p">,</span> <span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">main_td</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">lp</span> <span class="ow">in</span> <span class="n">layer_paths</span><span class="p">:</span>
                 <span class="n">lp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="n">lp</span>
@@ -591,7 +595,7 @@
             <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">layer_td</span><span class="p">,</span> <span class="n">layer_dir</span><span class="p">)</span>
             <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">main_td</span><span class="p">,</span> <span class="n">main_dir</span><span class="p">)</span>
 
-<div class="viewcode-block" id="LambdaPackager.set_utime"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.set_utime">[docs]</a>    <span class="k">def</span> <span class="nf">set_utime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">set_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="LambdaPackager.set_utime"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.lambda_packager.LambdaPackager.set_utime">[docs]</a>    <span class="k">def</span> <span class="nf">set_utime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">set_time</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">set_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">set_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">timestamp</span><span class="p">())</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1e9</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">dirpath</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">):</span>  <span class="c1"># noqa: B007</span>
@@ -657,7 +661,7 @@
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    6.1.3.
+    6.2.1.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
@@ -676,7 +680,7 @@
     <script id="__config" type="application/json">{"base": "../..", "features": [], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
       
-        <script src="../../_static/sphinx_immaterial_theme.cea6a0c1d5b0618cf.min.js"></script>
+        <script src="../../_static/sphinx_immaterial_theme.1b5b7a2d5891aec19.min.js"></script>
     
   </body>
 </html>

@@ -13,7 +13,7 @@
     
     
       
-        <title>aws_lambda_python_packager.poetry_analyzer - aws-lambda-python-packager v1.3.5 documentation</title>
+        <title>aws_lambda_python_packager.poetry_analyzer - aws-lambda-python-packager v1.4.2 documentation</title>
       
     
     
@@ -36,7 +36,7 @@
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
-        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.fa3fbbd75cfdd7cef.min.css" />
+        <link rel="stylesheet" type="text/css" href="../../_static/sphinx_immaterial_theme.9dcb20399d0097661.min.css" />
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -71,7 +71,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../index.html" title="aws-lambda-python-packager v1.3.5 documentation" class="md-header__button md-logo" aria-label="aws-lambda-python-packager v1.3.5 documentation" data-md-component="logo">
+    <a href="../../index.html" title="aws-lambda-python-packager v1.4.2 documentation" class="md-header__button md-logo" aria-label="aws-lambda-python-packager v1.4.2 documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -83,7 +83,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            aws-lambda-python-packager v1.3.5 documentation
+            aws-lambda-python-packager v1.4.2 documentation
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -170,12 +170,12 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../index.html" title="aws-lambda-python-packager v1.3.5 documentation" class="md-nav__button md-logo" aria-label="aws-lambda-python-packager v1.3.5 documentation" data-md-component="logo">
+    <a href="../../index.html" title="aws-lambda-python-packager v1.4.2 documentation" class="md-nav__button md-logo" aria-label="aws-lambda-python-packager v1.4.2 documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
     </a>
-    aws-lambda-python-packager v1.3.5 documentation
+    aws-lambda-python-packager v1.4.2 documentation
   </label>
   
     <div class="md-nav__source">
@@ -254,15 +254,14 @@
 
 
 <h1>Source code for aws_lambda_python_packager.poetry_analyzer</h1><div class="highlight"><pre>
-<span></span><code><span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span></span><code><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span>
 
 <span class="kn">import</span> <span class="nn">toml</span>
 
@@ -323,7 +322,7 @@
 <div class="viewcode-block" id="PoetryAnalyzer.lock"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.lock">[docs]</a>    <span class="k">def</span> <span class="nf">lock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_poetry</span><span class="p">(</span><span class="s2">&quot;lock&quot;</span><span class="p">,</span> <span class="s2">&quot;--no-update&quot;</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_get_requirements</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">PackageInfo</span><span class="p">,</span> <span class="n">ExtraLine</span><span class="p">]]:</span>
+    <span class="k">def</span> <span class="nf">_get_requirements</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">PackageInfo</span> <span class="o">|</span> <span class="n">ExtraLine</span><span class="p">]:</span>
         <span class="n">output_file</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">locked</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Locking dependencies&quot;</span><span class="p">)</span>
@@ -345,7 +344,7 @@
             <span class="k">if</span> <span class="n">output_file</span><span class="p">:</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">output_file</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_update_dependency_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs_to_add</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PackageInfo</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="nf">_update_dependency_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgs_to_add</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PackageInfo</span><span class="p">]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">backup_files</span><span class="p">([</span><span class="s2">&quot;pyproject.toml&quot;</span><span class="p">,</span> <span class="s2">&quot;poetry.lock&quot;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
             <span class="s2">&quot;Updating pyproject.toml with </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
@@ -393,13 +392,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Package not built with poetry, falling back to .py files&quot;</span><span class="p">)</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">install_root</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="PoetryAnalyzer.load_toml"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.load_toml">[docs]</a>    <span class="k">def</span> <span class="nf">load_toml</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<div class="viewcode-block" id="PoetryAnalyzer.load_toml"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.load_toml">[docs]</a>    <span class="k">def</span> <span class="nf">load_toml</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">pyproject</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_root</span> <span class="o">/</span> <span class="s2">&quot;pyproject.toml&quot;</span>
         <span class="k">with</span> <span class="n">pyproject</span><span class="o">.</span><span class="n">open</span><span class="p">()</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">toml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">data</span></div>
 
-    <span class="k">def</span> <span class="nf">_get_credentials</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">_get_credentials</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_toml</span><span class="p">()</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="p">(</span>
@@ -419,7 +418,7 @@
                         <span class="n">out</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;POETRY_HTTP_BASIC_</span><span class="si">{</span><span class="n">src_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
         <span class="k">return</span> <span class="n">out</span>
 
-<div class="viewcode-block" id="PoetryAnalyzer.direct_dependencies"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.direct_dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">direct_dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="PoetryAnalyzer.direct_dependencies"><a class="viewcode-back" href="../../aws_lambda_python_packager.html#aws_lambda_python_packager.poetry_analyzer.PoetryAnalyzer.direct_dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">direct_dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_toml</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;tool&quot;</span><span class="p">][</span><span class="s2">&quot;poetry&quot;</span><span class="p">][</span><span class="s2">&quot;dependencies&quot;</span><span class="p">]</span></div></div>
 </code></pre></div>
@@ -453,7 +452,7 @@
   
     Created using
     <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
-    6.1.3.
+    6.2.1.
      and
     <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
   
@@ -472,7 +471,7 @@
     <script id="__config" type="application/json">{"base": "../..", "features": [], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
       
-        <script src="../../_static/sphinx_immaterial_theme.cea6a0c1d5b0618cf.min.js"></script>
+        <script src="../../_static/sphinx_immaterial_theme.1b5b7a2d5891aec19.min.js"></script>
     
   </body>
 </html>

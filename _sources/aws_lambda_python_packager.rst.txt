@@ -12,10 +12,10 @@ Subpackages
 Submodules
 ----------
 
-aws\_lambda\_python\_packager.aws\_wrangler module
---------------------------------------------------
+aws\_lambda\_python\_packager.arrow\_fetcher module
+---------------------------------------------------
 
-.. automodule:: aws_lambda_python_packager.aws_wrangler
+.. automodule:: aws_lambda_python_packager.arrow_fetcher
    :members:
    :undoc-members:
    :show-inheritance:
