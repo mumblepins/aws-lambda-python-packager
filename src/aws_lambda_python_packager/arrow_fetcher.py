@@ -2,10 +2,9 @@ import logging
 import shutil
 import tarfile
 import tempfile
-from collections.abc import Generator
 from contextlib import contextmanager, suppress
 from pathlib import Path
-from typing import Optional, Union
+from typing import Generator, Optional, Union
 
 import fsspec
 import requests
